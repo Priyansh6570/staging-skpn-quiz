@@ -244,7 +244,7 @@ The competition's own landing page. Everything a candidate needs, before they si
 **Rules content, in the source order's own sections:**
 
 1. **Who can participate** — two categories; Class 9–12; college/university/polytechnic/ITI; MP resident; free entry.
-2. **What the form asks for** — name, email, mobile, address, district, gender, level of education, name of institution; the category selection; and a warning that false information will cancel the entry.
+2. **What the form asks for** — name, email, mobile, address, district, gender, Educational qualification, name of institution; the category selection; and a warning that false information will cancel the entry.
 3. **For divyang students** — a candidate participating on the basis of disability must produce a disability certificate if selected; failure to do so cancels the entry.
 4. **Competition format** — the seven points in §6.3 under Format, plus the syllabus statement.
 5. **Before you begin** — have a stable internet connection; do not refresh the page or use the back button once the quiz starts; **the timer will not be extended** for a lost connection or any other interruption.
@@ -283,7 +283,7 @@ Read-only. Everything the student submitted at registration, displayed clearly a
 - Personal: name, gender, date of birth (if collected), mobile, and email — with the email labelled as the sign-in address **and** the address results are sent to. Do not badge the mobile number as verified; it is not (§8).
 - How the account signs in: Google, or email code. If Google, show which Google account is linked.
 - Address: address line, city/village, district, state (Madhya Pradesh), PIN code.
-- Education: category (Vidyalaya / Mahavidyalaya), level of education, institution name.
+- Education: category (Vidyalaya / Mahavidyalaya), Educational qualification, institution name.
 - Divyang declaration: yes/no, with the standing reminder that a government disability certificate must be produced if selected.
 - **Participation summary — required by the client:**
   - Number of attempts taken (`x times / x बार`)
@@ -333,7 +333,7 @@ The Hindi wording matches the source rules exactly (*अध्ययनरत �
 | 9 | `state` | State | राज्य | fixed, disabled | — | Always "Madhya Pradesh / मध्यप्रदेश". Not a dropdown. |
 | 10 | `pincode` | PIN Code | पिन कोड | tel | Yes | 6 digits. Numeric keypad. |
 | 11 | `category` | Applying As | किस श्रेणी में आवेदन | radio (2 large cards) | Yes | **Vidyalaya Star / विद्यालय स्तर** (Class 9–12) or **Mahavidyalaya Star / महाविद्यालय स्तर** (college, university, polytechnic, ITI). Ask this **before** field 12 — it drives its options. Radio cards, not a dropdown; this is the single most consequential choice on the form. |
-| 12 | `educationLevel` | Level of Education | पढ़ाई का स्तर | select, dependent on #11 | Yes | Options in **Appendix B**. Must reset if `category` changes, with a visible notice. |
+| 12 | `educationLevel` | Educational qualification | शैक्षणिक योग्यता | select, dependent on #11 | Yes | Options in **Appendix B**. Must reset if `category` changes, with a visible notice. |
 | 13 | `institutionName` | Name of School / College Currently Enrolled In | वर्तमान अध्ययनरत विद्यालय / महाविद्यालय का नाम | text | Yes | 3–150 chars. Free text — do not attempt an institution autocomplete; there is no clean master list and a wrong-but-plausible suggestion is worse than free text. |
 | 14 | `isDivyang` | I am participating under the Divyang (disability) category | मैं दिव्यांग श्रेणी में भाग ले रहा/रही हूँ | checkbox | No | On tick, reveal a persistent, non-dismissible notice — see §7.2. |
 | 15 | `rulesAccepted` | *(declaration text)* | *(declaration text)* | checkbox | Yes | The verbatim Hindi declaration from §6.5. Gates the submit button. |

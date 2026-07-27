@@ -662,7 +662,7 @@ export const en = {
             "points": [
               "Your mobile number, which is your identity here.",
               "Name, email, date of birth, gender and address.",
-              "Category, level of education and name of institution.",
+              "Category, Educational qualification and name of institution.",
               "Your answers, score and time taken in the competition."
             ]
           },
@@ -883,7 +883,7 @@ export const en = {
         "state": "State",
         "pin": "PIN code",
         "category": "Category",
-        "level": "Level of education",
+        "level": "Educational qualification",
         "institution": "Institution",
         "exam": "Competitive exam",
         "divyang": "Divyang category"
@@ -1372,7 +1372,7 @@ export const en = {
       "districtPlaceholder": "Select a district",
       "districtModalTitle": "Select a district",
       "levelPlaceholder": "Select a level",
-      "levelModalTitle": "Select your level of education",
+      "levelModalTitle": "Select your Educational qualification",
       "examLabel": "Competitive exam, preparing or cleared",
       "examPlaceholder": "Select an exam",
       "examModalTitle": "Select a competitive exam",
@@ -1398,7 +1398,7 @@ export const en = {
           "who": "College, university, polytechnic or ITI"
         }
       ],
-      "levelLabel": "Level of education",
+      "levelLabel": "Educational qualification",
       "institutionLabel": "Name of school or college currently enrolled in",
       "divyangLabel": "Applying under the Divyang category",
       "divyangNotice": "If selected, a government-issued disability certificate must be produced.",
