@@ -32,8 +32,10 @@ const call = async (path, init = {}) => {
 // --- gating -------------------------------------------------------------------------------------
 let r = await call("/admin");
 check("/admin unauthenticated redirects", r.status === 307 || r.status === 302, `status ${r.status}`);
-r = await call("/api/admin/stats");
-check("stats API unauthenticated is 401", r.status === 401, `status ${r.status}`);
+for (const path of ["overview", "participants", "districts", "integrity", "operations", "traffic", "exports"]) {
+  r = await call(`/api/admin/${path}`);
+  check(`/api/admin/${path} unauthenticated is 401`, r.status === 401, `status ${r.status}`);
+}
 r = await call("/api/admin/export/full", { method: "POST" });
 check("full export unauthenticated is 401", r.status === 401, `status ${r.status}`);
 r = await call("/api/admin/export/counts", { method: "POST" });
@@ -55,15 +57,58 @@ const setCookieHeader = r.headers.getSetCookie?.().find((c) => c.startsWith("skp
 check("admin cookie is httpOnly + Secure + Lax", /HttpOnly/i.test(setCookieHeader) && /Secure/i.test(setCookieHeader) && /SameSite=Lax/i.test(setCookieHeader), setCookieHeader.split(";").slice(1).join(";").trim());
 check("admin cookie name is distinct from the student cookie", setCookieHeader.startsWith("skpn_admin=") && !setCookieHeader.startsWith("skpn_session="));
 
-// --- stats --------------------------------------------------------------------------------------
-r = await call("/api/admin/stats");
-check("stats returns for a signed-in admin", r.status === 200, `status ${r.status}`);
-const stats = r.body;
-check("all 55 districts are present", stats.districts?.length === 55, `${stats.districts?.length} districts`);
-check("districts are sorted ascending", stats.districts.every((d, i, a) => i === 0 || a[i - 1].count <= d.count));
-check("score histogram spans 0..30", stats.scores.histogram.length === 31);
-check("traffic covers 30 days", stats.traffic.length === 30);
-check("stats leaks no personal fields", !JSON.stringify(stats).match(/fullName|dateOfBirth|institutionName|passwordHash|pincode/), "no PII keys");
+// --- per-page endpoints -------------------------------------------------------------------------
+const overview = (await call("/api/admin/overview")).body;
+check("overview returns", !!overview.counters, JSON.stringify(overview).slice(0, 60));
+check("overview carries a score histogram of 0..30", overview.scores.histogram.length === 31);
+check("overview sparkline is 14 days", overview.sparkline.length === 14);
+check("overview does not carry the district table", !("districts" in overview) && Array.isArray(overview.zeroDistricts));
+check("overview leaks no personal fields", !JSON.stringify(overview).match(/fullName|dateOfBirth|institutionName|passwordHash|pincode|mobile/));
+
+const districts = (await call("/api/admin/districts")).body;
+check("districts returns all 55", districts.rows?.length === 55, `${districts.rows?.length}`);
+check("districts default to fewest first", districts.rows.every((d, i, a) => i === 0 || a[i - 1].registrations <= d.registrations));
+
+const integrity = (await call("/api/admin/integrity")).body;
+check("integrity returns both flag sets", Array.isArray(integrity.duplicateMobiles) && Array.isArray(integrity.nameInstitutionClusters));
+
+const ops = (await call("/api/admin/operations")).body;
+check("operations reports sweeper status", "sweeper" in ops && "lastRunAt" in ops.sweeper);
+check("operations reports stuck attempts", typeof ops.stuckInProgress === "number");
+
+const traffic = (await call("/api/admin/traffic?from=2026-07-01&to=2026-07-10")).body;
+check("traffic honours a date range", traffic.days?.length === 10, `${traffic.days?.length} days`);
+r = await call("/api/admin/traffic?from=not-a-date&to=2026-07-10");
+check("traffic rejects a malformed range", r.status === 400, `status ${r.status}`);
+
+// --- participants -------------------------------------------------------------------------------
+r = await call("/api/admin/participants");
+check("participants returns a page", r.status === 200 && Array.isArray(r.body.rows), `status ${r.status}`);
+check("page size is capped at 50", r.body.rows.length <= 50, `${r.body.rows.length} rows`);
+check("participants row is whitelisted", r.body.rows.length === 0 || Object.keys(r.body.rows[0]).sort().join(",") === "attemptAt,category,district,id,name,score,status", Object.keys(r.body.rows[0] ?? {}).join(","));
+check("participants never returns mobile or date of birth", !JSON.stringify(r.body).match(/mobile|dateOfBirth|pincode|email/));
+
+const firstPage = r.body;
+r = await call("/api/admin/participants?page=2");
+check("pagination returns a different slice", firstPage.total <= 50 || r.body.rows[0]?.id !== firstPage.rows[0]?.id);
+
+r = await call("/api/admin/participants?district=Sehore");
+check("district filter is applied server-side", r.body.rows.every((x) => x.district === "Sehore"), `${r.body.rows.length} rows`);
+
+r = await call("/api/admin/participants?category=vidyalaya");
+check("category filter is applied server-side", r.body.rows.every((x) => x.category === "vidyalaya"));
+
+const asc = (await call("/api/admin/participants?sort=name&direction=asc")).body;
+const desc = (await call("/api/admin/participants?sort=name&direction=desc")).body;
+check("sort direction is applied server-side", asc.total <= 1 || asc.rows[0]?.id !== desc.rows[0]?.id, `${asc.rows[0]?.name} vs ${desc.rows[0]?.name}`);
+const scored = (await call("/api/admin/participants?sort=score&direction=desc")).body.rows.map((x) => x.score).filter((v) => v !== null);
+check("sorting by score orders across the join", scored.every((v, i, a) => i === 0 || a[i - 1] >= v), scored.slice(0, 6).join(","));
+
+r = await call("/api/admin/participants?search=" + encodeURIComponent("Probe"));
+check("search is applied server-side", r.body.rows.every((x) => /probe/i.test(x.name)), `${r.body.rows.length} rows`);
+
+r = await call("/api/admin/participants?search=" + encodeURIComponent("a[b"));
+check("a regex metacharacter in search is escaped, not executed", r.status === 200, `status ${r.status}`);
 
 // --- exports ------------------------------------------------------------------------------------
 r = await call("/api/admin/export/counts", { method: "POST" });
@@ -95,7 +140,7 @@ check("password is argon2id, not plaintext", (adminRow?.passwordHash ?? "").star
 const stolen = cookie;
 await call("/api/admin/logout", { method: "POST" });
 cookie = stolen;
-r = await call("/api/admin/stats");
+r = await call("/api/admin/overview");
 check("sign-out revokes an already-issued admin cookie", r.status === 401, `status ${r.status}`);
 
 // --- traffic ------------------------------------------------------------------------------------

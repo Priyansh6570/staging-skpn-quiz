@@ -1,9 +1,9 @@
 import "./admin.css";
 
-export const metadata = { title: "SKPN Admin" };
+export const metadata = { title: "SKPN Administration" };
 
-// The public site's providers wrap this too, but nothing here consumes them: the dashboard has
-// its own session, its own CSS scope and no dependency on the student-facing components.
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+// Styling only. The session gate lives in (authed)/layout.tsx so the login screen, which is also
+// under /admin, is not redirected to itself.
+export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

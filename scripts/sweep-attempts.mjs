@@ -68,5 +68,16 @@ for (const attempt of stale) {
   swept++;
 }
 
+// Heartbeat: without a row here the operations panel cannot tell "nothing to sweep" from
+// "nobody has run the sweeper since launch".
+await db.collection("adminAuditLog").insertOne({
+  adminId: null,
+  username: "system",
+  action: "system.sweep",
+  target: `${stale.length} found, ${swept} scored`,
+  ip: "-",
+  at: new Date(),
+});
+
 console.log(`${stale.length} expired attempt(s) found, ${swept} scored`);
 await client.close();

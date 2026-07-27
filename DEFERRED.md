@@ -48,3 +48,17 @@ against relying on shared modules or globals, so on a deployment where the proxy
 context it will open its own connection pool. On a single Hostinger VPS that is one extra pool. On a
 platform that runs the proxy at the edge it would not work at all and the counting would have to move
 behind an internal route handler.
+
+---
+
+## Sorting participants by score or attempt date cannot use an index
+
+`/admin/participants` pages before the `$lookup` when the sort key lives on the user document
+(name, district, category, registration date), which keeps the slice indexed and cheap. Sorting by
+**score** or **attempt date** cannot: the value is in `attempts`, so the pipeline joins every
+matching user before it can sort, with `allowDiskUse` on to survive it.
+
+At 5 lakh registrations an unfiltered sort by score is a full join. It is usable today and it will
+not be at scale. The fix is to denormalise the latest attempt's score and submission date onto the
+user document at submit time — the write path already touches that document to set `bestScore` — and
+then index it.
