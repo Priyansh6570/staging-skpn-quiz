@@ -11,15 +11,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="hi">
-      <head>
+      <body>
+        {/* React hoists these into <head>. A manual <head> element in the root layout stops the
+            tree hydrating altogether, which silently makes every page on the site inert. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link
           href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
-      </head>
-      <body>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

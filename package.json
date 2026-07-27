@@ -14,7 +14,9 @@
     "import-questions": "node scripts/import-questions.mjs",
     "css": "node scripts/build-css.mjs",
     "smoke": "node tests/smoke.mjs",
-    "sweep": "node scripts/sweep-attempts.mjs"
+    "sweep": "node scripts/sweep-attempts.mjs",
+    "journey": "node tests/journey.mjs",
+    "shell": "node tests/shell.mjs"
   },
   "dependencies": {
     "mongodb": "^7.5.0",

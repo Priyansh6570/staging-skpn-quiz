@@ -1584,5 +1584,10 @@ export const en = {
       "text3": "→",
       "text4": "shrikrishnapatheynyas@gmail.com"
     }
+  },
+  "Shell": {
+    "inline": [
+      "लोड हो रहा है"
+    ]
   }
 };

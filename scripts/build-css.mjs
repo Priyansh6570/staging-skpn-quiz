@@ -171,6 +171,18 @@ ${pages.map((p) => `     ${p}`).join("\n")}
 `;
 out += `${renderGroup(sharedOnce, null)}\n`;
 
+// The boot loader's keyframes are design CSS too — they just live in assets/site.js, which the
+// export injects at parse time rather than declaring in a <helmet>.
+const shellJs = readFileSync(join(DESIGN, "assets", "site.js"), "utf8");
+const shellCss = [...shellJs.matchAll(/"((?:[^"\\]|\\.)*)"/g)]
+  .map((m) => m[1])
+  .filter((s) => /^(@keyframes|#skpn-loader|@media)/.test(s.trim()))
+  .join("");
+if (shellCss) {
+  out += `\n/* ---------- shell (assets/site.js) ---------- */\n`;
+  out += `${renderGroup(parseRules(shellCss, "site.js"), null)}\n`;
+}
+
 for (const page of pages) {
   const rules = all.filter((r) => slug(r.file) === page && !isReducedMotion(r) && !isShared(r));
   if (!rules.length) continue;

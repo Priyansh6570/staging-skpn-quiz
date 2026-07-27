@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { useLang, useSession } from "@/components/AppProviders";
+import { useLang, useSession, useShell } from "@/components/AppProviders";
 import { strings } from "@/lib/i18n";
+import { codeFromResponse } from "@/lib/errors";
 
 const MOBILE_RE = /^[6-9]\d{9}$/;
 
@@ -22,12 +23,13 @@ export default function LoginPage() {
   const router = useRouter();
   const { lang, toggle: toggleLang } = useLang();
   const { session, refresh } = useSession();
+  const { busy, showError } = useShell();
   const t = strings(lang).Login.S;
 
   const [mobile, setMobile] = useState("");
   const [touched, setTouched] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
-  const [busy, setBusy] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [notRegistered, setNotRegistered] = useState(false);
 
   useEffect(() => {
@@ -42,16 +44,26 @@ export default function LoginPage() {
 
   const signIn = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!ok || busy) return;
-    setBusy(true);
+    if (!ok || submitting) return;
+    setSubmitting(true);
     setNotRegistered(false);
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ mobile }),
-    });
-    const body = res.ok ? await res.json() : { registered: false };
-    setBusy(false);
+    const res = await busy(
+      fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ mobile }),
+      }).catch(() => null),
+    );
+    setSubmitting(false);
+    if (!res) {
+      showError("network");
+      return;
+    }
+    if (!res.ok) {
+      showError(codeFromResponse(res.status, await res.json().catch(() => null)));
+      return;
+    }
+    const body = await res.json();
     if (!body.registered) {
       setNotRegistered(true);
       return;

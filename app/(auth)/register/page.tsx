@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { useLang, useSession } from "@/components/AppProviders";
+import { useLang, useSession, useShell } from "@/components/AppProviders";
 import { strings, en } from "@/lib/i18n";
 import { CATEGORY_KEYS, GENDER_KEYS } from "@/lib/registration";
+import { codeFromResponse } from "@/lib/errors";
 
 const ITEM = 44;
 const YEARS = Array.from({ length: 2013 - 1900 + 1 }, (_, i) => 1900 + i);
@@ -42,6 +43,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { lang, toggle: toggleLang } = useLang();
   const { session, refresh } = useSession();
+  const { showError } = useShell();
   const t = strings(lang).Register.S;
   const DISTRICTS = strings(lang).Register.DISTRICTS;
   const LEVELS = strings(lang).Register.LEVELS;
@@ -118,9 +120,10 @@ export default function RegisterPage() {
   };
 
   const canAdvance = () => {
-    if (step === 0) return !mobileProblem() && form.mobile.length === 10 && dob.y > 0;
+    if (step === 0) return !mobileProblem() && form.mobile.length === 10;
     if (step === 1) {
-      return form.name.trim().length >= 3 && !emailProblem() && !!form.gender
+      // Date of birth is required, and its control lives on this step, not the previous one.
+      return form.name.trim().length >= 3 && !emailProblem() && !!form.gender && dob.y > 0
         && form.address.trim().length >= 5 && form.city.trim().length >= 2
         && /^\d{6}$/.test(form.pin) && !!form.district;
     }
@@ -203,8 +206,13 @@ export default function RegisterPage() {
         rulesAccepted: true,
         privacyAccepted: true,
       }),
-    });
-    if (!res.ok) { setSubmitting(false); return; }
+    }).catch(() => null);
+
+    if (!res || !res.ok) {
+      setSubmitting(false);
+      showError(res ? codeFromResponse(res.status, await res.json().catch(() => null)) : "network");
+      return;
+    }
     setSubmitted(true);
     await refresh();
     router.push("/quiz/rules");

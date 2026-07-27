@@ -4,10 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { useLang, useSession } from "@/components/AppProviders";
+import { useLang, useSession, useShell } from "@/components/AppProviders";
 import { strings } from "@/lib/i18n";
+import { codeFromResponse } from "@/lib/errors";
 
 const TOTAL = 30;
+// Display-only: the submit request is already in flight while these run.
+const MIN_SUBMIT_MS = 3000;
+const SUCCESS_HOLD_MS = 900;
 
 interface ServedQuestion {
   id: string;
@@ -32,6 +36,7 @@ export default function QuizScreen({ phase, attemptId }: Props) {
   const router = useRouter();
   const { lang, toggle: toggleLang } = useLang();
   const { session, refresh } = useSession();
+  const { busy, setBusy, showError } = useShell();
   const t = strings(lang).Quiz.T;
   const letters = strings(lang).Quiz.inline.slice(0, 4);
 
@@ -47,6 +52,7 @@ export default function QuizScreen({ phase, attemptId }: Props) {
   const [auto, setAuto] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const [stamp, setStamp] = useState("");
+  const [succeeded, setSucceeded] = useState(false);
   const [result, setResult] = useState<{ score: number; answered: number; timeTakenSeconds: number; expired: boolean } | null>(null);
 
   const expiresAtRef = useRef<number>(0);
@@ -101,15 +107,18 @@ export default function QuizScreen({ phase, attemptId }: Props) {
     if (!attemptId || pendingRef.current.size === 0) return;
     const changes = [...pendingRef.current.entries()].map(([questionId, v]) => ({ questionId, ...v }));
     pendingRef.current.clear();
-    await fetch(`/api/quiz/attempts/${attemptId}/answers`, {
+    const res = await fetch(`/api/quiz/attempts/${attemptId}/answers`, {
       method: "PATCH",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ changes }),
       keepalive: true,
-    }).catch(() => {
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      // Put the diff back so the next flush retries it, and say so rather than failing silently.
       for (const c of changes) if (!pendingRef.current.has(c.questionId)) pendingRef.current.set(c.questionId, c);
-    });
-  }, [attemptId]);
+      showError(res ? codeFromResponse(res.status, null) : "save_failed");
+    }
+  }, [attemptId, showError]);
 
   // A compact diff every 12s and on unload, not one request per tap: 30 questions times 5 lakh
   // students is the highest write volume in the product.
@@ -131,22 +140,35 @@ export default function QuizScreen({ phase, attemptId }: Props) {
     async (reason: "manual" | "auto") => {
       if (!attemptId || submittingRef.current) return;
       submittingRef.current = true;
-      await flush();
-      const res = await fetch(`/api/quiz/attempts/${attemptId}/submit`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ reason }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setResult(data);
-        setStamp(new Date(data.submittedAt).toLocaleString());
-        await refresh();
-        router.push(`/quiz/submitted/${attemptId}`);
+      setBusy(true);
+
+      // The request goes out now; the three seconds run alongside it, never after it. A slow
+      // network adds its own latency and nothing on top.
+      const request = (async () => {
+        await flush();
+        return fetch(`/api/quiz/attempts/${attemptId}/submit`, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ reason }),
+        }).catch(() => null);
+      })();
+      const [res] = await Promise.all([request, new Promise((r) => setTimeout(r, MIN_SUBMIT_MS))]);
+
+      setBusy(false);
+      if (!res || !res.ok) {
+        submittingRef.current = false;
+        showError(res ? codeFromResponse(res.status, await res.json().catch(() => null)) : "network");
+        return;
       }
-      submittingRef.current = false;
+
+      const data = await res.json();
+      setResult(data);
+      setStamp(new Date(data.submittedAt).toLocaleString());
+      setSucceeded(true);
+      await refresh();
+      setTimeout(() => router.push(`/quiz/submitted/${attemptId}`), SUCCESS_HOLD_MS);
     },
-    [attemptId, flush, refresh, router],
+    [attemptId, flush, refresh, router, setBusy, showError],
   );
 
   // --- timer -----------------------------------------------------------------------------------
@@ -206,17 +228,30 @@ export default function QuizScreen({ phase, attemptId }: Props) {
 
   const isDone = phase === "done";
   const isInstructions = phase === "instructions";
-  const isAttempt = phase === "attempt";
-  const isSubmitted = phase === "submitted";
+  const isAttempt = phase === "attempt" && !succeeded;
+  const isSubmitted = phase === "submitted" || succeeded;
 
   const begin = async () => {
-    const res = await fetch("/api/quiz/attempts", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ rulesAccepted: true }),
-    });
-    if (res.status === 409) { router.push("/quiz"); return; }
-    if (!res.ok) return;
+    const res = await busy(
+      fetch("/api/quiz/attempts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ rulesAccepted: true }),
+      }).catch(() => null),
+    );
+    if (!res) {
+      showError("network");
+      return;
+    }
+    if (res.status === 409) {
+      showError("already_attempted");
+      router.push("/quiz");
+      return;
+    }
+    if (!res.ok) {
+      showError(codeFromResponse(res.status, await res.json().catch(() => null)));
+      return;
+    }
     const data = await res.json();
     await refresh();
     router.push(`/quiz/attempt/${data.attemptId}`);
