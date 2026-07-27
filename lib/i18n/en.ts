@@ -629,7 +629,7 @@ export const en = {
       ],
       [
         "Trustee Secretary",
-        "Shri Shiv Shekhar Shukla",
+        "Shri Sheo Shekhar Shukla",
         "Additional Chief Secretary, Culture"
       ],
       [
