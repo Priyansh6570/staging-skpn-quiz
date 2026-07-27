@@ -62,7 +62,7 @@ export default function AboutPage() {
           <p style={{ margin: "0", fontSize: "17.5px", lineHeight: "1.9", color: "#161C2E" }}>{t.sandipaniP2}</p>
         </div>
         <div style={{ position: "relative", overflow: "hidden", borderRadius: "24px", boxShadow: "0 18px 44px rgba(20,32,62,.18)" }}>
-          <img src="assets/cosmic-spiral.png" alt={t.illoAlt} width="924" height="540" loading="lazy" decoding="async" style={{ display: "block", width: "100%", height: "auto", aspectRatio: "16/10", objectFit: "cover" }} />
+          <img src="/assets/cosmic-spiral.png" alt={t.illoAlt} width="924" height="540" loading="lazy" decoding="async" style={{ display: "block", width: "100%", height: "auto", aspectRatio: "16/10", objectFit: "cover" }} />
         </div>
       </section>
 

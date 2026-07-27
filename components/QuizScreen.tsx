@@ -408,7 +408,7 @@ export default function QuizScreen({ phase, attemptId }: Props) {
         <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#FBF7F0" }}>
           <header style={{ position: "sticky", top: "0", zIndex: "40", background: "#FFFFFF", borderBottom: "1px solid #E8DFCE" }}>
             <div data-e="pad" style={{ maxWidth: "1220px", margin: "0 auto", padding: "10px 24px", display: "flex", alignItems: "center", gap: "16px" }}>
-              <img src="uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" width="38" height="38" style={{ display: "block", width: "38px", height: "38px", flex: "0 0 auto" }} />
+              <img src="/uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" width="38" height="38" style={{ display: "block", width: "38px", height: "38px", flex: "0 0 auto" }} />
               <span style={{ fontSize: "15.5px", lineHeight: "1.6", color: "#161C2E", whiteSpace: "nowrap" }}>{progressLine}</span>
               <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
                 <button type="button" onClick={toggleLang} aria-label="Switch language" style={{ display: "flex", alignItems: "center", border: "1px solid #DCD1BC", background: "#FCFAF4", borderRadius: "999px", padding: "3px", cursor: "pointer" }}>

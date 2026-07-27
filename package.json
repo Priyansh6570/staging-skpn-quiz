@@ -20,7 +20,8 @@
     "certificate": "node tests/certificate.mjs",
     "quizentry": "node tests/quizentry.mjs",
     "seed-admin": "node scripts/seed-admin.mjs",
-    "admin": "node tests/admin.mjs"
+    "admin": "node tests/admin.mjs",
+    "protection": "node tests/protection.mjs"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",

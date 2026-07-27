@@ -46,7 +46,7 @@ export default function PratiyogitaPage() {
       <SiteHeader lang={lang} active="pratiyogita" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
 
       <section style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
-        <img src="assets/cosmic-spiral.png" alt="" width="924" height="540" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 40%", opacity: ".55" }} />
+        <img src="/assets/cosmic-spiral.png" alt="" width="924" height="540" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 40%", opacity: ".55" }} />
         <div style={{ position: "absolute", inset: "0", background: "linear-gradient(180deg, rgba(7,11,30,.62) 0%, rgba(7,11,30,.93) 100%)" }}></div>
         <div data-e="pad hero" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "76px 30px 62px" }}>
           <p style={{ margin: "0 0 14px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "17px", letterSpacing: ".01em", color: "#E8C173", lineHeight: "1.9" }}>{t.kicker}</p>

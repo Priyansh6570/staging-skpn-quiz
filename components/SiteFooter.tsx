@@ -41,16 +41,16 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
     <div>
       <p style={{ margin: "0 0 15px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "15.5px", letterSpacing: ".01em", color: "rgba(232,193,115,.72)", lineHeight: "1.8" }}>{t.followTitle}</p>
       <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-        <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label={m.ariaLabel0} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+        <a href="https://instagram.com/shrikrishnapatheynyas/" target="_blank" rel="noopener" aria-label={m.ariaLabel0} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F1DFB6" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true" style={{ display: "block" }}><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.1" cy="6.9" r="1.1" fill="#F1DFB6" stroke="none"></circle></svg>
         </a>
         <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label={m.ariaLabel1} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style={{ display: "block" }}><path d="M13.6 21v-7.7h2.7l.4-3.1h-3.1V8.2c0-.9.3-1.5 1.6-1.5h1.6V3.9c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1v2.3H7.6v3.1h2.8V21z" fill="#F1DFB6"></path></svg>
         </a>
-        <a href="https://twitter.com/" target="_blank" rel="noopener" aria-label={m.ariaLabel2} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+        <a href="https://x.com/KrishnaPathey" target="_blank" rel="noopener" aria-label={m.ariaLabel2} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style={{ display: "block" }}><path d="M3.3 3h4.4l4 5.6L16.6 3H21l-6.2 7.4L21.4 21h-4.4l-4.3-6-4.9 6H3.4l6.6-7.9z" fill="#F1DFB6"></path></svg>
         </a>
-        <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label={m.ariaLabel3} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+        <a href="https://www.youtube.com/@shrikrishnapatheynyas" target="_blank" rel="noopener" aria-label={m.ariaLabel3} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style={{ display: "block" }}><path d="M21.3 8.2a2.6 2.6 0 00-1.8-1.8C17.8 6 12 6 12 6s-5.8 0-7.5.4A2.6 2.6 0 002.7 8.2C2.3 9.9 2.3 12 2.3 12s0 2.1.4 3.8a2.6 2.6 0 001.8 1.8C6.2 18 12 18 12 18s5.8 0 7.5-.4a2.6 2.6 0 001.8-1.8c.4-1.7.4-3.8.4-3.8s0-2.1-.4-3.8zM10.2 15V9l5.2 3z" fill="#F1DFB6"></path></svg>
         </a>
       </div>

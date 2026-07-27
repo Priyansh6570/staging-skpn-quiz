@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import ContentProtection from "@/components/ContentProtection";
 import Loader from "@/components/Loader";
 import MotionShell from "@/components/MotionShell";
 import OfflineBanner from "@/components/OfflineBanner";
@@ -134,6 +135,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
       <SessionContext.Provider value={{ session, loaded, refresh: async () => void (await refresh()) }}>
         <ShellContext.Provider value={{ busy, setBusy, showError, showMessage }}>
           {children}
+          <ContentProtection />
           <MotionShell />
           <OfflineBanner lang={lang} />
           <Loader lang={lang} visible={pending > 0} />

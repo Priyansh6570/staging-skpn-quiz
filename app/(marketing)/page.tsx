@@ -149,7 +149,7 @@ export default function HomePage() {
               <circle r="94" fill="none" stroke="rgba(232,193,115,.55)" strokeWidth="1.4" strokeDasharray="1.5 7.3" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "v5-spin 240s linear infinite" }}></circle>
               <circle r="76" fill="none" stroke="rgba(232,193,115,.35)" strokeWidth="3.2" strokeDasharray="5 29.1" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "v5-spin-rev 300s linear infinite" }}></circle>
             </svg>
-            <img src="uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" style={{ position: "relative", width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 14px 40px rgba(0,0,0,.6))" }} />
+            <img src="/uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" style={{ position: "relative", width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 14px 40px rgba(0,0,0,.6))" }} />
           </div>
 
           <p data-reveal style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "clamp(16px,1.9vw,19px)", lineHeight: "1.6", color: "#E8C173", letterSpacing: ".02em" }}>{t.org}</p>
@@ -185,7 +185,7 @@ export default function HomePage() {
       </section>
 
       <section style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
-        <img src="assets/cosmic-spiral.png" alt="" width="924" height="540" loading="lazy" decoding="async" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 38%", opacity: ".5" }} />
+        <img src="/assets/cosmic-spiral.png" alt="" width="924" height="540" loading="lazy" decoding="async" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 38%", opacity: ".5" }} />
         <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "radial-gradient(80% 60% at 50% 22%, rgba(7,11,30,.62) 0%, rgba(7,11,30,.9) 58%, rgba(4,7,18,.98) 100%)" }}></div>
         <div aria-hidden="true" style={{ position: "absolute", left: "50%", top: "-18%", width: "720px", height: "720px", transform: "translateX(-50%)", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.16) 0%,rgba(232,193,115,0) 66%)", animation: "v5-glow 11s ease-in-out infinite" }}></div>
 
