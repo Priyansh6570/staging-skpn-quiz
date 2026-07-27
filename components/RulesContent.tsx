@@ -48,7 +48,7 @@ export default function RulesContent({ gated = false }: { gated?: boolean }) {
   }, []);
 
   // Anchor slugs are structure, not copy, so they stay out of i18n; order matches t.sections.
-  const SECTION_IDS = ["eligibility", "application", "divyang", "format", "selection", "other"];
+  const SECTION_IDS = ["eligibility", "application", "format", "selection", "other"];
 
   const ok = accepted;
   const chips = t.chips;

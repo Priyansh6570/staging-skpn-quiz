@@ -536,7 +536,7 @@ export const en = {
     ],
     "S": {
       "org": "Shri Krishna Pathey Nyas, Bhopal",
-      "heroTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita",
+      "heroTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Yojana",
       "heroDate": "Opens on Guru Purnima, 29 July 2026",
       "heroLede": "A free competition on the 14 Vidyas, the 64 Kalas and the Indian knowledge tradition.",
       "ctaPrimaryOut": "Register now",
@@ -1246,7 +1246,8 @@ export const en = {
         "Class 9",
         "Class 10",
         "Class 11",
-        "Class 12"
+        "Class 12",
+        "Polytechnic or ITI"
       ],
       "mahavidyalaya": [
         "Undergraduate, 1st year",
@@ -1255,8 +1256,6 @@ export const en = {
         "Undergraduate, 4th year",
         "Postgraduate, 1st year",
         "Postgraduate, 2nd year",
-        "Diploma or Polytechnic",
-        "ITI",
         "Research or PhD"
       ]
     },
@@ -1313,8 +1312,8 @@ export const en = {
     "S": {
       "title": "Register for the competition",
       "asideOrg": "Shri Krishna Pathey Nyas, Bhopal",
-      "asideKicker": "Guru Purnima, 29 July 2026",
-      "asideTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita",
+      "asideKicker": "Opens on Guru Purnima, 29 July to Shri Krishna Janmashtami, 4 September",
+      "asideTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Yojana",
       "slides": [
         {
           "value": "₹1,00,000",
@@ -1470,13 +1469,6 @@ export const en = {
         },
         {
           "n": "3",
-          "title": "For divyang students",
-          "points": [
-            "A participant taking part on the basis of disability must produce a disability certificate if selected. Otherwise the entry will be treated as cancelled."
-          ]
-        },
-        {
-          "n": "4",
           "title": "Format of the competition",
           "points": [
             "The competition will be based on the philosophy of Maharishi Sandipani, the 14 Vidyas and 64 Kalas of Bhagwan Shri Krishna, his path of public welfare, and the Indian knowledge tradition.",
@@ -1487,7 +1479,7 @@ export const en = {
           ]
         },
         {
-          "n": "5",
+          "n": "4",
           "title": "Selection process",
           "points": [
             "In both the school and college/university categories, separate district-wise lists will first be prepared for the male, female and divyang classes. A combined list of all three will then be prepared, and 50 best students from each of the two categories, that is 100 students in all, will be selected from every district.",
@@ -1497,7 +1489,7 @@ export const en = {
           ]
         },
         {
-          "n": "6",
+          "n": "5",
           "title": "Other necessary conditions",
           "points": [
             "After selection, the necessary certificates, marksheet, institutional identity card, proof of residence, Aadhaar and bank account details must be provided.",

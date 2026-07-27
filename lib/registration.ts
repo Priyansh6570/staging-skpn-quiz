@@ -27,7 +27,9 @@ export const RegistrationInput = z
     educationLevel: z.string().min(1).max(80),
     institutionName: z.string().trim().min(3).max(150),
     competitiveExam: z.enum(EXAM_KEYS as [string, ...string[]]).nullable(),
-    isDivyang: z.boolean(),
+    // The form no longer asks. Kept on the document so the flag rows registered before the change
+    // carry still means what it meant, and so a client that still sends it is not rejected.
+    isDivyang: z.boolean().default(false),
     guardianName: z.string().trim().max(100).optional().or(z.literal("")),
     rulesAccepted: z.literal(true),
     privacyAccepted: z.literal(true),

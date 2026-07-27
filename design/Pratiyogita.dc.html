@@ -22,6 +22,7 @@
   @keyframes pr-marq-rev { from { transform: translate3d(-50%,0,0); } to { transform: translate3d(0,0,0); } }
   [data-e~="marqwrap"] { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); }
   [data-e~="marqwrap"]:hover [data-e~="marqrow"] { animation-play-state: paused; }
+  [data-e~="prizebreak"] { display: none; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
   @media (max-width: 980px) {
     [data-g="two"] { grid-template-columns: minmax(0,1fr) !important; }
@@ -29,6 +30,7 @@
     [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
     [data-e~="menu-btn"] { display: inline-flex !important; }
     [data-e~="prizerow"] { grid-template-columns: minmax(0,1fr) !important; }
+    [data-e~="prizebreak"] { display: inline !important; }
   }
   @media (max-width: 640px) {
     [data-e~="pad"] { padding-left: 18px !important; padding-right: 18px !important; }

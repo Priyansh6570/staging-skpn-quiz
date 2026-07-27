@@ -9,12 +9,12 @@ import SiteFooter from "@/components/SiteFooter";
 import CtaBox from "@/components/CtaBox";
 import Leadership from "@/components/Leadership";
 import { useLang, useSession } from "@/components/AppProviders";
-import { strings } from "@/lib/i18n";
+import { custom, strings } from "@/lib/i18n";
 
 const DATE_STYLE = [
-  { bg: "linear-gradient(150deg,#FFFFFF 0%,#FDF4E2 100%)", border: "#EFDFBE", blob: "radial-gradient(circle,rgba(232,193,115,.3) 0%,rgba(232,193,115,0) 70%)", dotBg: "#E8C173", dotHalo: "rgba(232,193,115,.28)", rule: "rgba(138,96,21,.45)", stepFg: "#8A6015", pillBg: "#F7EEDA", pillBorder: "#E7D6B2", pillFg: "#6B4A10" },
-  { bg: "linear-gradient(150deg,#FFFFFF 0%,#F1F4FC 100%)", border: "#DDE3F2", blob: "radial-gradient(circle,rgba(39,64,139,.16) 0%,rgba(39,64,139,0) 70%)", dotBg: "#27408B", dotHalo: "rgba(39,64,139,.18)", rule: "rgba(39,64,139,.4)", stepFg: "#27408B", pillBg: "#E9EEF9", pillBorder: "#D6DEF2", pillFg: "#22366F" },
-  { bg: "linear-gradient(150deg,#FFFFFF 0%,#EDF4F0 100%)", border: "#D9E7DF", blob: "radial-gradient(circle,rgba(63,107,88,.16) 0%,rgba(63,107,88,0) 70%)", dotBg: "#3F6B58", dotHalo: "rgba(63,107,88,.18)", rule: "rgba(63,107,88,.4)", stepFg: "#2E5142", pillBg: "#E7F1EC", pillBorder: "#D3E4DA", pillFg: "#2E5142" },
+  { bg: "linear-gradient(150deg,#FFFFFF 0%,#FDF4E2 100%)", border: "#EFDFBE", blob: "radial-gradient(circle,rgba(232,193,115,.3) 0%,rgba(232,193,115,0) 70%)", dotBg: "#E8C173", dotHalo: "rgba(232,193,115,.28)", rule: "rgba(138,96,21,.45)", stepFg: "#8A6015" },
+  { bg: "linear-gradient(150deg,#FFFFFF 0%,#F1F4FC 100%)", border: "#DDE3F2", blob: "radial-gradient(circle,rgba(39,64,139,.16) 0%,rgba(39,64,139,0) 70%)", dotBg: "#27408B", dotHalo: "rgba(39,64,139,.18)", rule: "rgba(39,64,139,.4)", stepFg: "#27408B" },
+  { bg: "linear-gradient(150deg,#FFFFFF 0%,#EDF4F0 100%)", border: "#D9E7DF", blob: "radial-gradient(circle,rgba(63,107,88,.16) 0%,rgba(63,107,88,0) 70%)", dotBg: "#3F6B58", dotHalo: "rgba(63,107,88,.18)", rule: "rgba(63,107,88,.4)", stepFg: "#2E5142" },
 ];
 
 // s.steps carries only copy; the icon each step draws is structure and keeps the export's order.
@@ -24,6 +24,7 @@ export default function HomePage() {
   const { lang, toggle: toggleLang } = useLang();
   const { session } = useSession();
   const s = strings(lang).Home_v5.S;
+  const c = custom(lang);
   const inline = strings(lang).Home_v5.inline;
   const VIDYAS = strings(lang).Home_v5.VIDYAS;
   const KALAS = strings(lang).Home_v5.KALAS;
@@ -95,7 +96,19 @@ export default function HomePage() {
     (isVidyas ? inline[0] : inline[1]) + String(i + 1).padStart(2, "0");
 
   const t = { ...s, ctaPrimary: signedIn ? (attempts > 0 ? s.ctaCert : s.ctaTake) : s.ctaPrimaryOut };
-  const facts = s.facts;
+
+  // heroDateRange is one string, and narrow screens have to break it before the second occasion.
+  // That occasion is the only point inside it that also exists as a string of its own, so the cut
+  // is found rather than spelled out — in either language. The head keeps its trailing space: the
+  // <br> is display:none above 640px, and without the space the two halves would run together.
+  const dateCut = t.heroDateRange.indexOf(s.dates[1].what);
+  const heroDateHead = t.heroDateRange.slice(0, dateCut);
+  const heroDateTail = t.heroDateRange.slice(dateCut);
+
+  const facts = s.facts.map((f, i) =>
+    i === 0 ? { ...f, label: c.home.perStudent }
+      : i === 3 ? { value: t.factTimeValue, label: t.factTimeLabel }
+        : f);
   const steps = s.steps.map((step, i) => ({
     title: step.title,
     n: String(i + 1).padStart(2, "0"),
@@ -158,7 +171,7 @@ export default function HomePage() {
 
           <div data-reveal style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap", justifyContent: "center" }}>
             <span style={{ width: "38px", height: "1px", background: "rgba(232,193,115,.7)" }}></span>
-            <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "clamp(16px,2vw,20px)", lineHeight: "1.6", color: "#F5E5C2" }}>{t.heroDate}</span>
+            <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "clamp(16px,2vw,20px)", lineHeight: "1.6", color: "#F5E5C2" }}>{heroDateHead}<br data-e="datebreak" />{heroDateTail}</span>
             <span style={{ width: "38px", height: "1px", background: "rgba(232,193,115,.7)" }}></span>
           </div>
 
@@ -273,7 +286,6 @@ export default function HomePage() {
       </section>
 
       <section data-e="pad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "88px 30px" }}>
-        <h2 data-reveal style={{ margin: "0 0 34px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(26px,3.4vw,36px)", lineHeight: "1.35", color: "#14203E" }}>{t.datesTitle}</h2>
         <ol data-e="datesgrid" style={{ margin: "0", padding: "0", listStyle: "none", display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: "20px" }}>
           {dates.map((d, dIndex) => (
             <li key={dIndex} data-reveal style={{ position: "relative", overflow: "hidden", padding: "30px 30px 32px", borderRadius: "24px", background: `${d.bg}`, border: `1px solid ${d.border}`, boxShadow: "0 2px 4px rgba(20,32,62,.04),0 16px 38px rgba(20,32,62,.07)", display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -283,9 +295,10 @@ export default function HomePage() {
                 <span aria-hidden="true" style={{ flex: "1 1 auto", height: "1px", background: `linear-gradient(90deg, ${d.rule} 0%, rgba(138,96,21,0) 100%)` }}></span>
                 <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "20px", fontWeight: "600", letterSpacing: ".02em", fontVariantNumeric: "tabular-nums", color: `${d.stepFg}` }}>{d.step}</span>
               </span>
+              {/* The section heading is gone, so each card's own heading is the top level here. */}
+              <h2 style={{ position: "relative", margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "20px", lineHeight: "1.5", color: `${d.stepFg}` }}>{d.note}</h2>
               <span style={{ position: "relative", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(25px,3vw,32px)", lineHeight: "1.24", color: "#14203E", fontVariantNumeric: "tabular-nums", textWrap: "balance" }}>{d.when}</span>
               <span style={{ position: "relative", fontSize: "18px", lineHeight: "1.6", color: "#161C2E" }}>{d.what}</span>
-              <span style={{ position: "relative", marginTop: "2px", alignSelf: "flex-start", padding: "8px 16px", borderRadius: "999px", background: `${d.pillBg}`, border: `1px solid ${d.pillBorder}`, fontSize: "15px", lineHeight: "1.7", color: `${d.pillFg}` }}>{d.note}</span>
             </li>
           ))}
         </ol>

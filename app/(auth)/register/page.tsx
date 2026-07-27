@@ -60,7 +60,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({
     email: "", name: "", mobile: "", gender: "", address: "", city: "", pin: "",
     district: "", category: "" as "" | CategoryKey, level: "", institution: "",
-    divyang: false, exam: "", guardianName: "",
+    exam: "", guardianName: "",
   });
   const [mobileTouched, setMobileTouched] = useState(false);
   const [mobileTaken, setMobileTaken] = useState(false);
@@ -237,7 +237,6 @@ export default function RegisterPage() {
         educationLevel: form.level,
         institutionName: form.institution.trim(),
         competitiveExam: form.exam || null,
-        isDivyang: form.divyang,
         guardianName: needsGuardian ? form.guardianName.trim() : "",
         rulesAccepted: true,
         privacyAccepted: true,
@@ -376,11 +375,6 @@ export default function RegisterPage() {
   }));
   const institution = form.institution;
   const onInstitution = (e: React.FormEvent<HTMLInputElement>) => set("institution", e.currentTarget.value);
-  const divyang = form.divyang;
-  const toggleDivyang = () => set("divyang", !form.divyang);
-  const divyangBorder = divyang ? "#14203E" : "#DCD1BC";
-  const divyangBg = divyang ? "#F7F2E6" : "#FCFAF4";
-  const divyangNoticeDisplay = divyang ? "block" : "none";
 
   // One checkbox now stands for both, so they flip together.
   const toggleBothConsents = () => {
@@ -582,11 +576,6 @@ export default function RegisterPage() {
                   <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.institutionLabel}</span>
                   <input type="text" value={institution} onInput={onInstitution} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
                 </label>
-                <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", border: `1px solid ${divyangBorder}`, borderRadius: "14px", background: `${divyangBg}`, transition: "border-color .16s ease,background .16s ease" }}>
-                  <input type="checkbox" checked={divyang} onChange={toggleDivyang} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
-                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.divyangLabel}</span>
-                </label>
-                <p style={{ margin: "0", display: `${divyangNoticeDisplay}`, padding: "18px 22px", borderLeft: "3px solid #8A6015", borderRadius: "0 14px 14px 0", background: "#F4EBD8", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.divyangNotice}</p>
               </div>
             ) : null}
 

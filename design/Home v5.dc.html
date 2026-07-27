@@ -37,6 +37,7 @@
   [data-e~="step"]:nth-child(4) [data-e~="ring"] { animation-delay: 3.15s; }
   [data-e~="rail"] { scrollbar-width: none; -ms-overflow-style: none; }
   [data-e~="rail"]::-webkit-scrollbar { display: none; }
+  [data-e~="datebreak"] { display: none; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
   @media (max-width: 980px) {
     [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
@@ -62,6 +63,7 @@
     [data-e~="sylrail"] { grid-template-rows: repeat(3, minmax(0,1fr)) !important; grid-auto-columns: minmax(168px, max-content) !important; }
     [data-e~="sylrail"] > button { max-width: 84vw; white-space: normal; overflow-wrap: break-word; }
     [data-e~="thumbrow"] > div:last-child { margin-left: 0 !important; }
+    [data-e~="datebreak"] { display: inline !important; }
   }
 </style>
 <script src="assets/site.js"></script>
