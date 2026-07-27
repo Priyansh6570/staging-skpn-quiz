@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useLang, useSession } from "@/components/AppProviders";
@@ -357,7 +358,7 @@ export default function RegisterPage() {
         <div data-e="split" style={{ display: "grid", gridTemplateColumns: "minmax(0,.8fr) minmax(0,1.2fr)", borderRadius: "26px", overflow: "hidden", boxShadow: "0 2px 6px rgba(20,32,62,.06),0 22px 52px rgba(20,32,62,.14)", alignItems: "stretch" }}>
 
           <aside data-e="aside" style={{ position: "relative", overflow: "hidden", background: "#070B1E", minHeight: "560px", padding: "36px 32px", display: "flex", flexDirection: "column", gap: "24px" }}>
-            <img src="assets/pathey.png" alt="" width="2560" height="1440" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 34%", opacity: ".46" }} />
+            <Image src="/assets/pathey.png" alt="" width={2560} height={1440} sizes="100vw" loading="eager" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 34%", opacity: ".46" }} />
             <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(170deg, rgba(7,11,30,.5) 0%, rgba(7,11,30,.87) 52%, rgba(5,8,22,.97) 100%)" }}></div>
             <div aria-hidden="true" style={{ position: "absolute", left: "-12%", top: "-14%", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%)", animation: "rg-glow 9s ease-in-out infinite" }}></div>
 

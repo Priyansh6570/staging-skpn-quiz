@@ -38,9 +38,11 @@ export async function POST(req: Request) {
 
   if (!user) {
     await record(mobile, "unknown_mobile");
-    // Deliberately the same body as success: no endpoint may confirm whether a number is
-    // registered. The header reflects the real state once the client re-reads /api/session.
-    return json({ ok: true });
+    // This does tell the caller the number is unregistered. Under a mobile-only model that is not
+    // a leak worth defending: sign-in needs no credential, so anyone probing a number can simply
+    // sign in with it and read the answer off the header. Silence only confused real students.
+    // The per-IP limit above, and the authEvents row, are what actually bound bulk probing.
+    return json({ ok: true, registered: false });
   }
 
   const [certificateCount] = await Promise.all([
@@ -57,5 +59,5 @@ export async function POST(req: Request) {
     sv: user.sessionVersion ?? 0,
   });
 
-  return json({ ok: true });
+  return json({ ok: true, registered: true });
 }

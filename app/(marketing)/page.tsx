@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CtaBox from "@/components/CtaBox";
@@ -135,7 +136,7 @@ export default function HomePage() {
       <SiteHeader lang={lang} active="home" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
 
       <section id="top" style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
-        <img src="assets/pathey.png" alt="" width="2560" height="1440" data-parallax="0.06" style={{ position: "absolute", left: "50%", top: "0", transform: "translateX(-50%)", width: "116%", height: "100%", objectFit: "cover", objectPosition: "50% 32%", opacity: ".6" }} />
+        <Image src="/assets/pathey.png" alt="" width={2560} height={1440} sizes="116vw" priority data-parallax="0.06" style={{ position: "absolute", left: "50%", top: "0", transform: "translateX(-50%)", width: "116%", height: "100%", objectFit: "cover", objectPosition: "50% 32%", opacity: ".6" }} />
         <div style={{ position: "absolute", inset: "0", background: "radial-gradient(72% 58% at 50% 40%, rgba(7,11,30,.66) 0%, rgba(7,11,30,.92) 62%, rgba(5,8,22,.98) 100%)" }}></div>
         <div aria-hidden="true" style={{ position: "absolute", inset: "-10%", backgroundImage: "radial-gradient(1.5px 1.5px at 12% 22%, rgba(255,238,196,.85), transparent 60%),radial-gradient(1.2px 1.2px at 78% 16%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.6px 1.6px at 34% 68%, rgba(255,238,196,.6), transparent 60%),radial-gradient(1.1px 1.1px at 88% 74%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.4px 1.4px at 60% 40%, rgba(255,238,196,.5), transparent 60%),radial-gradient(1.2px 1.2px at 22% 86%, rgba(255,238,196,.55), transparent 60%)", backgroundSize: "520px 520px", animation: "v5-drift 46s linear infinite alternate", opacity: ".7" }}></div>
 

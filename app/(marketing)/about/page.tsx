@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Leadership from "@/components/Leadership";
@@ -28,7 +29,7 @@ export default function AboutPage() {
       <SiteHeader lang={lang} active="about" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
 
       <section style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
-        <img src="assets/teaching.png" alt="" width="2560" height="1440" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 28%", opacity: ".55" }} />
+        <Image src="/assets/teaching.png" alt="" width={2560} height={1440} sizes="100vw" loading="eager" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 28%", opacity: ".55" }} />
         <div style={{ position: "absolute", inset: "0", background: "linear-gradient(180deg, rgba(7,11,30,.66) 0%, rgba(7,11,30,.92) 100%)" }}></div>
         <div data-e="pad hero" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "76px 30px 66px" }}>
           <p style={{ margin: "0 0 14px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "17px", letterSpacing: ".01em", color: "#E8C173", lineHeight: "1.9" }}>{t.kicker}</p>

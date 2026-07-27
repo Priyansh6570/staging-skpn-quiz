@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -8,6 +9,14 @@ import { useLang, useSession } from "@/components/AppProviders";
 import { strings } from "@/lib/i18n";
 
 const MOBILE_RE = /^[6-9]\d{9}$/;
+
+// Client-supplied copy. The export has no equivalent string, so there is no Hindi for it and Hindi
+// readers see the English until the department provides it. Everything else on this page comes
+// from lib/i18n.
+const NO_REGISTRATION: Record<"hi" | "en", string | null> = {
+  en: "No registration found for this number",
+  hi: null,
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,6 +28,7 @@ export default function LoginPage() {
   const [touched, setTouched] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [notRegistered, setNotRegistered] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -34,13 +44,19 @@ export default function LoginPage() {
     e.preventDefault();
     if (!ok || busy) return;
     setBusy(true);
-    await fetch("/api/auth/login", {
+    setNotRegistered(false);
+    const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ mobile }),
     });
-    await refresh();
+    const body = res.ok ? await res.json() : { registered: false };
     setBusy(false);
+    if (!body.registered) {
+      setNotRegistered(true);
+      return;
+    }
+    await refresh();
     router.push("/");
   };
 
@@ -53,7 +69,10 @@ export default function LoginPage() {
   const onMobile = (e: React.FormEvent<HTMLInputElement>) => {
     setMobile(e.currentTarget.value.replace(/\D/g, "").slice(0, 10));
     setTouched(true);
+    setNotRegistered(false);
   };
+  const notRegisteredMsg = NO_REGISTRATION[lang] ?? NO_REGISTRATION.en;
+  const notRegisteredDisplay = notRegistered ? "block" : "none";
   const mobileBorder = bad ? "#A03A2B" : "#DCD1BC";
   const mobileMsgDisplay = bad ? "block" : "none";
   const goHref = ok ? "/" : "#";
@@ -123,12 +142,13 @@ export default function LoginPage() {
                   <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={mobile} onInput={onMobile} placeholder="00000 00000" style={{ flex: "1 1 auto", minWidth: "0", minHeight: "58px", padding: "14px 16px", border: "0", background: "transparent", fontSize: "19px", letterSpacing: ".04em", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }} />
                 </span>
                 <span style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B", display: `${mobileMsgDisplay}` }}>{t.mobileInvalid}</span>
+                <span role="status" style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B", display: `${notRegisteredDisplay}` }}>{notRegisteredMsg} <Link href="/register" style={{ color: "#27408B" }}>{t.register}</Link></span>
               </label>
 
               <a href={goHref} onClick={markSignedIn} style={{ minHeight: "58px", padding: "16px 28px", borderRadius: "999px", background: `${goBg}`, color: `${goFg}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "17.5px", fontWeight: "600", lineHeight: "1.5", pointerEvents: `${goEvents}`, textDecoration: "none" }}>{t.continue}</a>
             </div>
 
-            <p style={{ margin: "auto 0 0", paddingTop: "20px", borderTop: "1px solid #F0EADD", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.noAccount} <a href="Register.dc.html">{t.register}</a></p>
+            <p style={{ margin: "auto 0 0", paddingTop: "20px", borderTop: "1px solid #F0EADD", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.noAccount} <Link href="/register">{t.register}</Link></p>
           </div>
         </div>
       </section>

@@ -174,8 +174,11 @@ check("login issues a working session", r.body.signedIn === true);
 
 cookie = "";
 const unknown = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ mobile: "9000000001" }) });
-check("login for unknown number is indistinguishable", unknown.status === 200 && unknown.body.ok === true, JSON.stringify(unknown.body));
-check("...but issues no session", (await call("/api/session")).body.signedIn === false);
+check("login reports an unregistered number", unknown.status === 200 && unknown.body.registered === false, JSON.stringify(unknown.body));
+check("...and issues no session", (await call("/api/session")).body.signedIn === false);
+
+r = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ mobile }) });
+check("login reports a registered number", r.body.registered === true, JSON.stringify(r.body));
 
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed`);
