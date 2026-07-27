@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import Loader from "@/components/Loader";
 import MotionShell from "@/components/MotionShell";
+import OfflineBanner from "@/components/OfflineBanner";
 import Toast, { type ToastItem } from "@/components/Toast";
 import { errorMessage, type ErrorCode } from "@/lib/errors";
 import type { Lang } from "@/lib/models/types";
@@ -28,7 +29,8 @@ const ShellContext = createContext<{
   busy: <T>(work: Promise<T>) => Promise<T>;
   setBusy: (on: boolean) => void;
   showError: (code: ErrorCode) => void;
-}>({ busy: (w) => w, setBusy: () => {}, showError: () => {} });
+  showMessage: (text: string) => void;
+}>({ busy: (w) => w, setBusy: () => {}, showError: () => {}, showMessage: () => {} });
 
 export const useLang = () => useContext(LangContext);
 export const useSession = () => useContext(SessionContext);
@@ -86,6 +88,11 @@ export default function AppProviders({ children }: { children: React.ReactNode }
 
   const dismiss = useCallback((id: number) => setToasts((list) => list.filter((t) => t.id !== id)), []);
 
+  const showMessage = useCallback((message: string) => {
+    toastId.current += 1;
+    setToasts((list) => [...list, { id: toastId.current, message }]);
+  }, []);
+
   const showError = useCallback(
     (code: ErrorCode) => {
       const { message, missingCopy } = errorMessage(lang, code);
@@ -125,9 +132,10 @@ export default function AppProviders({ children }: { children: React.ReactNode }
   return (
     <LangContext.Provider value={{ lang, toggle }}>
       <SessionContext.Provider value={{ session, loaded, refresh: async () => void (await refresh()) }}>
-        <ShellContext.Provider value={{ busy, setBusy, showError }}>
+        <ShellContext.Provider value={{ busy, setBusy, showError, showMessage }}>
           {children}
           <MotionShell />
+          <OfflineBanner lang={lang} />
           <Loader lang={lang} visible={pending > 0} />
           <Toast lang={lang} items={toasts} dismiss={dismiss} />
         </ShellContext.Provider>

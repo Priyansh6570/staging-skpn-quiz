@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
@@ -164,7 +166,7 @@ export default function HomePage() {
 
           <div data-reveal data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center", width: "100%", maxWidth: "540px", marginTop: "8px" }}>
             <a href={primaryHref} data-e="cta" style={{ padding: "17px 34px", minHeight: "58px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", borderRadius: "999px", fontSize: "18px", fontWeight: "600", lineHeight: "1.5", boxShadow: "0 14px 36px rgba(232,193,115,.28)", transition: "transform .2s ease,box-shadow .2s ease" }}>{t.ctaPrimary}</a>
-            <a href="Rules.dc.html" data-e="cta" style={{ padding: "17px 30px", minHeight: "58px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.42)", borderRadius: "999px", fontSize: "18px", lineHeight: "1.5", color: "#FFF9EC", transition: "background .2s ease" }}>{t.ctaSecondary}</a>
+            <Link href="/rules" data-e="cta" style={{ padding: "17px 30px", minHeight: "58px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.42)", borderRadius: "999px", fontSize: "18px", lineHeight: "1.5", color: "#FFF9EC", transition: "background .2s ease" }}>{t.ctaSecondary}</Link>
           </div>
         </div>
 

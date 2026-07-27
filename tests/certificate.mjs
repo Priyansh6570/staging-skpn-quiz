@@ -17,7 +17,15 @@ const browser = await chromium.launch();
   const bar = page.locator('[data-e~="topbar"]').first();
   const shown = async () => !(await bar.evaluate((el) => getComputedStyle(el).transform)).includes("-");
 
+  const pinned = async () => { const b = await bar.boundingBox(); return !!b && b.y > -2 && b.y < 2; };
   check("navbar visible at the top", await shown());
+  await page.mouse.wheel(0, 400);
+  await page.waitForTimeout(400);
+  await page.mouse.wheel(0, -200);
+  await page.waitForTimeout(500);
+  check("navbar is actually pinned to the viewport", await pinned(), "bar must stay at y=0 when shown");
+  await page.mouse.wheel(0, -5000);
+  await page.waitForTimeout(400);
 
   await page.mouse.wheel(0, 60);
   await page.waitForTimeout(300);
@@ -75,33 +83,59 @@ const browser = await chromium.launch();
     page.waitForEvent("download", { timeout: 30000 }),
     page.getByRole("link", { name: /डाउनलोड|Download/ }).first().click(),
   ]);
-  check("download is a PNG, not the bare jpeg", download.suggestedFilename().endsWith(".png"), download.suggestedFilename());
+  check("download is the named PDF", download.suggestedFilename() === "Medhavi Chhatravritti Pratiyogita Pramaan Patra.pdf", download.suggestedFilename());
 
   const path = await download.path();
   const { readFileSync } = await import("node:fs");
   const bytes = readFileSync(path);
-  check("file is a real PNG", bytes[0] === 0x89 && bytes.toString("latin1", 1, 4) === "PNG");
+  check("file is a real PDF", bytes.toString("latin1", 0, 5) === "%PDF-");
+  const head = bytes.toString("latin1", 0, 2000);
+  check("page is A4 landscape", /MediaBox\s*\[\s*0\s+0\s+841\.89\s+595\.28/.test(head) || /\/MediaBox[^\]]*841[^\]]*595/.test(head), head.match(/MediaBox[^\]]*\]/)?.[0] ?? "no MediaBox");
 
-  // Compare the exported pixels against the untouched source: the name region must differ.
-  const probe = await page.evaluate(async (dataUrl) => {
-    const load = (src) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.src = src; });
-    const [made, original] = await Promise.all([load(dataUrl), load("/uploads/cert.jpeg")]);
-    const px = (img) => { const c = new OffscreenCanvas(img.width, img.height); c.getContext("2d").drawImage(img, 0, 0); return c.getContext("2d").getImageData(0, 0, img.width, img.height).data; };
-    if (made.width !== original.width || made.height !== original.height) return { sizeMismatch: `${made.width}x${made.height} vs ${original.width}x${original.height}` };
-    const [a, b] = [px(made), px(original)];
-    const band = { top: Math.floor(made.height * 0.47), bottom: Math.ceil(made.height * 0.58) };
-    let inBand = 0, outsideBand = 0;
-    for (let i = 0; i < a.length; i += 4) {
-      if (a[i] === b[i] && a[i + 1] === b[i + 1] && a[i + 2] === b[i + 2]) continue;
-      const y = Math.floor(i / 4 / made.width);
-      if (y >= band.top && y <= band.bottom) inBand++; else outsideBand++;
-    }
-    return { w: made.width, h: made.height, inBand, outsideBand };
-  }, `data:image/png;base64,${bytes.toString("base64")}`);
+  // The button locks for five seconds and says so.
+  const button = page.locator('[data-e~="download"]');
+  check("button switches to a downloaded state", (await button.getAttribute("aria-disabled")) === "true");
+  await page.waitForTimeout(5600);
+  check("button re-enables after five seconds", (await button.getAttribute("aria-disabled")) === "false");
 
-  check("export keeps the certificate's own dimensions", !probe.sizeMismatch, JSON.stringify(probe));
-  check("name is painted into the design's band", (probe.inBand ?? 0) > 500, `${probe.inBand} px changed in band`);
-  check("nothing else on the certificate is touched", (probe.outsideBand ?? 1) === 0, `${probe.outsideBand} px changed elsewhere`);
+  await page.close();
+}
+
+// --- image load: loader, retry, never a blank frame -------------------------------------------------
+{
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  let fail = true;
+  await page.route("**/uploads/cert.jpeg**", (route) => (fail ? route.abort() : route.continue()));
+  await page.goto(`${BASE}/certificates`, { waitUntil: "domcontentloaded" });
+  check("loader covers the frame while the image loads", (await page.locator('[data-e~="certloading"]').count()) === 1);
+  await page.waitForSelector('[data-e~="certretry"]', { timeout: 15000 }).catch(() => {});
+  check("after retries it offers a control, not a blank frame", (await page.locator('[data-e~="certretry"]').count()) === 1);
+  check("download is locked while the image is unavailable", (await page.locator('[data-e~="download"]').getAttribute("aria-disabled")) === "true");
+  fail = false;
+  await page.locator('[data-e~="certretry"] button').click();
+  await page.waitForSelector('[data-e~="certframe"] img', { timeout: 15000 }).catch(() => {});
+  check("retry control recovers the image", (await page.locator('[data-e~="certframe"] img').count()) === 1);
+  await page.close();
+}
+
+// --- 404 and offline ---------------------------------------------------------------------------------
+{
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  const res = await page.goto(`${BASE}/no-such-page`, { waitUntil: "networkidle" });
+  check("unknown route returns 404", res.status() === 404, `status ${res.status()}`);
+  check("404 uses the design shell", (await page.locator('[data-page="NotFound"]').count()) === 1);
+  check("404 links home", (await page.locator('[data-page="NotFound"] a[href="/"]').count()) >= 1);
+
+  await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  check("no offline banner while online", (await page.locator('[data-e~="offlinebar"]').count()) === 0);
+  await page.context().setOffline(true);
+  await page.waitForTimeout(600);
+  const bar = page.locator('[data-e~="offlinebar"]');
+  check("offline raises a banner", (await bar.count()) === 1);
+  check("banner cannot intercept a tap", (await bar.evaluate((el) => getComputedStyle(el).pointerEvents)) === "none");
+  await page.context().setOffline(false);
+  await page.waitForTimeout(600);
+  check("banner clears on reconnect", (await bar.count()) === 0);
   await page.close();
 }
 

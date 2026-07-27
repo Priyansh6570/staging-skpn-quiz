@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
@@ -370,8 +372,8 @@ export default function QuizScreen({ phase, attemptId }: Props) {
             <h1 style={{ margin: "0 0 14px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(26px,3.8vw,38px)", lineHeight: "1.3", color: "#14203E" }}>{t.onceTitle}</h1>
             <p style={{ margin: "0 0 32px", maxWidth: "56ch", fontSize: "17.5px", lineHeight: "1.85", color: "#161C2E" }}>{t.onceBody}</p>
             <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
-              <a href="Certificates.dc.html" data-e="cta" style={{ minHeight: "58px", padding: "17px 32px", borderRadius: "999px", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "600", lineHeight: "1.5" }}>{t.download}</a>
-              <a href="Home v5.dc.html" data-e="cta" style={{ minHeight: "56px", padding: "16px 28px", border: "1px solid #DCD1BC", borderRadius: "999px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "17px", lineHeight: "1.5", color: "#161C2E" }}>{t.home}</a>
+              <Link href="/certificates" data-e="cta" style={{ minHeight: "58px", padding: "17px 32px", borderRadius: "999px", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "600", lineHeight: "1.5" }}>{t.download}</Link>
+              <Link href="/" data-e="cta" style={{ minHeight: "56px", padding: "16px 28px", border: "1px solid #DCD1BC", borderRadius: "999px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "17px", lineHeight: "1.5", color: "#161C2E" }}>{t.home}</Link>
             </div>
           </section>
           <SiteFooter lang={lang} />
@@ -395,7 +397,7 @@ export default function QuizScreen({ phase, attemptId }: Props) {
             <p style={{ margin: "0 0 28px", padding: "20px 24px", borderLeft: "3px solid #8A6015", borderRadius: "0 16px 16px 0", background: "#F4EBD8", fontSize: "17px", lineHeight: "1.85", color: "#161C2E" }}>{t.insWarning}</p>
             <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center" }}>
               <button type="button" onClick={begin} data-e="cta" style={{ minHeight: "58px", padding: "17px 34px", border: "0", borderRadius: "999px", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", cursor: "pointer", fontSize: "18.5px", fontWeight: "600", lineHeight: "1.5" }}>{t.begin}</button>
-              <a href="Pratiyogita.dc.html" data-e="cta" style={{ minHeight: "56px", padding: "16px 28px", border: "1px solid #DCD1BC", borderRadius: "999px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "17px", lineHeight: "1.5", color: "#161C2E" }}>{t.exit}</a>
+              <Link href="/pratiyogita" data-e="cta" style={{ minHeight: "56px", padding: "16px 28px", border: "1px solid #DCD1BC", borderRadius: "999px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "17px", lineHeight: "1.5", color: "#161C2E" }}>{t.exit}</Link>
             </div>
           </section>
           <SiteFooter lang={lang} />
@@ -548,8 +550,8 @@ export default function QuizScreen({ phase, attemptId }: Props) {
             <p style={{ margin: "0 0 30px", fontSize: "16.5px", lineHeight: "1.85", color: "#161C2E", maxWidth: "66ch" }}>{t.resultsNote}</p>
 
             <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
-              <a href="Certificates.dc.html" data-e="cta" style={{ minHeight: "58px", padding: "17px 32px", borderRadius: "999px", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "600", lineHeight: "1.5" }}>{t.download}</a>
-              <a href="Profile.dc.html" data-e="cta" style={{ minHeight: "56px", padding: "16px 28px", border: "1px solid #DCD1BC", borderRadius: "999px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "17px", lineHeight: "1.5", color: "#161C2E" }}>{t.profile}</a>
+              <Link href="/certificates" data-e="cta" style={{ minHeight: "58px", padding: "17px 32px", borderRadius: "999px", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "600", lineHeight: "1.5" }}>{t.download}</Link>
+              <Link href="/profile" data-e="cta" style={{ minHeight: "56px", padding: "16px 28px", border: "1px solid #DCD1BC", borderRadius: "999px", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: "17px", lineHeight: "1.5", color: "#161C2E" }}>{t.profile}</Link>
             </div>
           </section>
           <SiteFooter lang={lang} />

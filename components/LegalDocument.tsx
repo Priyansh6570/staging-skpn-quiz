@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
@@ -55,7 +57,7 @@ export default function LegalDocument({ which }: { which: "privacy" | "terms" })
           ))}
         </div>
 
-        <p style={{ margin: "24px 0 0", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.questions} <a href="About.dc.html#sampark">{t.contactLink}</a></p>
+        <p style={{ margin: "24px 0 0", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.questions} <Link href="/about#sampark">{t.contactLink}</Link></p>
       </section>
 
       <SiteFooter lang={lang} />

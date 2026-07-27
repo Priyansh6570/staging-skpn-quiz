@@ -88,6 +88,16 @@ check("session signed in after register", r.body.signedIn === true, JSON.stringi
 r = await call("/api/register/check-mobile", { method: "POST", body: JSON.stringify({ mobile }) });
 check("check-mobile now taken", r.body.available === false);
 
+// --- nothing before Begin may write an attempt --------------------------------------------------------
+r = await call("/quiz/instructions");
+check("instructions page loads", r.status === 200, `status ${r.status}`);
+r = await call("/api/session");
+check("loading instructions writes no attempt", r.body.attemptCount === 0, `attemptCount ${r.body.attemptCount}`);
+await call("/");
+await call("/quiz/instructions");
+r = await call("/api/session");
+check("away-and-back still writes no attempt", r.body.attemptCount === 0, `attemptCount ${r.body.attemptCount}`);
+
 // --- attempt ----------------------------------------------------------------------------------------
 r = await call("/api/quiz/attempts", { method: "POST", body: JSON.stringify({ rulesAccepted: true }) });
 const attemptId = r.body.attemptId;
@@ -150,6 +160,24 @@ check("third submit is idempotent", r.status === 200 && r.body.alreadySubmitted 
 // --- one attempt ever -------------------------------------------------------------------------------------------
 r = await call("/api/quiz/attempts", { method: "POST", body: JSON.stringify({ rulesAccepted: true }) });
 check("second attempt refused", r.status === 409, `status ${r.status}`);
+
+// --- an unfinished attempt resumes rather than locking the student out ---------------------------------
+{
+  const other = `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
+  const saved = cookie;
+  cookie = "";
+  await call("/api/register", { method: "POST", body: JSON.stringify({
+    mobile: other, email: "", fullName: "Resume Probe", gender: "male", dateOfBirth: "2009-05-14",
+    address: { line: "12 Test Marg", cityVillage: "Sehore", district: "Sehore", pincode: "466001" },
+    category: "vidyalaya", educationLevel: "Class 10", institutionName: "Test School",
+    competitiveExam: null, isDivyang: false, guardianName: "", rulesAccepted: true, privacyAccepted: true }) });
+  const first = await call("/api/quiz/attempts", { method: "POST", body: JSON.stringify({ rulesAccepted: true }) });
+  await call("/");
+  await call("/quiz/instructions");
+  const again = await call("/api/quiz/attempts", { method: "POST", body: JSON.stringify({ rulesAccepted: true }) });
+  check("returning to instructions resumes the same attempt", again.status === 200 && again.body.attemptId === first.body.attemptId, `${again.status} ${again.body.attemptId} vs ${first.body.attemptId}`);
+  cookie = saved;
+}
 
 // --- me / certificates -------------------------------------------------------------------------------------------
 r = await call("/api/me");

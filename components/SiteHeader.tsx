@@ -104,7 +104,7 @@ export default function SiteHeader({
   const scrimOpacity = open ? "1" : "0";
 
   return (
-<div style={{ fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif" }}>
+<div style={{ fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", position: "sticky", top: "0", zIndex: "60" }}>
 
   <div data-e="topbar" style={{ position: "sticky", top: "0", zIndex: "60", background: "rgba(251,247,240,.94)", backdropFilter: "blur(14px)", borderBottom: "1px solid #E8DFCE", transform: barHidden ? "translateY(-100%)" : "translateY(0)", transition: "transform .28s cubic-bezier(.22,.61,.36,1)" }}>
   <div data-e="pad" style={{ maxWidth: "1220px", margin: "0 auto", padding: "10px 30px", display: "flex", alignItems: "center", gap: "14px" }}>

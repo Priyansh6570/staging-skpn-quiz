@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
@@ -144,7 +146,7 @@ export default function ProfilePage() {
                 <span style={{ minWidth: "180px", fontSize: "16.5px", lineHeight: "1.7", color: "#161C2E", fontVariantNumeric: "tabular-nums" }}>{a.date}</span>
                 <span style={{ fontSize: "16px", lineHeight: "1.7", color: "#161C2E" }}>{a.time}</span>
                 <span style={{ fontSize: "16.5px", lineHeight: "1.7", color: "#8A6015" }}>{a.status}</span>
-                <a data-e="rowval" href="Certificates.dc.html" style={{ marginLeft: "auto", fontSize: "16px", lineHeight: "1.7" }}>{t.viewCertificate} <span aria-hidden="true">→</span></a>
+                <Link data-e="rowval" href="/certificates" style={{ marginLeft: "auto", fontSize: "16px", lineHeight: "1.7" }}>{t.viewCertificate} <span aria-hidden="true">→</span></Link>
               </li>
             ))}
           </ul>

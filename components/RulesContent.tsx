@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
@@ -144,7 +146,7 @@ export default function RulesContent({ gated = false }: { gated?: boolean }) {
               </label>
 
               <div data-e="ctarow" style={{ position: "relative", display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", marginTop: "22px" }}>
-                <a href="Pratiyogita.dc.html" data-e="cta" style={{ padding: "15px 26px", minHeight: "54px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.36)", borderRadius: "999px", fontSize: "17px", lineHeight: "1.5", color: "#F6F2E9" }}>{t.back}</a>
+                <Link href="/pratiyogita" data-e="cta" style={{ padding: "15px 26px", minHeight: "54px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.36)", borderRadius: "999px", fontSize: "17px", lineHeight: "1.5", color: "#F6F2E9" }}>{t.back}</Link>
                 <a href={continueHref} aria-disabled={blocked} data-e="cta" style={{ padding: "16px 32px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: `${continueBg}`, color: `${continueFg}`, borderRadius: "999px", fontSize: "18px", fontWeight: "600", lineHeight: "1.5", pointerEvents: `${continueEvents}`, boxShadow: `${continueShadow}` }}>{t.accept}</a>
               </div>
             </div>

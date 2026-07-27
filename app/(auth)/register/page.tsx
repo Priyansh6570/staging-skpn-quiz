@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -43,7 +45,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { lang, toggle: toggleLang } = useLang();
   const { session, refresh } = useSession();
-  const { showError } = useShell();
+  const { showError, showMessage } = useShell();
   const t = strings(lang).Register.S;
   const DISTRICTS = strings(lang).Register.DISTRICTS;
   const LEVELS = strings(lang).Register.LEVELS;
@@ -119,17 +121,42 @@ export default function RegisterPage() {
     return "";
   };
 
-  const canAdvance = () => {
-    if (step === 0) return !mobileProblem() && form.mobile.length === 10;
-    if (step === 1) {
-      // Date of birth is required, and its control lives on this step, not the previous one.
-      return form.name.trim().length >= 3 && !emailProblem() && !!form.gender && dob.y > 0
-        && form.address.trim().length >= 5 && form.city.trim().length >= 2
-        && /^\d{6}$/.test(form.pin) && !!form.district;
+  // A date is valid only if the whole value is, not if some flag says it was touched. dob starts
+  // at {0,0,0}, and the picker's defaults are only committed by Confirm.
+  const dobValid =
+    dob.y > 0 && dob.m >= 1 && dob.m <= 12 && dob.d >= 1 && dob.d <= daysInMonth(dob.m, dob.y);
+
+  /** The labels of everything the current step still needs, in the reader's language. */
+  const missingFields = (): string[] => {
+    if (step === 0) {
+      return mobileProblem() || form.mobile.length !== 10 ? [t.mobileLabel] : [];
     }
-    if (step === 2) return !!form.category && !!form.level && form.institution.trim().length >= 3;
-    return rulesAccepted && privacyAccepted;
+    if (step === 1) {
+      const missing: string[] = [];
+      if (form.name.trim().length < 3) missing.push(t.nameLabel);
+      if (emailProblem()) missing.push(t.emailLabel);
+      if (!form.gender) missing.push(t.genderLabel);
+      if (!dobValid) missing.push(t.dobLabel);
+      if (form.address.trim().length < 5) missing.push(t.addressLabel);
+      if (form.city.trim().length < 2) missing.push(t.cityLabel);
+      if (!/^\d{6}$/.test(form.pin)) missing.push(t.pinLabel);
+      if (!form.district) missing.push(t.districtLabel);
+      return missing;
+    }
+    if (step === 2) {
+      const missing: string[] = [];
+      if (!form.category) missing.push(t.categoryLabel);
+      if (!form.level) missing.push(t.levelLabel);
+      if (form.institution.trim().length < 3) missing.push(t.institutionLabel);
+      return missing;
+    }
+    const missing: string[] = [];
+    if (!rulesAccepted) missing.push(t.rulesLink);
+    if (!privacyAccepted) missing.push(t.privacyLink);
+    return missing;
   };
+
+  const canAdvance = () => missingFields().length === 0;
 
   const ep = emailProblem();
   const mp = mobileProblem();
@@ -347,7 +374,11 @@ export default function RegisterPage() {
   const prevDisplay = step === 0 ? "none" : "inline-flex";
   const prev = () => setStep((p) => Math.max(0, p - 1));
   const next = () => {
-    if (!canAdvance()) return;
+    const missing = missingFields();
+    if (missing.length) {
+      showMessage(missing.join(", "));
+      return;
+    }
     if (step === 3) { void submit(); return; }
     setStep((p) => p + 1);
   };
@@ -535,11 +566,11 @@ export default function RegisterPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", border: `1px solid ${rulesBorder}`, borderRadius: "14px", background: `${rulesBg}` }}>
                   <input type="checkbox" checked={rulesAccepted} onChange={toggleRules} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
-                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.rulesConsent} <a href="Rules.dc.html">{t.rulesLink}</a></span>
+                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.rulesConsent} <Link href="/rules">{t.rulesLink}</Link></span>
                 </label>
                 <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", border: `1px solid ${privacyBorder}`, borderRadius: "14px", background: `${privacyBg}` }}>
                   <input type="checkbox" checked={privacyAccepted} onChange={togglePrivacy} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
-                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.privacyConsent} <a href="Legal.dc.html">{t.privacyLink}</a></span>
+                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.privacyConsent} <Link href="/privacy">{t.privacyLink}</Link></span>
                 </label>
                 <div style={{ padding: "22px", borderRadius: "16px", background: "#F6F0E4", display: "flex", flexDirection: "column", gap: "14px" }}>
                   <p style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18px", lineHeight: "1.5", color: "#14203E" }}>{t.guardianTitle}</p>
@@ -556,7 +587,7 @@ export default function RegisterPage() {
               <button type="button" onClick={next} data-e="cta" style={{ minHeight: "56px", padding: "16px 30px", border: "0", borderRadius: "999px", background: `${nextBg}`, color: `${nextFg}`, cursor: `${nextCursor}`, fontSize: "18px", fontWeight: "600", lineHeight: "1.5" }}>{nextLabel}</button>
             </div>
 
-            <p style={{ margin: "22px 0 0", fontSize: "15.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.haveAccount} <a href="Login.dc.html">{t.signIn}</a></p>
+            <p style={{ margin: "22px 0 0", fontSize: "15.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.haveAccount} <Link href="/login">{t.signIn}</Link></p>
           </div>
         </div>
       </section>

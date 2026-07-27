@@ -28,6 +28,14 @@ check("register hydrates", await page.evaluate(() => !!Object.keys(document.quer
 
 // --- step 1: mobile alone gates -----------------------------------------------------------------
 check("step 1 starts gated", (await ctaBg()) !== ENABLED);
+
+// Pressing the gated button explains what is missing rather than doing nothing.
+await cta().click();
+await page.waitForTimeout(400);
+const gateToast = await page.locator('[data-e~="toast"]').first().textContent().catch(() => "");
+check("gated step names the missing field", /[ऀ-ॿ]/.test(gateToast ?? "") && (gateToast ?? "").includes("मोबाइल"), JSON.stringify((gateToast ?? "").slice(0, 40)));
+await page.locator('[data-e~="toast"] button').first().click().catch(() => {});
+await page.waitForTimeout(200);
 await page.locator('input[type="tel"]').fill(mobile);
 await page.waitForTimeout(150);
 check("step 1 opens on a valid mobile alone (no DOB needed)", (await ctaBg()) === ENABLED, await ctaBg());
@@ -52,6 +60,7 @@ await page.waitForTimeout(250);
 await page.getByRole("button", { name: "सीहोर", exact: true }).first().click();
 await page.waitForTimeout(300);
 check("step 2 complete", (await ctaBg()) === ENABLED, await ctaBg());
+check("a confirmed date of birth is not reported missing", !((await page.locator('[data-e~="toast"]').first().textContent().catch(() => "")) ?? "").includes("जन्म"));
 await cta().click();
 await page.waitForTimeout(300);
 

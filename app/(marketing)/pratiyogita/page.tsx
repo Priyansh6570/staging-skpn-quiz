@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CtaBox from "@/components/CtaBox";
@@ -52,7 +54,7 @@ export default function PratiyogitaPage() {
           <p style={{ margin: "0 0 30px", maxWidth: "54ch", fontSize: "clamp(16.5px,1.9vw,19px)", lineHeight: "1.85", color: "#E9E4D8" }}>{t.lede}</p>
           <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
             <a href={primaryHref} data-e="cta" style={{ padding: "16px 32px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", borderRadius: "999px", fontSize: "18px", fontWeight: "600", lineHeight: "1.5", whiteSpace: "nowrap", transition: "transform .2s ease" }}>{t.ctaPrimary}</a>
-            <a href="Rules.dc.html" data-e="cta" style={{ padding: "16px 28px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.4)", borderRadius: "999px", fontSize: "18px", lineHeight: "1.5", whiteSpace: "nowrap", color: "#FFF9EC" }}>{t.ctaSecondary}</a>
+            <Link href="/rules" data-e="cta" style={{ padding: "16px 28px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.4)", borderRadius: "999px", fontSize: "18px", lineHeight: "1.5", whiteSpace: "nowrap", color: "#FFF9EC" }}>{t.ctaSecondary}</Link>
           </div>
         </div>
       </section>
