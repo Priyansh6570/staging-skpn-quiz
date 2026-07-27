@@ -61,10 +61,9 @@ export async function POST(req: Request) {
 
   const { insertedId } = await attemptsCollection.insertOne(attempt as Attempt);
 
-  await Promise.all([
-    usersCollection.updateOne({ _id: userId }, { $inc: { attemptCount: 1 }, $set: { updatedAt: startedAt } }),
-    setSession({ ...session, attemptCount: session.attemptCount + 1 }),
-  ]);
+  // attemptCount is "papers actually sat", so it moves on submit, not here. Starting a paper must
+  // not flip the site's calls to action over to "view your certificate".
+  await usersCollection.updateOne({ _id: userId }, { $set: { updatedAt: startedAt } });
 
   return json({
     attemptId: String(insertedId),

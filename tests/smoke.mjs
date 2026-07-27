@@ -34,10 +34,13 @@ const check = (name, pass, detail = "") => {
 const mobile = `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
 
 // --- pages render -------------------------------------------------------------------------------
-for (const path of ["/", "/about", "/pratiyogita", "/rules", "/privacy", "/terms", "/login", "/register", "/quiz"]) {
+for (const path of ["/", "/about", "/pratiyogita", "/rules", "/privacy", "/terms", "/login", "/register"]) {
   const r = await call(path);
   check(`GET ${path}`, r.status === 200, `status ${r.status}`);
 }
+
+const quizSignedOut = await call("/quiz");
+check("GET /quiz signed out redirects rather than rendering", quizSignedOut.status === 307 || quizSignedOut.status === 302, `status ${quizSignedOut.status}`);
 
 // --- session is signed out ----------------------------------------------------------------------
 let r = await call("/api/session");
@@ -91,6 +94,8 @@ check("check-mobile now taken", r.body.available === false);
 // --- nothing before Begin may write an attempt --------------------------------------------------------
 r = await call("/quiz/instructions");
 check("instructions page loads", r.status === 200, `status ${r.status}`);
+r = await call("/quiz");
+check("GET /quiz with no attempt redirects to the rules gate", r.status === 307 || r.status === 302, `status ${r.status}`);
 r = await call("/api/session");
 check("loading instructions writes no attempt", r.body.attemptCount === 0, `attemptCount ${r.body.attemptCount}`);
 await call("/");

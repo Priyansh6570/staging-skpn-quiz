@@ -92,11 +92,14 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     ),
     usersCollection.updateOne(
       { _id: attempt.userId },
-      { $set: { bestScore: score, bestAttemptId: attemptId, bestAttemptAt: closedAt, updatedAt: closedAt } },
+      {
+        $set: { bestScore: score, bestAttemptId: attemptId, bestAttemptAt: closedAt, updatedAt: closedAt },
+        $inc: { attemptCount: 1 },
+      },
     ),
   ]);
 
-  await setSession({ ...session, hasCertificates: true });
+  await setSession({ ...session, hasCertificates: true, attemptCount: session.attemptCount + 1 });
 
   return json({
     score,

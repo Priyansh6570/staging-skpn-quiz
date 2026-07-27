@@ -47,7 +47,10 @@ for (const attempt of stale) {
   await Promise.all([
     users.updateOne(
       { _id: attempt.userId },
-      { $set: { bestScore: score, bestAttemptId: attempt._id, bestAttemptAt: attempt.expiresAt, updatedAt: new Date() } },
+      {
+        $set: { bestScore: score, bestAttemptId: attempt._id, bestAttemptAt: attempt.expiresAt, updatedAt: new Date() },
+        $inc: { attemptCount: 1 },
+      },
     ),
     certificates.updateOne(
       { attemptId: attempt._id },

@@ -17,7 +17,8 @@
     "sweep": "node scripts/sweep-attempts.mjs",
     "journey": "node tests/journey.mjs",
     "shell": "node tests/shell.mjs",
-    "certificate": "node tests/certificate.mjs"
+    "certificate": "node tests/certificate.mjs",
+    "quizentry": "node tests/quizentry.mjs"
   },
   "dependencies": {
     "jspdf": "^4.2.1",
