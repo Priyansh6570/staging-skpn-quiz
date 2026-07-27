@@ -1,6 +1,8 @@
 import type { Collection } from "mongodb";
 import { getDb } from "@/lib/db";
-import type { Attempt, AuthEvent, Certificate, Question, User } from "./types";
+import type {
+  Admin, AdminAuditEvent, Attempt, AuthEvent, Certificate, PageView, Question, User, VisitorDay,
+} from "./types";
 
 export * from "./types";
 export { COLLECTIONS, INDEXES, type IndexSpec, type CollectionName } from "./indexes";
@@ -10,3 +12,7 @@ export const questions = async (): Promise<Collection<Question>> => (await getDb
 export const attempts = async (): Promise<Collection<Attempt>> => (await getDb()).collection<Attempt>("attempts");
 export const certificates = async (): Promise<Collection<Certificate>> => (await getDb()).collection<Certificate>("certificates");
 export const authEvents = async (): Promise<Collection<AuthEvent>> => (await getDb()).collection<AuthEvent>("authEvents");
+export const admins = async (): Promise<Collection<Admin>> => (await getDb()).collection<Admin>("admins");
+export const adminAuditLog = async (): Promise<Collection<AdminAuditEvent>> => (await getDb()).collection<AdminAuditEvent>("adminAuditLog");
+export const pageViews = async (): Promise<Collection<PageView>> => (await getDb()).collection<PageView>("pageViews");
+export const visitorDays = async (): Promise<Collection<VisitorDay>> => (await getDb()).collection<VisitorDay>("visitorDays");

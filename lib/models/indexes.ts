@@ -9,7 +9,10 @@ export type IndexSpec = {
   expireAfterSeconds?: number;
 };
 
-export const COLLECTIONS = ["users", "questions", "attempts", "certificates", "authEvents"] as const;
+export const COLLECTIONS = [
+  "users", "questions", "attempts", "certificates", "authEvents",
+  "admins", "adminAuditLog", "pageViews", "visitorDays",
+] as const;
 
 export type CollectionName = (typeof COLLECTIONS)[number];
 
@@ -58,6 +61,22 @@ export const INDEXES: Record<CollectionName, IndexSpec[]> = {
     { name: "mobile_recent", key: { mobile: 1, at: -1 } },
     { name: "ip_recent", key: { ip: 1, at: -1 } },
     // Holds the mobile number and IP of accounts that are mostly minors. 365 days.
+    { name: "retention_ttl", key: { at: 1 }, expireAfterSeconds: 365 * 24 * 60 * 60 },
+  ],
+  admins: [
+    { name: "username_unique", key: { username: 1 }, unique: true },
+  ],
+  adminAuditLog: [
+    { name: "admin_recent", key: { adminId: 1, at: -1 } },
+    { name: "action_recent", key: { action: 1, at: -1 } },
+    { name: "retention_ttl", key: { at: 1 }, expireAfterSeconds: 365 * 24 * 60 * 60 },
+  ],
+  pageViews: [
+    { name: "day_path_unique", key: { day: 1, path: 1 }, unique: true },
+    { name: "day", key: { day: 1 } },
+  ],
+  visitorDays: [
+    { name: "day_hash_unique", key: { day: 1, hash: 1 }, unique: true },
     { name: "retention_ttl", key: { at: 1 }, expireAfterSeconds: 365 * 24 * 60 * 60 },
   ],
 };

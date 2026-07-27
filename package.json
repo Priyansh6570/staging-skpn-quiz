@@ -18,14 +18,19 @@
     "journey": "node tests/journey.mjs",
     "shell": "node tests/shell.mjs",
     "certificate": "node tests/certificate.mjs",
-    "quizentry": "node tests/quizentry.mjs"
+    "quizentry": "node tests/quizentry.mjs",
+    "seed-admin": "node scripts/seed-admin.mjs",
+    "admin": "node tests/admin.mjs"
   },
   "dependencies": {
+    "@node-rs/argon2": "^2.0.2",
     "jspdf": "^4.2.1",
     "mongodb": "^7.5.0",
     "next": "16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "recharts": "^3.10.1",
+    "xlsx-populate": "^1.21.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -159,3 +159,52 @@ export interface AuthEvent {
   outcome: AuthOutcome;
   at: Date;
 }
+
+// --- admin ------------------------------------------------------------------------------------
+
+export type AdminRole = "viewer" | "operator" | "owner";
+
+export interface Admin {
+  _id: ObjectId;
+  username: string;
+  /** argon2id. Never leaves the server, never appears in a serialiser. */
+  passwordHash: string;
+  displayName: string;
+  role: AdminRole;
+  failedAttempts: number;
+  lockedUntil?: Date;
+  lastLoginAt?: Date;
+  /** Bumped on sign-out; the admin cookie is dead the moment it stops matching. */
+  sessionVersion: number;
+  createdAt: Date;
+}
+
+export interface AdminAuditEvent {
+  _id: ObjectId;
+  adminId: ObjectId | null;
+  username: string;
+  action: string;
+  target: string;
+  ip: string;
+  at: Date;
+}
+
+/** One row per path per day. Written by proxy.ts, never carries anything about a person. */
+export interface PageView {
+  _id: ObjectId;
+  day: string;   // YYYY-MM-DD
+  path: string;
+  count: number;
+}
+
+/**
+ * One row per unique visitor per day. The hash is over ip + user agent + a salt that rotates
+ * daily, so yesterday's rows cannot be re-derived from today's traffic and nothing identifying is
+ * stored at any point.
+ */
+export interface VisitorDay {
+  _id: ObjectId;
+  day: string;
+  hash: string;
+  at: Date;
+}
