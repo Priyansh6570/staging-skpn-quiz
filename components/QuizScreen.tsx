@@ -19,7 +19,7 @@ interface ServedQuestion {
   options: { id: string; text: { hi: string; en: string } }[];
 }
 
-type Phase = "done" | "instructions" | "attempt" | "submitted";
+type Phase = "done" | "instructions" | "attempt";
 
 interface Props {
   phase: Phase;
@@ -69,6 +69,11 @@ export default function QuizScreen({ phase, attemptId }: Props) {
       const res = await fetch(`/api/quiz/attempts/${attemptId}`, { cache: "no-store" });
       if (!res.ok || cancelled) return;
       const data = await res.json();
+      // A finished attempt has no screen of its own any more.
+      if (data.status !== "in_progress") {
+        router.replace("/certificates");
+        return;
+      }
       setQuestions(data.questions);
       const restored: Record<string, string> = {};
       for (const a of data.answers) if (a.selectedOptionId) restored[a.questionId] = a.selectedOptionId;
@@ -77,12 +82,9 @@ export default function QuizScreen({ phase, attemptId }: Props) {
       // The clock is seeded from the server's clock and its own expiry, never from a local start.
       expiresAtRef.current = Date.parse(data.expiresAt);
       setLeft(Math.max(0, Math.round((expiresAtRef.current - Date.parse(data.serverNow)) / 1000)));
-      if (data.status !== "in_progress") {
-        setResult({ score: data.score ?? 0, answered: 0, timeTakenSeconds: data.timeTakenSeconds ?? 0, expired: data.status === "expired" });
-      }
     })();
     return () => { cancelled = true; };
-  }, [attemptId]);
+  }, [attemptId, router]);
 
   useEffect(() => {
     const onNetwork = () => setOffline(!navigator.onLine);
@@ -166,7 +168,7 @@ export default function QuizScreen({ phase, attemptId }: Props) {
       setStamp(new Date(data.submittedAt).toLocaleString());
       setSucceeded(true);
       await refresh();
-      setTimeout(() => router.push(`/quiz/submitted/${attemptId}`), SUCCESS_HOLD_MS);
+      setTimeout(() => router.push("/certificates"), SUCCESS_HOLD_MS);
     },
     [attemptId, flush, refresh, router, setBusy, showError],
   );
@@ -229,7 +231,7 @@ export default function QuizScreen({ phase, attemptId }: Props) {
   const isDone = phase === "done";
   const isInstructions = phase === "instructions";
   const isAttempt = phase === "attempt" && !succeeded;
-  const isSubmitted = phase === "submitted" || succeeded;
+  const isSubmitted = succeeded;
 
   const begin = async () => {
     const res = await busy(

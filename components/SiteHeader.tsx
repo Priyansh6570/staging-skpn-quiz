@@ -1,8 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { strings, type Lang } from "@/lib/i18n";
+
+/** Below this the bar is always shown, so the top of a page never hides it. */
+const ALWAYS_VISIBLE_ABOVE = 90;
+/** Ignore anything smaller, so a trackpad twitch or rubber-banding cannot flicker the bar. */
+const SCROLL_THRESHOLD = 10;
 
 export type NavKey = "home" | "about" | "pratiyogita" | "rules" | "certificates";
 
@@ -32,9 +37,37 @@ export default function SiteHeader({
   onToggleLang,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const lastY = useRef(0);
   const s = strings(lang);
   const t = s.SiteHeader.T;
   const m = s.SiteHeader.markup;
+
+  // Hides on the way down, returns on any upward movement. Sliding a nav bar out of view is
+  // motion, so under prefers-reduced-motion it simply never hides.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    lastY.current = window.scrollY;
+    let queued = false;
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        const y = window.scrollY;
+        const delta = y - lastY.current;
+        if (Math.abs(delta) < SCROLL_THRESHOLD) return;
+        lastY.current = y;
+        setHidden(y > ALWAYS_VISIBLE_ABOVE && delta > 0);
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // The drawer is anchored to the bar, so the bar cannot slide away while it is open.
+  const barHidden = hidden && !open;
 
   useEffect(() => {
     if (!open) return;
@@ -73,7 +106,7 @@ export default function SiteHeader({
   return (
 <div style={{ fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif" }}>
 
-  <div style={{ position: "sticky", top: "0", zIndex: "60", background: "rgba(251,247,240,.94)", backdropFilter: "blur(14px)", borderBottom: "1px solid #E8DFCE" }}>
+  <div data-e="topbar" style={{ position: "sticky", top: "0", zIndex: "60", background: "rgba(251,247,240,.94)", backdropFilter: "blur(14px)", borderBottom: "1px solid #E8DFCE", transform: barHidden ? "translateY(-100%)" : "translateY(0)", transition: "transform .28s cubic-bezier(.22,.61,.36,1)" }}>
   <div data-e="pad" style={{ maxWidth: "1220px", margin: "0 auto", padding: "10px 30px", display: "flex", alignItems: "center", gap: "14px" }}>
     <Link href="/" style={{ display: "flex", alignItems: "center", gap: "12px", color: "inherit", textDecoration: "none", flex: "0 1 auto", minWidth: "0" }}>
       <img src="/uploads/images.jpg" alt={m.alt0} width="38" height="38" style={{ display: "block", width: "38px", height: "38px", borderRadius: "50%", flex: "0 0 auto" }} />

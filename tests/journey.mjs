@@ -122,9 +122,9 @@ if (await confirm.count()) await confirm.click();
 await page.waitForTimeout(400);
 check("loader covers the submit", (await page.locator("#skpn-loader").evaluate((el) => getComputedStyle(el).opacity)) !== "0");
 
-await page.waitForURL(/\/quiz\/submitted\//, { timeout: 40000 }).catch(() => {});
+await page.waitForURL(/\/certificates/, { timeout: 40000 }).catch(() => {});
 const elapsed = Date.now() - startedAt;
-check("submit reaches /quiz/submitted/[id]", /\/quiz\/submitted\//.test(page.url()), page.url());
+check("submit lands on /certificates", /\/certificates/.test(page.url()), page.url());
 check("submitting state is held at least 3s", elapsed >= 3000, `${elapsed}ms`);
 check("and is not held far beyond it", elapsed < 9000, `${elapsed}ms`);
 

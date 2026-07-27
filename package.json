@@ -16,7 +16,8 @@
     "smoke": "node tests/smoke.mjs",
     "sweep": "node scripts/sweep-attempts.mjs",
     "journey": "node tests/journey.mjs",
-    "shell": "node tests/shell.mjs"
+    "shell": "node tests/shell.mjs",
+    "certificate": "node tests/certificate.mjs"
   },
   "dependencies": {
     "mongodb": "^7.5.0",
