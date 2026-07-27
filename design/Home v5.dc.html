@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FBF7F0; }
+  * { box-sizing: border-box; }
+  a { color: #27408B; text-decoration: none; }
+  a:hover { color: #8A6015; }
+  ::selection { background: #F1DFB6; color: #14203E; }
+  @keyframes v5-inA { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @keyframes v5-inB { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @keyframes v5-glow { 0%,100% { opacity: .4; transform: scale(1); } 50% { opacity: .9; transform: scale(1.04); } }
+  @keyframes v5-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes v5-spin-rev { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+  @keyframes v5-drift { 0% { transform: translate3d(0,0,0); } 100% { transform: translate3d(-40px,-30px,0); } }
+  @keyframes v5-ring {
+    0%, 74%, 100% { box-shadow: 0 8px 22px rgba(20,32,62,.09); border-color: #E5D9C2; transform: translateY(0); }
+    12%, 28% { box-shadow: 0 12px 32px rgba(232,193,115,.62); border-color: #E8C173; transform: translateY(-4px); }
+  }
+  @keyframes v5-travel { 0% { left: 9%; opacity: 0; } 8% { opacity: 1; } 90% { opacity: 1; } 100% { left: 91%; opacity: 0; } }
+  @keyframes v5-travel-y { 0% { top: 0; opacity: 0; } 8% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+  [data-e~="sylrail"] { scrollbar-width: none; -ms-overflow-style: none; }
+  [data-e~="sylrail"]::-webkit-scrollbar { display: none; }
+  [data-e~="step"] [data-e~="ring"] { animation: v5-ring 5.6s cubic-bezier(.4,0,.2,1) infinite; }
+  [data-e~="step"]:nth-child(2) [data-e~="ring"] { animation-delay: 1.05s; }
+  [data-e~="step"]:nth-child(3) [data-e~="ring"] { animation-delay: 2.1s; }
+  [data-e~="step"]:nth-child(4) [data-e~="ring"] { animation-delay: 3.15s; }
+  [data-e~="rail"] { scrollbar-width: none; -ms-overflow-style: none; }
+  [data-e~="rail"]::-webkit-scrollbar { display: none; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  @media (max-width: 980px) {
+    [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
+    [data-e~="menu-btn"] { display: inline-flex !important; }
+    [data-e~="track-line"], [data-e~="travel"] { display: none !important; }
+    [data-e~="vline"], [data-e~="vtravel"], [data-e~="stepn"] { display: block !important; }
+    [data-e~="steps"] { flex-direction: column !important; gap: 14px !important; align-items: stretch !important; }
+    [data-e~="step"] { flex-direction: row !important; align-items: center !important; gap: 16px !important; text-align: left !important; padding: 14px 18px !important; background: #FFFFFF !important; border: 1px solid #EFE5D3 !important; border-radius: 20px !important; box-shadow: 0 8px 24px rgba(20,32,62,.07) !important; }
+    [data-e~="step"] [data-e~="ring"] { width: 58px !important; height: 58px !important; }
+    [data-e~="step"] > span:nth-of-type(2) { flex: 1 1 auto !important; }
+    [data-g="lead"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="datesgrid"] { grid-template-columns: minmax(0,1fr) !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="pad"] { padding-left: 18px !important; padding-right: 18px !important; }
+    [data-e~="section"] { padding-top: 56px !important; padding-bottom: 56px !important; }
+    [data-e~="hero-body"] { padding-top: 54px !important; padding-bottom: 40px !important; }
+    [data-e~="facts"] { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+    [data-e~="fact"] { border-left: 0 !important; border-top: 1px solid rgba(255,247,225,.14) !important; align-items: center !important; text-align: center !important; }
+    [data-e~="cta"] { width: 100% !important; }
+    [data-e~="ctarow"] { flex-direction: column !important; align-items: stretch !important; }
+    [data-e~="sylrail"] { grid-template-rows: repeat(3, minmax(0,1fr)) !important; grid-auto-columns: minmax(168px, max-content) !important; }
+    [data-e~="sylrail"] > button { max-width: 84vw; white-space: normal; overflow-wrap: break-word; }
+    [data-e~="thumbrow"] > div:last-child { margin-left: 0 !important; }
+  }
+</style>
+<script src="assets/site.js"></script>
+</helmet>
+
+<div style="background:#FBF7F0;color:#161C2E;font-family:'Noto Sans Devanagari',system-ui,sans-serif;min-width:320px;overflow-x:clip">
+
+  <dc-import name="SiteHeader" lang="{{ lang }}" active="home" signed-in="{{ signedIn }}" has-certificates="{{ hasCerts }}" on-toggle-lang="{{ toggleLang }}" hint-size="100%,68px"></dc-import>
+
+  <section id="top" style="position:relative;overflow:hidden;background:#070B1E">
+    <img src="assets/pathey.png" alt="" width="2560" height="1440" data-parallax="0.06" style="position:absolute;left:50%;top:0;transform:translateX(-50%);width:116%;height:100%;object-fit:cover;object-position:50% 32%;opacity:.6" />
+    <div style="position:absolute;inset:0;background:radial-gradient(72% 58% at 50% 40%, rgba(7,11,30,.66) 0%, rgba(7,11,30,.92) 62%, rgba(5,8,22,.98) 100%)"></div>
+    <div aria-hidden="true" style="position:absolute;inset:-10%;background-image:radial-gradient(1.5px 1.5px at 12% 22%, rgba(255,238,196,.85), transparent 60%),radial-gradient(1.2px 1.2px at 78% 16%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.6px 1.6px at 34% 68%, rgba(255,238,196,.6), transparent 60%),radial-gradient(1.1px 1.1px at 88% 74%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.4px 1.4px at 60% 40%, rgba(255,238,196,.5), transparent 60%),radial-gradient(1.2px 1.2px at 22% 86%, rgba(255,238,196,.55), transparent 60%);background-size:520px 520px;animation:v5-drift 46s linear infinite alternate;opacity:.7"></div>
+
+    <div data-e="pad hero-body" style="position:relative;max-width:1000px;margin:0 auto;padding:88px 30px 66px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px">
+      <div data-reveal style="position:relative;width:clamp(132px,17vw,186px);height:clamp(132px,17vw,186px);display:flex;align-items:center;justify-content:center;margin-bottom:6px">
+        <div style="position:absolute;inset:-52%;border-radius:50%;background:radial-gradient(circle, rgba(232,193,115,.4) 0%, rgba(232,193,115,.12) 42%, rgba(232,193,115,0) 70%);animation:v5-glow 8s ease-in-out infinite"></div>
+        <svg viewBox="-100 -100 200 200" width="100%" height="100%" aria-hidden="true" focusable="false" style="position:absolute;inset:-30%;width:160%;height:160%">
+          <circle r="94" fill="none" stroke="rgba(232,193,115,.55)" stroke-width="1.4" stroke-dasharray="1.5 7.3" stroke-linecap="round" style="transform-origin:0 0;animation:v5-spin 240s linear infinite"></circle>
+          <circle r="76" fill="none" stroke="rgba(232,193,115,.35)" stroke-width="3.2" stroke-dasharray="5 29.1" stroke-linecap="round" style="transform-origin:0 0;animation:v5-spin-rev 300s linear infinite"></circle>
+        </svg>
+        <img src="uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" style="position:relative;width:100%;height:auto;display:block;filter:drop-shadow(0 14px 40px rgba(0,0,0,.6))" />
+      </div>
+
+      <p data-reveal style="margin:0;font-family:'Noto Serif Devanagari',serif;font-size:clamp(16px,1.9vw,19px);line-height:1.6;color:#E8C173;letter-spacing:.02em">{{ t.org }}</p>
+
+      <h1 data-reveal style="margin:0;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(32px,5vw,58px);line-height:1.24;color:#FFF9EC;max-width:20ch;text-wrap:balance;text-shadow:0 2px 30px rgba(0,0,0,.4)">{{ t.heroTitle }}</h1>
+
+      <div data-reveal style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:center">
+        <span style="width:38px;height:1px;background:rgba(232,193,115,.7)"></span>
+        <span style="font-family:'Noto Serif Devanagari',serif;font-size:clamp(16px,2vw,20px);line-height:1.6;color:#F5E5C2">{{ t.heroDate }}</span>
+        <span style="width:38px;height:1px;background:rgba(232,193,115,.7)"></span>
+      </div>
+
+      <p data-reveal style="margin:0;max-width:44ch;font-size:clamp(16.5px,1.9vw,19px);line-height:1.85;color:#E9E4D8">{{ t.heroLede }}</p>
+
+      <div data-reveal data-e="ctarow" style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;width:100%;max-width:540px;margin-top:8px">
+        <a href="{{ primaryHref }}" data-e="cta" style="padding:17px 34px;min-height:58px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%);color:#1E1503;border-radius:999px;font-size:18px;font-weight:600;line-height:1.5;box-shadow:0 14px 36px rgba(232,193,115,.28);transition:transform .2s ease,box-shadow .2s ease" style-hover="transform:translateY(-2px);box-shadow:0 20px 46px rgba(232,193,115,.38)">{{ t.ctaPrimary }}</a>
+        <a href="Rules.dc.html" data-e="cta" style="padding:17px 30px;min-height:58px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,249,236,.42);border-radius:999px;font-size:18px;line-height:1.5;color:#FFF9EC;transition:background .2s ease" style-hover="background:rgba(255,255,255,.1)">{{ t.ctaSecondary }}</a>
+      </div>
+    </div>
+
+    <div style="position:relative;border-top:1px solid rgba(255,247,225,.14);background:rgba(5,8,20,.82)">
+      <div data-e="pad" style="max-width:1220px;margin:0 auto;padding:0 30px">
+        <dl data-e="facts" style="margin:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))">
+          <sc-for list="{{ facts }}" as="f" hint-placeholder-count="4">
+            <div data-e="fact" data-reveal style="padding:26px 24px 30px;border-left:1px solid rgba(255,247,225,.14);display:flex;flex-direction:column;gap:5px">
+              <dt style="font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(26px,3vw,34px);line-height:1.25;color:#E8C173">{{ f.value }}</dt>
+              <dd style="margin:0;font-size:15.5px;line-height:1.7;color:#F2EEE4">{{ f.label }}</dd>
+            </div>
+          </sc-for>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section style="position:relative;overflow:hidden;background:#070B1E">
+    <img src="assets/cosmic-spiral.png" alt="" width="924" height="540" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 38%;opacity:.5" />
+    <div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 22%, rgba(7,11,30,.62) 0%, rgba(7,11,30,.9) 58%, rgba(4,7,18,.98) 100%)"></div>
+    <div aria-hidden="true" style="position:absolute;left:50%;top:-18%;width:720px;height:720px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.16) 0%,rgba(232,193,115,0) 66%);animation:v5-glow 11s ease-in-out infinite"></div>
+
+    <div data-e="pad section" style="position:relative;max-width:1220px;margin:0 auto;padding:92px 30px 96px">
+      <div data-reveal style="max-width:64ch;margin:0 0 34px">
+        <p style="margin:0 0 12px;font-family:'Noto Serif Devanagari',serif;font-size:17px;letter-spacing:.01em;color:#E8C173;line-height:1.9">{{ t.sylKicker }}</p>
+        <h2 style="margin:0 0 14px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(27px,3.6vw,42px);line-height:1.3;color:#FFF9EC;text-wrap:pretty">{{ t.sylTitle }}</h2>
+        <p style="margin:0;font-size:17.5px;line-height:1.9;color:#E9E4D8">{{ t.sylLede }}</p>
+      </div>
+
+      <div data-reveal role="tablist" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+        <button type="button" role="tab" aria-selected="{{ vidyaSelected }}" onClick="{{ showVidyas }}" style="min-height:50px;padding:13px 26px;border:1px solid {{ vidyaBorder }};border-radius:999px;background:{{ vidyaBg }};color:{{ vidyaFg }};cursor:pointer;font-family:'Noto Serif Devanagari',serif;font-size:18px;line-height:1.5;transition:background .2s ease,color .2s ease,border-color .2s ease">{{ t.tabVidyas }}</button>
+        <button type="button" role="tab" aria-selected="{{ kalaSelected }}" onClick="{{ showKalas }}" style="min-height:50px;padding:13px 26px;border:1px solid {{ kalaBorder }};border-radius:999px;background:{{ kalaBg }};color:{{ kalaFg }};cursor:pointer;font-family:'Noto Serif Devanagari',serif;font-size:18px;line-height:1.5;transition:background .2s ease,color .2s ease,border-color .2s ease">{{ t.tabKalas }}</button>
+      </div>
+
+      <div data-reveal style="position:relative;overflow:hidden;border-radius:24px;border:1px solid rgba(232,193,115,.28);background:linear-gradient(140deg, rgba(24,34,70,.78) 0%, rgba(8,12,28,.86) 100%);padding:30px 32px;margin-bottom:22px;min-height:150px;display:flex;flex-direction:column;gap:10px;animation:{{ featureAnim }} .45s cubic-bezier(.22,.61,.36,1)">
+        <div aria-hidden="true" style="position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%)"></div>
+        <span style="position:relative;font-family:'Noto Serif Devanagari',serif;font-size:16.5px;letter-spacing:.01em;color:#E8C173;line-height:1.9">{{ feature.group }}</span>
+        <span style="position:relative;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(28px,4vw,44px);line-height:1.22;color:#FFF9EC">{{ feature.name }}</span>
+        <span style="position:relative;font-size:18px;line-height:1.8;color:#E9E4D8;max-width:52ch">{{ feature.meaning }}</span>
+      </div>
+
+      <div data-e="sylrail" ref="{{ sylRef }}" onScroll="{{ onSylScroll }}" style="display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,minmax(0,1fr));grid-auto-columns:198px;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 16px;overscroll-behavior-x:contain">
+        <sc-for list="{{ items }}" as="it" hint-placeholder-count="14">
+          <button type="button" onClick="{{ it.select }}" onMouseEnter="{{ it.select }}" onFocus="{{ it.select }}" style="scroll-snap-align:start;position:relative;min-height:68px;padding:12px 14px 12px 42px;text-align:left;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif;font-size:15.5px;line-height:1.55;border:1px solid {{ it.border }};border-radius:14px;background:{{ it.bg }};color:{{ it.fg }};transition:border-color .18s ease,background .18s ease,transform .18s ease" style-hover="transform:translateY(-2px)">
+          <span aria-hidden="true" style="position:absolute;left:12px;top:12px;font-size:11.5px;line-height:1.6;color:{{ it.numFg }};font-variant-numeric:tabular-nums">{{ it.n }}</span>
+          {{ it.name }}
+        </button>
+        </sc-for>
+      </div>
+
+      <div data-e="sylbar" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:10px">
+          <button type="button" onClick="{{ sylPrev }}" aria-label="{{ t.prevLabel }}" style="width:48px;height:48px;border:1px solid rgba(232,193,115,.4);border-radius:50%;background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s ease,border-color .18s ease" style-hover="background:rgba(232,193,115,.18)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E8C173" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="display:block"><path d="M14.5 5.5 8 12l6.5 6.5"></path></svg>
+          </button>
+          <button type="button" onClick="{{ sylNext }}" aria-label="{{ t.nextLabel }}" style="width:48px;height:48px;border:1px solid rgba(232,193,115,.4);border-radius:50%;background:rgba(255,255,255,.05);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s ease,border-color .18s ease" style-hover="background:rgba(232,193,115,.18)">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E8C173" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="display:block"><path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg>
+          </button>
+        </div>
+        <div aria-hidden="true" style="flex:1 1 160px;height:3px;border-radius:3px;background:rgba(255,249,236,.14);overflow:hidden">
+          <span style="display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,rgba(232,193,115,.35),#E8C173);width:{{ sylThumbW }};transform:translateX({{ sylThumbX }});transition:width .2s ease"></span>
+        </div>
+        <span style="font-size:14.5px;line-height:1.7;color:#DBD5C7;font-variant-numeric:tabular-nums">{{ sylCount }}</span>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="Leadership" lang="{{ lang }}" hint-size="100%,620px"></dc-import>
+
+  <section style="background:#F6F0E4;border-top:1px solid #EFE5D3;border-bottom:1px solid #EFE5D3">
+    <div data-e="pad section" style="max-width:1220px;margin:0 auto;padding:80px 30px">
+      <h2 data-reveal style="margin:0 0 48px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(26px,3.4vw,36px);line-height:1.35;color:#14203E">{{ t.howTitle }}</h2>
+      <div data-reveal style="position:relative">
+        <div data-e="track-line" aria-hidden="true" style="position:absolute;left:10%;right:10%;top:38px;height:1px;background:linear-gradient(90deg, rgba(138,96,21,0) 0%, rgba(138,96,21,.34) 12%, rgba(138,96,21,.34) 88%, rgba(138,96,21,0) 100%)"></div>
+        <span data-e="travel" aria-hidden="true" style="position:absolute;top:33px;width:11px;height:11px;border-radius:50%;background:#E8C173;box-shadow:0 0 0 5px rgba(232,193,115,.28),0 0 18px rgba(232,193,115,.9);animation:v5-travel 5.6s cubic-bezier(.4,0,.2,1) infinite"></span>
+        <span data-e="vline" aria-hidden="true" style="display:none;position:absolute;left:46px;top:20px;bottom:20px;width:2px;background:linear-gradient(180deg, rgba(138,96,21,0) 0%, rgba(138,96,21,.32) 10%, rgba(138,96,21,.32) 90%, rgba(138,96,21,0) 100%)"></span>
+        <span data-e="vtravel" aria-hidden="true" style="display:none;position:absolute;left:41px;width:12px;height:12px;border-radius:50%;background:#E8C173;box-shadow:0 0 0 5px rgba(232,193,115,.28),0 0 18px rgba(232,193,115,.9);animation:v5-travel-y 5.6s cubic-bezier(.4,0,.2,1) infinite"></span>
+        <ol data-e="steps" style="position:relative;margin:0;padding:0;list-style:none;display:flex;justify-content:space-between;gap:24px">
+          <sc-for list="{{ steps }}" as="s" hint-placeholder-count="4">
+            <li data-e="step" data-reveal style="position:relative;flex:1 1 0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
+              <span data-e="ring" style="width:76px;height:76px;flex:0 0 auto;border-radius:50%;background:#FFFFFF;border:1px solid #E5D9C2;box-shadow:0 8px 22px rgba(20,32,62,.09);display:flex;align-items:center;justify-content:center">
+                <svg viewBox="0 0 32 32" width="30" height="30" fill="none" stroke="#8A6015" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="display:block">
+                  <sc-if value="{{ s.isUser }}" hint-placeholder-val="{{ true }}">
+                    <g><circle cx="16" cy="11" r="5"></circle><path d="M6 27c1.6-5.4 5.3-8 10-8s8.4 2.6 10 8"></path></g>
+                  </sc-if>
+                  <sc-if value="{{ s.isDoc }}" hint-placeholder-val="{{ true }}">
+                    <g><rect x="7" y="4" width="18" height="24" rx="2.5"></rect><path d="M12 11h8M12 16h8M12 21h5"></path></g>
+                  </sc-if>
+                  <sc-if value="{{ s.isClock }}" hint-placeholder-val="{{ true }}">
+                    <g><circle cx="16" cy="16" r="11"></circle><path d="M16 9.5V16l4.5 3"></path></g>
+                  </sc-if>
+                  <sc-if value="{{ s.isCert }}" hint-placeholder-val="{{ true }}">
+                    <g><rect x="5" y="6" width="22" height="15" rx="2"></rect><circle cx="16" cy="24" r="3.4"></circle><path d="M10 11h12M10 15h7"></path></g>
+                  </sc-if>
+                </svg>
+              </span>
+              <span style="font-family:'Noto Serif Devanagari',serif;font-weight:500;font-size:20px;line-height:1.5;color:#14203E">{{ s.title }}</span>
+              <span data-e="stepn" aria-hidden="true" style="display:none;margin-left:auto;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:26px;line-height:1;color:rgba(20,32,62,.12);font-variant-numeric:tabular-nums">{{ s.n }}</span>
+            </li>
+          </sc-for>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section data-e="pad section" style="max-width:1220px;margin:0 auto;padding:88px 30px">
+    <h2 data-reveal style="margin:0 0 34px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(26px,3.4vw,36px);line-height:1.35;color:#14203E">{{ t.datesTitle }}</h2>
+    <ol data-e="datesgrid" style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px">
+      <sc-for list="{{ dates }}" as="d" hint-placeholder-count="3">
+        <li data-reveal style="position:relative;overflow:hidden;padding:30px 30px 32px;border-radius:24px;background:{{ d.bg }};border:1px solid {{ d.border }};box-shadow:0 2px 4px rgba(20,32,62,.04),0 16px 38px rgba(20,32,62,.07);display:flex;flex-direction:column;gap:14px">
+          <span aria-hidden="true" style="position:absolute;right:-46px;top:-46px;width:170px;height:170px;border-radius:50%;background:{{ d.blob }}"></span>
+          <span style="position:relative;display:flex;align-items:center;gap:12px">
+            <span aria-hidden="true" style="width:13px;height:13px;flex:0 0 auto;border-radius:50%;background:{{ d.dotBg }};box-shadow:0 0 0 4px {{ d.dotHalo }}"></span>
+            <span aria-hidden="true" style="flex:1 1 auto;height:1px;background:linear-gradient(90deg, {{ d.rule }} 0%, rgba(138,96,21,0) 100%)"></span>
+            <span style="font-family:'Noto Serif Devanagari',serif;font-size:20px;font-weight:600;letter-spacing:.02em;font-variant-numeric:tabular-nums;color:{{ d.stepFg }}">{{ d.step }}</span>
+          </span>
+          <span style="position:relative;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(25px,3vw,32px);line-height:1.24;color:#14203E;font-variant-numeric:tabular-nums;text-wrap:balance">{{ d.when }}</span>
+          <span style="position:relative;font-size:18px;line-height:1.6;color:#161C2E">{{ d.what }}</span>
+          <span style="position:relative;margin-top:2px;align-self:flex-start;padding:8px 16px;border-radius:999px;background:{{ d.pillBg }};border:1px solid {{ d.pillBorder }};font-size:15px;line-height:1.7;color:{{ d.pillFg }}">{{ d.note }}</span>
+        </li>
+      </sc-for>
+    </ol>
+  </section>
+
+  <dc-import name="CtaBox" lang="{{ lang }}" signed-in="{{ signedIn }}" hint-size="100%,430px"></dc-import>
+
+  <dc-import name="SiteFooter" lang="{{ lang }}" hint-size="100%,300px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400}}">
+const VIDYAS = [
+  ["ऋग्वेद", "चार वेद", "Rigveda", "The first of the four Vedas"],
+  ["यजुर्वेद", "चार वेद", "Yajurveda", "Mantras and method of yajna"],
+  ["सामवेद", "चार वेद", "Samaveda", "The tradition of chant and music"],
+  ["अथर्ववेद", "चार वेद", "Atharvaveda", "Everyday life, medicine and science"],
+  ["शिक्षा", "उच्चारण विज्ञान", "Shiksha", "Phonetics and articulation"],
+  ["कल्प", "कर्मकांड", "Kalpa", "Ritual and procedure"],
+  ["व्याकरण", "छह वेदांग", "Vyakarana", "Grammar"],
+  ["निरुक्त", "शब्द व्युत्पत्ति", "Nirukta", "Etymology"],
+  ["छंद", "छह वेदांग", "Chhanda", "Prosody and metre"],
+  ["ज्योतिष", "छह वेदांग", "Jyotisha", "Astronomy and time-reckoning"],
+  ["मीमांसा", "दर्शन", "Mimamsa", "Philosophy of interpretation"],
+  ["न्याय", "तर्कशास्त्र", "Nyaya", "Logic and reasoning"],
+  ["धर्मशास्त्र", "कानून/नीति", "Dharmashastra", "Law, ethics and conduct"],
+  ["पुराण", "अन्य चार", "Purana", "History and narrative tradition"]
+];
+
+const KALAS = [
+  ["गीत", "गायन", "Geet", "Singing"],
+  ["वाद्य", "वाद्ययंत्र बजाना", "Vadya", "Playing instruments"],
+  ["नृत्य", "अभिनय", "Nritya", "Acting"],
+  ["नाट्य", "अभिनय", "Natya", "Acting"],
+  ["आलेख्य", "चित्रकला", "Alekhya", "Painting"],
+  ["विशेषकच्छेद्य", "तिलक व शारीरिक सजावट", "Visheshakachchhedya", "Forehead marks and body adornment"],
+  ["तण्डुलकुसुमबलिविकार", "चावल और फूलों से आकृतियां बनाना", "Tandula-kusuma", "Rangoli with rice and flowers"],
+  ["पुष्पास्तरण", "फूलों की सेज सजाना", "Pushpastarana", "Arranging flower beds"],
+  ["दशनवसनांगराग", "वस्त्र और अंगों को रंगना/सजाना", "Dashana-vasana-raga", "Colouring teeth, cloth and limbs"],
+  ["मणिभूमिकाकर्म", "जवाहरात जड़ना", "Manibhumika-karma", "Setting jewels"],
+  ["शयनरचन", "बिस्तर सजाना", "Shayana-rachana", "Preparing a bed chamber"],
+  ["उदकवाद्य", "जल तरंग बजाना", "Udaka-vadya", "Music on water"],
+  ["उदकघात", "पानी से खेलना/छपछपाना", "Udaka-ghata", "Water sport"],
+  ["चित्रयोग", "रंगों का मिश्रण", "Chitra-yoga", "Mixing colours"],
+  ["माल्यग्रथनविकल्प", "माला गूंथना", "Malya-grathana", "Weaving garlands"],
+  ["शेखरकापीडयोजन", "सिर पर मुकुट या फूल सजाना", "Shekharaka-yojana", "Crowns and head ornaments"],
+  ["नेपथ्ययोग", "वेशभूषा धारण करना", "Nepathya-yoga", "Costume and stagecraft"],
+  ["कर्णपत्रभंग", "कान के आभूषण बनाना", "Karnapatra-bhanga", "Making ear ornaments"],
+  ["गंधयुक्ति", "इत्र और सुगंधित पदार्थ बनाना", "Gandha-yukti", "Making perfume"],
+  ["भूषणयोजन", "गहने पहनना", "Bhushana-yojana", "The art of adornment"],
+  ["ऐंद्रजाल", "जादू-गरी", "Aindrajala", "Conjuring"],
+  ["कौचुमारयोग", "छद्म वेश या रूप बदलना", "Kauchumara-yoga", "Changing one's appearance"],
+  ["हस्तलाघव", "हाथ की सफाई", "Hasta-laghava", "Manual dexterity"],
+  ["विचित्रशाकयूषभक्ष्यविकार", "स्वादिष्ट व्यंजन बनाना", "Vichitra-bhakshya", "Cooking varied dishes"],
+  ["पानकरसरागासवयोजन", "पेय पदार्थ और शर्बत बनाना", "Panaka-rasa-yojana", "Preparing drinks and syrups"],
+  ["सूचीवानकर्म", "सिलाई और बुनाई", "Suchi-vana-karma", "Sewing and weaving"],
+  ["सूत्रक्रीड़ा", "धागों का खेल", "Sutra-krida", "Games with threads"],
+  ["वीणाडमरुकवाद्य", "वीणा और डमरू बजाना", "Vina-damaruka", "Playing vina and damaru"],
+  ["प्रहेलिका", "पहेलियां बुझाना", "Prahelika", "Composing riddles"],
+  ["प्रतिमाला", "श्लोक या तुकबंदी बनाना", "Pratimala", "Verse-capping games"],
+  ["दुर्वाचकयोग", "कठिन शब्दों के अर्थ समझना", "Durvachaka-yoga", "Understanding difficult words"],
+  ["पुस्तकवाचन", "ग्रंथों का वाचन", "Pustaka-vachana", "Reading aloud"],
+  ["नाटिकाख्यायिकादर्शन", "नाटक और कहानियों की रचना", "Natika-akhyayika", "Knowledge of plays and tales"],
+  ["काव्यसमस्यापूरण", "अधूरी कविता को पूरा करना", "Kavya-samasya-purana", "Completing verses"],
+  ["पट्टिकावेत्रवाणविकल्प", "चटाई और टोकरी बुनना", "Pattika-vetra-vana", "Weaving mats and baskets"],
+  ["तर्ककर्म", "कताई और कढ़ाई", "Tarka-karma", "Spinning and embroidery"],
+  ["तक्षण", "बढ़ईगिरी / लकड़ी का काम", "Takshana", "Carpentry"],
+  ["वास्तुविद्या", "भवन निर्माण और वास्तुकला", "Vastu-vidya", "Architecture"],
+  ["रूप्यरत्नपरीक्षा", "चांदी और रत्नों की पहचान", "Rupya-ratna-pariksha", "Assaying gems and metals"],
+  ["धातुवाद", "धातुओं को पिघलाना / धातु विज्ञान", "Dhatu-vada", "Metallurgy"],
+  ["मणिरागज्ञान", "रत्नों के रंग की पहचान", "Mani-raga-jnana", "Colouring gems"],
+  ["आकरज्ञान", "खदानों की पहचान", "Akara-jnana", "Knowledge of mines"],
+  ["वृक्षायुर्वेदयोग", "पेड़-पौधों की चिकित्सा", "Vrikshayurveda", "Medicine for trees"],
+  ["मेषकुक्कुटलावकयुद्धविधि", "पशु-पक्षियों के युद्ध का ज्ञान", "Mesha-kukkuta-vidhi", "Training animals to contest"],
+  ["शुकसारिकाप्रलापन", "तोता-मैना को बोलना सिखाना", "Shuka-sarika-pralapana", "Teaching birds to speak"],
+  ["उत्सादन", "मालिश करना", "Utsadana", "Massage and body care"],
+  ["केशमार्जनकौशल", "बाल संवारना", "Kesha-marjana", "Hairdressing"],
+  ["अक्षरमुष्टिकाकथन", "इशारों में बात करना", "Akshara-mushtika", "Sign language"],
+  ["म्लेच्छितकलाविकल्प", "विदेशी भाषाएं सीखना", "Mlechchhita-kala", "Learning foreign languages"],
+  ["देशभाषाज्ञान", "क्षेत्रीय बोलियों का ज्ञान", "Desha-bhasha-jnana", "Knowledge of regional languages"],
+  ["पुष्पशकटिकानिर्मिति", "शकुन-अपशकुन का ज्ञान", "Pushpa-shakatika", "Knowledge of omens"],
+  ["यंत्रमातृका", "मशीनों का संचालन", "Yantra-matrika", "Building and running machines"],
+  ["धारणमातृका", "स्मरण शक्ति बढ़ाना", "Dharana-matrika", "Strengthening memory"],
+  ["सम्पाठ्य", "साथ मिलकर पढ़ना", "Sampathya", "Reciting in unison"],
+  ["मानसीकाव्यक्रिया", "मन में कविता रचना", "Manasi-kavya-kriya", "Extempore poetry"],
+  ["क्रियाविकल्प", "दूसरों का काम पूरा करना", "Kriya-vikalpa", "Completing another's work"],
+  ["छलितकयोग", "छल-कपट का ज्ञान", "Chhalitaka-yoga", "Knowledge of deception"],
+  ["अभिधानकोषछंदोज्ञान", "शब्दकोश और छंदों का ज्ञान", "Abhidhana-kosha", "Lexicon and metre"],
+  ["वस्त्रगोपन", "वस्त्र छिपाना", "Vastra-gopana", "Concealing garments"],
+  ["द्यूतविशेष", "शतरंज का ज्ञान", "Dyuta-vishesha", "Knowledge of chess"],
+  ["आकर्षक्रीड़ा", "चुंबक का खेल", "Akarsha-krida", "Play with magnets"],
+  ["बालक्रीडनक", "बच्चों के खेल", "Balakridanaka", "Games for children"],
+  ["वैनयिकीविद्या", "विनय और अनुशासन", "Vainayiki-vidya", "Discipline and etiquette"],
+  ["वैजयिकीविद्या", "विजय प्राप्त करने की कला", "Vaijayiki-vidya", "The art of victory"]
+];
+
+
+const DATE_STYLE = [
+  { bg: "linear-gradient(150deg,#FFFFFF 0%,#FDF4E2 100%)", border: "#EFDFBE", blob: "radial-gradient(circle,rgba(232,193,115,.3) 0%,rgba(232,193,115,0) 70%)", dotBg: "#E8C173", dotHalo: "rgba(232,193,115,.28)", rule: "rgba(138,96,21,.45)", stepFg: "#8A6015", pillBg: "#F7EEDA", pillBorder: "#E7D6B2", pillFg: "#6B4A10" },
+  { bg: "linear-gradient(150deg,#FFFFFF 0%,#F1F4FC 100%)", border: "#DDE3F2", blob: "radial-gradient(circle,rgba(39,64,139,.16) 0%,rgba(39,64,139,0) 70%)", dotBg: "#27408B", dotHalo: "rgba(39,64,139,.18)", rule: "rgba(39,64,139,.4)", stepFg: "#27408B", pillBg: "#E9EEF9", pillBorder: "#D6DEF2", pillFg: "#22366F" },
+  { bg: "linear-gradient(150deg,#FFFFFF 0%,#EDF4F0 100%)", border: "#D9E7DF", blob: "radial-gradient(circle,rgba(63,107,88,.16) 0%,rgba(63,107,88,0) 70%)", dotBg: "#3F6B58", dotHalo: "rgba(63,107,88,.18)", rule: "rgba(63,107,88,.4)", stepFg: "#2E5142", pillBg: "#E7F1EC", pillBorder: "#D3E4DA", pillFg: "#2E5142" }
+];
+
+const S = {
+  hi: {
+    org: "श्रीकृष्ण पाथेय न्यास, भोपाल",
+    heroTitle: "भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता",
+    heroDate: "गुरु पूर्णिमा, 29 जुलाई 2026 से प्रारंभ",
+    heroLede: "64 कलाएँ, 14 विद्याएँ और भारतीय ज्ञान परंपरा पर आधारित निःशुल्क प्रतियोगिता।",
+    ctaPrimaryOut: "पंजीकरण करें",
+    ctaTake: "भाग लें",
+    ctaCert: "प्रमाण पत्र देखें",
+    ctaSecondary: "नियम पढ़ें",
+    facts: [
+      { value: "₹1,00,000", label: "छात्रवृत्ति" },
+      { value: "102", label: "छात्रवृत्ति संख्या" },
+      { value: "30", label: "प्रश्न" },
+      { value: "10", label: "मिनट" }
+    ],
+    sylKicker: "प्रतियोगिता",
+    sylTitle: "गुरू सांदीपनि और श्रीकृष्‍ण",
+    sylLede: "भगवान श्रीकृष्ण का व्यक्तित्व केवल उनकी लीलाओं और पराक्रम से नहीं, बल्कि महर्षि सांदीपनि के आश्रम में प्राप्त शिक्षा, संस्कार और अनुशासन से पूर्ण हुआ। वहीं उन्होंने 14 विद्याओं, 64 कलाओं तथा भारतीय ज्ञान परंपरा के माध्यम से विवेक, सेवा, धैर्य, कर्तव्य और नेतृत्व का पाठ सीखा। यही गुरु–शिष्य परंपरा उनके जीवन की सबसे बड़ी शक्ति बनी और आगे चलकर उन्हें जगद्गुरु के रूप में प्रतिष्ठित किया।",
+    tabVidyas: "14 विद्याएँ",
+    tabKalas: "64 कलाएँ",
+    prevLabel: "पिछला कार्ड",
+    nextLabel: "अगला कार्ड",
+    howTitle: "प्रक्रिया",
+    steps: [
+      { title: "पंजीकरण", icon: "user" },
+      { title: "नियम पढ़ें", icon: "doc" },
+      { title: "प्रतियोगिता में भाग लें", icon: "clock" },
+      { title: "प्रमाण पत्र", icon: "cert" }
+    ],
+    datesTitle: "प्रतियोगिता आरंभ, परिणाम, वितरण तिथियाँ",
+    dateSteps: ["1", "2", "3"],
+    dates: [
+      { when: "29 जुलाई 2026", what: "महर्षि सांदीपनि गुरु पर्व आरंभ", note: "प्रतियोगिता प्रारंभ" },
+      { when: "4 सितम्बर 2026", what: "श्रीकृष्ण जन्माष्टमी", note: "प्रविष्टियों की अंतिम तिथि" },
+      { when: "1 नवंबर 2026", what: "मध्यप्रदेश स्थापना दिवस", note: "छात्रवृत्ति वितरण" }
+    ],
+    closeTitle: "प्रतियोगिता में सम्मिलित हों",
+    closeBody: "पंजीकरण कुछ मिनटों में पूर्ण हो जाता है।"
+  },
+  en: {
+    org: "Shri Krishna Pathey Nyas, Bhopal",
+    heroTitle: "Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita",
+    heroDate: "Opens on Guru Purnima, 29 July 2026",
+    heroLede: "A free competition on the 64 Kalas, the 14 Vidyas and the Indian knowledge tradition.",
+    ctaPrimaryOut: "Register now",
+    ctaTake: "Take part",
+    ctaCert: "View certificate",
+    ctaSecondary: "Read the rules",
+    facts: [
+      { value: "₹1,00,000", label: "Scholarship" },
+      { value: "102", label: "Scholarships" },
+      { value: "30", label: "Questions" },
+      { value: "10", label: "Minutes" }
+    ],
+    sylKicker: "Competition",
+    sylTitle: "Guru Sandipani and Shri Krishna",
+    sylLede: "The personality of Bhagwan Shri Krishna was completed not by his leelas and valour alone, but by the education, character and discipline he received at the ashram of Maharishi Sandipani. There, through the 14 Vidyas, the 64 Kalas and the Indian knowledge tradition, he learned discernment, service, patience, duty and leadership. That guru–shishya parampara became the greatest strength of his life and later established him as Jagadguru.",
+    tabVidyas: "14 Vidyas",
+    tabKalas: "64 Kalas",
+    prevLabel: "Previous card",
+    nextLabel: "Next card",
+    howTitle: "How it works",
+    steps: [
+      { title: "Register", icon: "user" },
+      { title: "Read the rules", icon: "doc" },
+      { title: "Take the quiz", icon: "clock" },
+      { title: "Certificate", icon: "cert" }
+    ],
+    datesTitle: "Competition start, results and distribution dates",
+    dateSteps: ["1", "2", "3"],
+    dates: [
+      { when: "29 July 2026", what: "Maharishi Sandipani Guru Parv begins", note: "Competition opens" },
+      { when: "4 September 2026", what: "Shri Krishna Janmashtami", note: "Last date for entries" },
+      { when: "1 November 2026", what: "Madhya Pradesh Sthapana Diwas", note: "Scholarship distribution" }
+    ],
+    closeTitle: "Enter the competition",
+    closeBody: "Registration takes a few minutes."
+  }
+};
+
+const CARD_STEP = 344;
+
+class Component extends DCLogic {
+  state = { lang: null, tab: "vidyas", index: 0, tick: 0, paused: false, signedIn: null, attempts: 0, active: 0, sylP: 0, sylRatio: 0.35 };
+  _rail = React.createRef();
+  _syl = React.createRef();
+
+  componentDidMount() {
+    try { const saved = localStorage.getItem("skpn_lang"); if (saved === "hi" || saved === "en") this.setState({ lang: saved }); } catch (e) {}
+    try {
+      const si = localStorage.getItem("skpn_signed_in") === "1";
+      const at = Number(localStorage.getItem("skpn_attempts") || 0);
+      if (si || at) this.setState({ signedIn: si, attempts: at });
+    } catch (e) {}
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    let queued = false;
+    this._onAnyScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        const y = window.scrollY || 0;
+        if (this._parallax && y < 1400) this._parallax.style.transform = "translateX(-50%) translate3d(0," + (y * 0.06).toFixed(1) + "px,0)";
+      });
+    };
+    this._parallax = document.querySelector("[data-parallax]");
+    window.addEventListener("scroll", this._onAnyScroll, { passive: true, capture: true });
+    window.addEventListener("resize", this._onAnyScroll, { passive: true });
+    setTimeout(() => this.onSylScroll(), 80);
+
+    this._timer = setInterval(() => {
+      if (this.state.paused) return;
+      this.setState(s => {
+        const list = s.tab === "vidyas" ? VIDYAS : KALAS;
+        return { index: (s.index + 1) % list.length, tick: s.tick + 1 };
+      });
+    }, 3800);
+  }
+
+  componentWillUnmount() {
+    if (this._onAnyScroll) {
+      window.removeEventListener("scroll", this._onAnyScroll, { capture: true });
+      window.removeEventListener("resize", this._onAnyScroll);
+    }
+    if (this._timer) clearInterval(this._timer);
+  }
+
+  get lang() { return this.state.lang || this.props.language || "hi"; }
+
+  setLang(next) {
+    try { localStorage.setItem("skpn_lang", next); } catch (e) {}
+    this.setState({ lang: next });
+  }
+
+  pick(i) { this.setState(s => ({ index: i, paused: true, tick: s.tick + 1 })); }
+
+  onSylScroll() {
+    const el = this._syl.current;
+    if (!el || this._sylQueued) return;
+    this._sylQueued = true;
+    requestAnimationFrame(() => {
+      this._sylQueued = false;
+      const max = Math.max(1, el.scrollWidth - el.clientWidth);
+      this.setState({ sylP: Math.min(1, Math.max(0, el.scrollLeft / max)), sylRatio: Math.min(1, el.clientWidth / Math.max(1, el.scrollWidth)) });
+    });
+  }
+
+  nudgeSyl(dir) {
+    const el = this._syl.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * Math.max(208, el.clientWidth * 0.8), behavior: "smooth" });
+  }
+
+  renderVals() {
+    const lang = this.lang, t = S[lang], hi = lang === "hi";
+    const signedIn = this.state.signedIn ?? (this.props.signedIn ?? false);
+    const attempts = this.state.attempts || 0;
+    const isVidyas = this.state.tab === "vidyas";
+    const list = isVidyas ? VIDYAS : KALAS;
+    const index = this.state.index % list.length;
+    const cur = list[index];
+    const groupOf = i => isVidyas
+      ? (hi ? "विद्या " + String(i + 1).padStart(2, "0") : "Vidya " + String(i + 1).padStart(2, "0"))
+      : (hi ? "कला " + String(i + 1).padStart(2, "0") : "Kala " + String(i + 1).padStart(2, "0"));
+
+    return {
+      t: Object.assign({}, t, { ctaPrimary: signedIn ? (attempts > 0 ? t.ctaCert : t.ctaTake) : t.ctaPrimaryOut }),
+      facts: t.facts,
+      steps: t.steps.map((s, i) => ({
+        title: s.title,
+        n: String(i + 1).padStart(2, "0"),
+        isUser: s.icon === "user",
+        isDoc: s.icon === "doc",
+        isClock: s.icon === "clock",
+        isCert: s.icon === "cert"
+      })),
+      dates: t.dates.map((d, i) => Object.assign({}, d, DATE_STYLE[i % 3], { step: t.dateSteps[i] })),
+
+      feature: { group: groupOf(index), name: hi ? cur[0] : cur[2], meaning: hi ? cur[1] : cur[3] },
+      featureAnim: this.state.tick % 2 === 0 ? "v5-inA" : "v5-inB",
+      items: list.map((it, i) => ({
+        name: hi ? it[0] : it[2],
+        n: String(i + 1).padStart(2, "0"),
+        select: () => this.pick(i),
+        bg: i === index ? "rgba(232,193,115,.16)" : "rgba(255,255,255,.045)",
+        fg: i === index ? "#FFF9EC" : "#F2EEE4",
+        border: i === index ? "#E8C173" : "rgba(232,193,115,.22)",
+        numFg: i === index ? "#E8C173" : "rgba(232,193,115,.55)"
+      })),
+      vidyaSelected: isVidyas,
+      kalaSelected: !isVidyas,
+      vidyaBg: isVidyas ? "#E8C173" : "transparent",
+      vidyaFg: isVidyas ? "#1E1503" : "#E8DFCE",
+      vidyaBorder: isVidyas ? "#E8C173" : "rgba(232,193,115,.4)",
+      kalaBg: isVidyas ? "transparent" : "#E8C173",
+      kalaFg: isVidyas ? "#E8DFCE" : "#1E1503",
+      kalaBorder: isVidyas ? "rgba(232,193,115,.4)" : "#E8C173",
+      showVidyas: () => this.setState(s => ({ tab: "vidyas", index: 0, paused: true, tick: s.tick + 1 })),
+      showKalas: () => this.setState(s => ({ tab: "kalas", index: 0, paused: true, tick: s.tick + 1 })),
+
+      sylRef: this._syl,
+      onSylScroll: () => this.onSylScroll(),
+      sylPrev: () => this.nudgeSyl(-1),
+      sylNext: () => this.nudgeSyl(1),
+      sylThumbW: Math.max(12, this.state.sylRatio * 100).toFixed(1) + "%",
+      sylThumbX: (this.state.sylP * (100 / Math.max(0.12, this.state.sylRatio) - 100)).toFixed(1) + "%",
+      sylCount: (index + 1) + " / " + list.length,
+
+      lang: lang,
+      signedIn: signedIn,
+      hasCerts: attempts > 0 || (this.props.hasCertificates ?? false),
+      primaryHref: signedIn ? (attempts > 0 ? "Certificates.dc.html" : "Quiz.dc.html") : "Register.dc.html",
+      toggleLang: () => this.setLang(this.lang === "hi" ? "en" : "hi")
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="font-family:'Noto Sans Devanagari',system-ui,sans-serif">
+<helmet>
+<style>
+  @media (max-width: 860px) { [data-e~="brandtext"] { display: none !important; } }
+</style>
+</helmet>
+  <div style="position:sticky;top:0;z-index:60;background:rgba(251,247,240,.94);backdrop-filter:blur(14px);border-bottom:1px solid #E8DFCE">
+  <div data-e="pad" style="max-width:1220px;margin:0 auto;padding:10px 30px;display:flex;align-items:center;gap:14px">
+    <a href="Home v5.dc.html" style="display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none;flex:0 1 auto;min-width:0">
+      <img src="uploads/images.jpg" alt="मध्यप्रदेश शासन" width="38" height="38" style="display:block;width:38px;height:38px;border-radius:50%;flex:0 0 auto" />
+      <span style="width:1px;height:28px;background:#E1D6C0;flex:0 0 auto"></span>
+      <span style="width:44px;height:44px;flex:0 0 auto;border-radius:50%;background:radial-gradient(circle at 32% 28%,#1B2544 0%,#080C1E 72%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(232,193,115,.42),0 6px 16px rgba(7,11,30,.28)">
+        <img src="uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" width="34" height="34" style="display:block;width:34px;height:34px" />
+      </span>
+      <span data-e="brandtext" style="display:flex;flex-direction:column;line-height:1.25;min-width:0">
+        <span style="font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:16.5px;color:#14203E">{{ t.orgShort }}</span>
+        <span style="font-size:11px;color:#161C2E">{{ t.deptShort }}</span>
+      </span>
+    </a>
+    <nav data-e="nav" style="margin-left:auto;display:flex;align-items:center;gap:2px">
+      <sc-for list="{{ items }}" as="item" hint-placeholder-count="4">
+        <a href="{{ item.href }}" style="position:relative;padding:10px 13px;border-radius:10px;font-size:16px;line-height:1.7;color:{{ item.color }};font-weight:{{ item.weight }};white-space:nowrap;text-decoration:none;transition:background .16s ease" style-hover="background:#F1E9DA;color:#14203E">{{ item.label }}<span aria-hidden="true" style="position:absolute;left:13px;right:13px;bottom:5px;height:2px;border-radius:2px;background:{{ item.underline }}"></span></a>
+      </sc-for>
+    </nav>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:9px;flex:0 0 auto">
+      <button type="button" onClick="{{ toggle }}" aria-label="Switch language" style="display:flex;align-items:center;border:1px solid #DCD1BC;background:#FFFFFF;border-radius:999px;padding:3px;cursor:pointer;font-family:inherit">
+        <span style="padding:5px 11px;font-size:14px;line-height:1.5;border-radius:999px;background:{{ hiBg }};color:{{ hiFg }}">हिं</span>
+        <span style="padding:5px 11px;font-size:14px;line-height:1.5;border-radius:999px;background:{{ enBg }};color:{{ enFg }}">EN</span>
+      </button>
+      <a href="{{ accountHref }}" data-e="signin-top" style="padding:10px 18px;border:1px solid #14203E;border-radius:999px;font-size:15.5px;line-height:1.6;color:#14203E;white-space:nowrap;text-decoration:none;transition:background .16s ease,color .16s ease" style-hover="background:#14203E;color:#FBF7F0">{{ accountLabel }}</a>
+      <button type="button" data-e="menu-btn" onClick="{{ toggleMenu }}" aria-expanded="{{ open }}" aria-controls="skpn-menu" aria-label="{{ t.menuLabel }}" style="display:none;width:46px;height:46px;align-items:center;justify-content:center;flex-direction:column;gap:5px;border:1px solid #DCD1BC;background:#FFFFFF;border-radius:14px;cursor:pointer;padding:0">
+        <span aria-hidden="true" style="display:block;width:18px;height:1.6px;background:#14203E"></span>
+        <span aria-hidden="true" style="display:block;width:18px;height:1.6px;background:#14203E"></span>
+        <span aria-hidden="true" style="display:block;width:18px;height:1.6px;background:#14203E"></span>
+      </button>
+    </div>
+  </div>
+  </div>
+
+  <div onClick="{{ closeMenu }}" aria-hidden="true" style="position:fixed;inset:0;z-index:70;background:rgba(7,11,30,.5);backdrop-filter:blur(2px);opacity:{{ scrimOpacity }};visibility:{{ drawerVis }};transition:opacity .32s ease,visibility .32s ease"></div>
+
+  <aside id="skpn-menu" role="dialog" aria-modal="true" aria-label="{{ t.menuLabel }}" style="position:fixed;top:0;right:0;bottom:0;z-index:80;width:min(86vw,340px);background:linear-gradient(180deg,#0B1226 0%,#070B1E 100%);box-shadow:-24px 0 60px rgba(4,6,15,.5);display:flex;flex-direction:column;transform:{{ drawerTransform }};visibility:{{ drawerVis }};transition:transform .36s cubic-bezier(.32,.72,.24,1),visibility .36s">
+    <div style="padding:20px 22px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(232,193,115,.2)">
+      <span style="width:42px;height:42px;flex:0 0 auto;border-radius:50%;background:#04060F;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(232,193,115,.4)">
+        <img src="uploads/skpn-logo.png" alt="" width="32" height="32" style="display:block;width:32px;height:32px" />
+      </span>
+      <span style="flex:1 1 auto;font-family:'Noto Serif Devanagari',serif;font-size:16px;line-height:1.4;color:#FFF9EC">{{ t.orgShort }}</span>
+      <button type="button" onClick="{{ closeMenu }}" aria-label="{{ t.close }}" style="width:44px;height:44px;flex:0 0 auto;border:1px solid rgba(255,249,236,.24);border-radius:12px;background:rgba(255,255,255,.05);color:#FFF9EC;cursor:pointer;font-size:20px;line-height:1;font-family:inherit">×</button>
+    </div>
+
+    <nav style="flex:1 1 auto;overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ items }}" as="item" hint-placeholder-count="4">
+        <a href="{{ item.href }}" style="padding:15px 14px;min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:14px;background:{{ item.drawerBg }};font-family:'Noto Serif Devanagari',serif;font-size:18.5px;color:{{ item.drawerFg }};text-decoration:none">{{ item.label }}<span aria-hidden="true" style="font-family:'Noto Sans Devanagari',sans-serif;font-size:16px;color:#E8C173">→</span></a>
+      </sc-for>
+    </nav>
+
+    <div style="padding:16px 22px 26px;display:flex;flex-direction:column;gap:16px;border-top:1px solid rgba(232,193,115,.2)">
+      <a href="{{ accountHref }}" style="padding:16px;min-height:54px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%);color:#1E1503;border-radius:999px;font-size:17.5px;font-weight:600;text-decoration:none">{{ accountLabel }}</a>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,249,236,.55);line-height:1.8">{{ t.follow }}</span>
+        <span style="flex:1 1 auto;height:1px;background:rgba(232,193,115,.22)"></span>
+      </div>
+      <div style="display:flex;gap:10px">
+        <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" style="width:46px;height:46px;border-radius:14px;border:1px solid rgba(232,193,115,.34);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.16)">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#F1DFB6" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" style="display:block"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.1" cy="6.9" r="1.1" fill="#F1DFB6" stroke="none"></circle></svg>
+        </a>
+        <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" style="width:46px;height:46px;border-radius:14px;border:1px solid rgba(232,193,115,.34);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.16)">
+          <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" style="display:block"><path d="M13.6 21v-7.7h2.7l.4-3.1h-3.1V8.2c0-.9.3-1.5 1.6-1.5h1.6V3.9c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1v2.3H7.6v3.1h2.8V21z" fill="#F1DFB6"></path></svg>
+        </a>
+        <a href="https://twitter.com/" target="_blank" rel="noopener" aria-label="X, formerly Twitter" style="width:46px;height:46px;border-radius:14px;border:1px solid rgba(232,193,115,.34);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.16)">
+          <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" style="display:block"><path d="M3.3 3h4.4l4 5.6L16.6 3H21l-6.2 7.4L21.4 21h-4.4l-4.3-6-4.9 6H3.4l6.6-7.9z" fill="#F1DFB6"></path></svg>
+        </a>
+        <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube" style="width:46px;height:46px;border-radius:14px;border:1px solid rgba(232,193,115,.34);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.16)">
+          <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" style="display:block"><path d="M21.3 8.2a2.6 2.6 0 00-1.8-1.8C17.8 6 12 6 12 6s-5.8 0-7.5.4A2.6 2.6 0 002.7 8.2C2.3 9.9 2.3 12 2.3 12s0 2.1.4 3.8a2.6 2.6 0 001.8 1.8C6.2 18 12 18 12 18s5.8 0 7.5-.4a2.6 2.6 0 001.8-1.8c.4-1.7.4-3.8.4-3.8s0-2.1-.4-3.8zM10.2 15V9l5.2 3z" fill="#F1DFB6"></path></svg>
+        </a>
+      </div>
+      <a href="mailto:shrikrishnapatheynyas@gmail.com" style="font-size:14.5px;line-height:1.7;color:#E9E4D8;text-decoration:none">shrikrishnapatheynyas@gmail.com</a>
+    </div>
+  </aside>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:80}}">
+const NAV = {
+  hi: [
+    { key: "home", label: "मुख्य पृष्ठ", href: "Home v5.dc.html" },
+    { key: "about", label: "हमारे बारे में", href: "About.dc.html" },
+    { key: "pratiyogita", label: "प्रतियोगिता", href: "Pratiyogita.dc.html" },
+    { key: "rules", label: "नियम", href: "Rules.dc.html" },
+    { key: "certificates", label: "प्रमाण पत्र", href: "Certificates.dc.html" }
+  ],
+  en: [
+    { key: "home", label: "Home", href: "Home v5.dc.html" },
+    { key: "about", label: "About Us", href: "About.dc.html" },
+    { key: "pratiyogita", label: "Pratiyogita", href: "Pratiyogita.dc.html" },
+    { key: "rules", label: "Rules", href: "Rules.dc.html" },
+    { key: "certificates", label: "My Certificates", href: "Certificates.dc.html" }
+  ]
+};
+const T = {
+  hi: { orgShort: "श्रीकृष्ण पाथेय न्यास", deptShort: "संस्कृति विभाग, मध्यप्रदेश शासन", menuLabel: "मेनू", close: "बंद करें", follow: "जुड़ें", signIn: "साइन इन", account: "मेरा खाता" },
+  en: { orgShort: "Shri Krishna Pathey Nyas", deptShort: "Department of Culture, Government of MP", menuLabel: "Menu", close: "Close", follow: "Follow", signIn: "Sign in", account: "My account" }
+};
+
+class Component extends DCLogic {
+  state = { open: false };
+
+  componentDidMount() {
+    this._onKey = e => { if (e.key === "Escape" && this.state.open) this.close(); };
+    document.addEventListener("keydown", this._onKey);
+  }
+  componentWillUnmount() {
+    document.removeEventListener("keydown", this._onKey);
+    try { document.body.style.overflow = ""; } catch (e) {}
+  }
+
+  close() { this.setState({ open: false }); try { document.body.style.overflow = ""; } catch (e) {} }
+  open() { this.setState({ open: true }); try { document.body.style.overflow = "hidden"; } catch (e) {} }
+
+  renderVals() {
+    const lang = this.props.lang === "en" ? "en" : "hi";
+    const t = T[lang];
+    const active = this.props.active || "home";
+    const signedIn = this.props.signedIn ?? false;
+    const hasCerts = this.props.hasCertificates ?? false;
+    const open = this.state.open;
+    return {
+      t: t,
+      items: NAV[lang]
+        .filter(i => i.key !== "certificates" || hasCerts)
+        .map(i => ({
+          label: i.label,
+          href: i.href,
+          color: i.key === active ? "#14203E" : "#333C50",
+          weight: i.key === active ? "600" : "400",
+          underline: i.key === active ? "#E8C173" : "transparent",
+          drawerBg: i.key === active ? "rgba(232,193,115,.14)" : "transparent",
+          drawerFg: i.key === active ? "#FFF9EC" : "#F2EEE4"
+        })),
+      accountHref: signedIn ? "Profile.dc.html" : "Login.dc.html",
+      accountLabel: signedIn ? t.account : t.signIn,
+      hiBg: lang === "hi" ? "#14203E" : "transparent",
+      hiFg: lang === "hi" ? "#FDF3DF" : "#161C2E",
+      enBg: lang === "en" ? "#14203E" : "transparent",
+      enFg: lang === "en" ? "#FDF3DF" : "#161C2E",
+      open: open,
+      drawerTransform: open ? "translateX(0)" : "translateX(102%)",
+      drawerVis: open ? "visible" : "hidden",
+      scrimOpacity: open ? "1" : "0",
+      toggleMenu: () => { if (this.state.open) this.close(); else this.open(); },
+      closeMenu: () => this.close(),
+      toggle: () => { if (this.props.onToggleLang) this.props.onToggleLang(); }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

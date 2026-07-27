@@ -25,8 +25,14 @@ The design is approved. The rebuild must render identically.
 - Port markup from the `.dc.html` files **character-identical**.
 - Only permitted transformations: `class` → `className`, self-closing tags, `{}` for dynamic values, event handler renaming.
 - Do **not** clean up, simplify, semanticise, reorder or consolidate classes.
-- Do **not** edit `app/globals.css`. If a style looks wrong, report it — do not fix it.
 - Do **not** substitute a component library for hand-written markup.
+
+**`app/globals.css` is page-scoped.** The design scopes styles per page, and the same `data-e` selector carries different values on different pages. Every page-specific block is prefixed `[data-page="X"] `; the page wrapper carries the matching `data-page`. Shared blocks — `@font-face`, base reset, SiteHeader/SiteFooter/CtaBox — stay unprefixed. The `prefers-reduced-motion` block is last and uses `!important`, because page-scoping raises specificity above it.
+
+- You may add a page's block when building that page.
+- You may **not** change any declared value, in any block, ever.
+- If a value looks wrong, report it. Do not fix it.
+- Never touch another page's block or the shared block.
 
 **Definition of done for any page:** the Playwright screenshot matches `tests/baseline/` at 390, 768 and 1440px. Not "it renders." Matches.
 
@@ -58,6 +64,8 @@ Because there is no credential, these are mandatory and not optional:
 - No endpoint confirms whether a mobile number is registered, except `POST /api/register/check-mobile`, which is throttled per IP and per session and returns a boolean only.
 
 Do not add a second factor. Do not propose one. The decision is made.
+
+Session revocation is a `sessionVersion` integer on the user document, embedded in the cookie payload and compared on every authenticated route including `/api/session`. Sign-out increments it, invalidating every outstanding cookie. Cookie TTL is 7 days.
 
 ---
 
@@ -95,7 +103,9 @@ Never edit files outside your track's directories.
 
 ## Stack
 
-Next.js App Router · TypeScript · MongoDB (Atlas, Mumbai) · Tailwind · `zod` · Playwright.
+Next.js App Router · TypeScript · MongoDB (Atlas, Mumbai) · `zod` · Playwright.
+
+**No Tailwind.** It is deliberately not imported. The design uses zero class attributes across all 14 files, and Preflight would reset list padding, heading margins and default fonts, diverging from the baselines. New UI — the contact form, anything not in the export — is built with the design's existing `data-e` vocabulary so it matches rather than approximates. Do not reinstate Tailwind.
 
 Static content pages are SSG and CDN-cacheable. Only the quiz is genuinely dynamic. Do not server-render the marketing pages.
 
@@ -104,5 +114,9 @@ Static content pages are SSG and CDN-cacheable. Only the quiz is genuinely dynam
 ## Deleted, not ported
 
 `assets/site.js` · `support.js` · `uploads/questions.json` and `uploads/quiz-questions.json` (after import) · `uploads/cert.jpeg` as a served asset · every `localStorage` key.
+
+## Assets
+
+Follow the design. Every image a `.dc.html` file references is copied into `public/` at the path the markup expects. No placeholders, no substitutions.
 
 The question JSON files contain the answer key. They must not exist under `public/` at any point, including temporarily.

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FBF7F0; }
+  * { box-sizing: border-box; }
+  a { color: #27408B; text-decoration: none; }
+  a:hover { color: #8A6015; }
+  ::selection { background: #F1DFB6; color: #14203E; }
+  button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offset: 2px; }
+  @media (max-width: 980px) {
+    [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
+    [data-e~="menu-btn"] { display: inline-flex !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="pad"] { padding-left: 18px !important; padding-right: 18px !important; }
+    [data-e~="card"] { padding: 20px 16px !important; }
+  }
+</style>
+<script src="assets/site.js"></script>
+</helmet>
+
+<div style="background:#FBF7F0;color:#161C2E;font-family:'Noto Sans Devanagari',system-ui,sans-serif;min-width:320px;overflow-x:hidden">
+  <dc-import name="SiteHeader" lang="{{ lang }}" active="certificates" signed-in="{{ true }}" has-certificates="{{ true }}" on-toggle-lang="{{ toggleLang }}" hint-size="100%,68px"></dc-import>
+
+  <section data-e="pad" style="max-width:900px;margin:0 auto;padding:48px 30px 78px">
+    <h1 style="margin:0 0 26px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(25px,3.6vw,34px);line-height:1.3;color:#14203E">{{ t.title }}</h1>
+
+    <div data-e="card" style="padding:26px;background:#FFFFFF;border-radius:22px;box-shadow:0 2px 4px rgba(20,32,62,.05),0 16px 34px rgba(20,32,62,.07)">
+      <div style="container-type:inline-size;position:relative;overflow:hidden;border-radius:14px;aspect-ratio:1600/1131;background:#FFFDF7">
+        <img src="uploads/cert.jpeg" alt="{{ t.certAlt }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block" />
+        <p style="position:absolute;left:12%;right:12%;top:49%;margin:0;text-align:center;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:4.2cqw;line-height:1.55;letter-spacing:.01em;color:#8C1A20;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ studentName }}</p>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:22px">
+        <a href="uploads/cert.jpeg" download="{{ fileName }}" style="min-height:54px;padding:15px 28px;border:0;border-radius:999px;background:linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%);color:#1E1503;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:17px;font-weight:600;line-height:1.5;text-decoration:none;box-shadow:0 10px 26px rgba(232,193,115,.28);transition:transform .2s ease" style-hover="transform:translateY(-2px)">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#1E1503" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block"><path d="M12 4v11m0 0-4.2-4.2M12 15l4.2-4.2M4.5 19.5h15"></path></svg>
+          {{ t.download }}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" lang="{{ lang }}" hint-size="100%,320px"></dc-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1000}}">
+const S = {
+  hi: {
+    title: "प्रमाण पत्र",
+    certAlt: "सहभागिता प्रमाण पत्र",
+    download: "प्रमाण पत्र डाउनलोड करें"
+  },
+  en: {
+    title: "Certificate",
+    certAlt: "Participation certificate",
+    download: "Download certificate"
+  }
+};
+
+class Component extends DCLogic {
+  state = { lang: null, profile: null };
+
+  componentDidMount() {
+    try { const saved = localStorage.getItem("skpn_lang"); if (saved === "hi" || saved === "en") this.setState({ lang: saved }); } catch (e) {}
+    try {
+      const raw = localStorage.getItem("skpn_profile");
+      if (raw) this.setState({ profile: JSON.parse(raw) });
+    } catch (e) {}
+  }
+
+  get lang() { return this.state.lang || this.props.language || "hi"; }
+
+  renderVals() {
+    const lang = this.lang;
+    return {
+      lang: lang,
+      t: S[lang],
+      studentName: (this.state.profile && this.state.profile.name) || (lang === "hi" ? "अनन्या वर्मा" : "Ananya Verma"),
+      fileName: "shri-krishna-pathey-nyas-certificate.jpeg",
+      toggleLang: () => {
+        const next = lang === "hi" ? "en" : "hi";
+        try { localStorage.setItem("skpn_lang", next); } catch (e) {}
+        this.setState({ lang: next });
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

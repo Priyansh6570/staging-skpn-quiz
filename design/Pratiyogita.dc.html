@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FBF7F0; }
+  * { box-sizing: border-box; }
+  a { color: #27408B; text-decoration: none; }
+  a:hover { color: #8A6015; }
+  ::selection { background: #F1DFB6; color: #14203E; }
+  @keyframes pr-glow { 0%,100% { opacity:.3; transform:scale(1); } 50% { opacity:.75; transform:scale(1.05); } }
+  @keyframes pr-marq { from { transform: translate3d(0,0,0); } to { transform: translate3d(-50%,0,0); } }
+  @keyframes pr-marq-rev { from { transform: translate3d(-50%,0,0); } to { transform: translate3d(0,0,0); } }
+  [data-e~="marqwrap"] { -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%); }
+  [data-e~="marqwrap"]:hover [data-e~="marqrow"] { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+  @media (max-width: 980px) {
+    [data-g="two"] { grid-template-columns: minmax(0,1fr) !important; }
+    [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
+    [data-e~="menu-btn"] { display: inline-flex !important; }
+    [data-e~="prizerow"] { grid-template-columns: minmax(0,1fr) !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="pad"] { padding-left: 18px !important; padding-right: 18px !important; }
+    [data-e~="section"] { padding-top: 52px !important; padding-bottom: 52px !important; }
+    [data-e~="card"] { padding: 24px 20px !important; }
+    [data-e~="hero"] { padding-top: 48px !important; padding-bottom: 48px !important; }
+    [data-e~="cta"] { width: 100% !important; }
+    [data-e~="ctarow"] { flex-direction: column !important; align-items: stretch !important; }
+  }
+</style>
+<script src="assets/site.js"></script>
+</helmet>
+
+<div style="background:#FBF7F0;color:#161C2E;font-family:'Noto Sans Devanagari',system-ui,sans-serif;min-width:320px;overflow-x:hidden">
+  <dc-import name="SiteHeader" lang="{{ lang }}" active="pratiyogita" on-toggle-lang="{{ toggleLang }}" hint-size="100%,68px"></dc-import>
+
+  <section style="position:relative;overflow:hidden;background:#070B1E">
+    <img src="assets/cosmic-spiral.png" alt="" width="924" height="540" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;opacity:.55" />
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(7,11,30,.62) 0%, rgba(7,11,30,.93) 100%)"></div>
+    <div data-e="pad hero" style="position:relative;max-width:1220px;margin:0 auto;padding:76px 30px 62px">
+      <p style="margin:0 0 14px;font-family:'Noto Serif Devanagari',serif;font-size:17px;letter-spacing:.01em;color:#E8C173;line-height:1.9">{{ t.kicker }}</p>
+      <h1 style="margin:0 0 18px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(29px,4.4vw,50px);line-height:1.26;color:#FFF9EC;max-width:22ch;text-wrap:balance">{{ t.title }}</h1>
+      <p style="margin:0 0 30px;max-width:54ch;font-size:clamp(16.5px,1.9vw,19px);line-height:1.85;color:#E9E4D8">{{ t.lede }}</p>
+      <div data-e="ctarow" style="display:flex;flex-wrap:wrap;gap:12px">
+        <a href="{{ primaryHref }}" data-e="cta" style="padding:16px 32px;min-height:56px;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%);color:#1E1503;border-radius:999px;font-size:18px;font-weight:600;line-height:1.5;white-space:nowrap;transition:transform .2s ease" style-hover="transform:translateY(-2px)">{{ t.ctaPrimary }}</a>
+        <a href="Rules.dc.html" data-e="cta" style="padding:16px 28px;min-height:56px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,249,236,.4);border-radius:999px;font-size:18px;line-height:1.5;white-space:nowrap;color:#FFF9EC" style-hover="background:rgba(255,255,255,.1)">{{ t.ctaSecondary }}</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="position:relative;overflow:hidden;background:#0B1226;border-bottom:1px solid rgba(232,193,115,.22)">
+    <div aria-hidden="true" style="position:absolute;left:50%;top:-60%;width:640px;height:640px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.16) 0%,rgba(232,193,115,0) 68%);animation:pr-glow 9s ease-in-out infinite"></div>
+    <div data-e="pad" style="position:relative;max-width:1220px;margin:0 auto;padding:56px 30px">
+      <p style="margin:0;max-width:34ch;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(26px,3.6vw,40px);line-height:1.35;color:#E8C173;text-wrap:balance">{{ t.prizeLine }}</p>
+    </div>
+  </section>
+
+  <section data-e="pad section" style="max-width:1220px;margin:0 auto;padding:80px 30px">
+    <h2 data-reveal style="margin:0 0 30px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(24px,3.2vw,32px);line-height:1.35;color:#14203E">{{ t.whoTitle }}</h2>
+    <div data-g="two" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px">
+      <sc-for list="{{ categories }}" as="c" hint-placeholder-count="2">
+        <div data-e="card" style="position:relative;overflow:hidden;padding:34px;background:{{ c.bg }};border-radius:24px;border:1px solid {{ c.border }};box-shadow:0 2px 4px rgba(20,32,62,.05),0 16px 36px rgba(20,32,62,.07);display:flex;flex-direction:column;gap:16px;transition:transform .18s ease" style-hover="transform:translateY(-3px)">
+          <span aria-hidden="true" style="position:absolute;right:-30px;top:-30px;width:150px;height:150px;border-radius:50%;background:{{ c.blob }}"></span>
+          <span style="position:relative;width:52px;height:52px;border-radius:16px;background:{{ c.iconBg }};display:flex;align-items:center;justify-content:center">
+            <svg viewBox="0 0 32 32" width="26" height="26" fill="none" stroke="{{ c.iconFg }}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block">
+              <sc-if value="{{ c.isSchool }}" hint-placeholder-val="{{ true }}">
+                <g><path d="M4 13 16 6l12 7-12 7z"></path><path d="M9 16v7c0 1.6 3.1 3 7 3s7-1.4 7-3v-7"></path></g>
+              </sc-if>
+              <sc-if value="{{ c.isCollege }}" hint-placeholder-val="{{ true }}">
+                <g><rect x="5" y="12" width="22" height="15" rx="2"></rect><path d="M11 27v-6h4v6M20 17h3M20 21h3M9 12V7h14v5"></path></g>
+              </sc-if>
+            </svg>
+          </span>
+          <h3 style="position:relative;margin:0;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:25px;line-height:1.4;color:#14203E">{{ c.name }}</h3>
+          <p style="position:relative;margin:0;font-size:17.5px;line-height:1.8;color:#161C2E">{{ c.who }}</p>
+          <span style="position:relative;margin-top:6px;align-self:flex-start;padding:9px 18px;border-radius:999px;background:{{ c.pillBg }};color:{{ c.pillFg }};font-size:16px;line-height:1.6;font-weight:600">{{ c.count }}</span>
+        </div>
+      </sc-for>
+    </div>
+        <div data-reveal data-e="card" style="position:relative;overflow:hidden;margin-top:30px;padding:34px 0 30px;border-radius:24px;background:linear-gradient(150deg,#FFFFFF 0%,#FDF6E8 100%);border:1px solid #EFE0C4;box-shadow:0 2px 4px rgba(20,32,62,.05),0 16px 36px rgba(20,32,62,.07)">
+      <div aria-hidden="true" style="position:absolute;left:50%;top:-70%;width:620px;height:620px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.3) 0%,rgba(232,193,115,0) 68%);animation:pr-glow 10s ease-in-out infinite"></div>
+      <div style="position:relative;padding:0 34px;display:flex;flex-direction:column;gap:12px;margin-bottom:26px">
+        <span style="font-family:'Noto Serif Devanagari',serif;font-size:16.5px;letter-spacing:.01em;color:#8A6015;line-height:1.8">{{ t.examEyebrow }}</span>
+        <p style="margin:0;max-width:30ch;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(20px,2.6vw,28px);line-height:1.45;color:#14203E;text-wrap:balance">{{ t.examTitle }}</p>
+      </div>
+      <div data-e="marqwrap" style="position:relative;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+        <div data-e="marqrow" style="display:flex;width:max-content;gap:12px;animation:pr-marq 42s linear infinite">
+          <sc-for list="{{ examsA }}" as="e" hint-placeholder-count="24">
+            <span style="flex:0 0 auto;padding:11px 22px;border-radius:999px;border:1px solid #E7D6B2;background:#F7EEDA;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:18px;line-height:1.5;color:#6B4A10;white-space:nowrap">{{ e }}</span>
+          </sc-for>
+        </div>
+        <div data-e="marqrow" style="display:flex;width:max-content;gap:12px;animation:pr-marq-rev 38s linear infinite">
+          <sc-for list="{{ examsB }}" as="e" hint-placeholder-count="24">
+            <span style="flex:0 0 auto;padding:11px 22px;border-radius:999px;border:1px solid #DDE3F2;background:#EEF2FB;font-size:17px;line-height:1.5;color:#22366F;white-space:nowrap">{{ e }}</span>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:#F6F0E4;border-top:1px solid #EFE5D3;border-bottom:1px solid #EFE5D3">
+    <div data-e="pad section" style="max-width:1220px;margin:0 auto;padding:76px 30px">
+      <h2 data-reveal style="margin:0 0 32px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(24px,3.2vw,32px);line-height:1.35;color:#14203E">{{ t.formatTitle }}</h2>
+      <dl style="margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px">
+        <sc-for list="{{ format }}" as="f" hint-placeholder-count="5">
+          <div data-e="card" style="padding:26px 28px;background:#FFFFFF;border-radius:20px;box-shadow:0 2px 4px rgba(20,32,62,.05),0 12px 26px rgba(20,32,62,.05);display:flex;flex-direction:column;gap:10px;border-top:3px solid {{ f.accent }}">
+            <dt style="font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:29px;line-height:1.25;color:#14203E">{{ f.value }}</dt>
+            <dd style="margin:0;font-size:16px;line-height:1.75;color:#161C2E">{{ f.label }}</dd>
+          </div>
+        </sc-for>
+      </dl>
+    </div>
+  </section>
+
+  <section data-e="pad section" style="max-width:1220px;margin:0 auto;padding:80px 30px">
+    <h2 data-reveal style="margin:0 0 34px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(24px,3.2vw,32px);line-height:1.35;color:#14203E">{{ t.datesTitle }}</h2>
+    <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column">
+      <sc-for list="{{ dates }}" as="d" hint-placeholder-count="3">
+        <li data-reveal style="position:relative;padding:0 0 30px 40px;display:flex;flex-direction:column;gap:5px">
+          <span aria-hidden="true" style="position:absolute;left:9px;top:24px;bottom:0;width:1px;background:{{ d.line }}"></span>
+          <span aria-hidden="true" style="position:absolute;left:0;top:7px;width:19px;height:19px;border-radius:50%;background:{{ d.dotBg }};border:2px solid {{ d.dotBorder }}"></span>
+          <span style="font-size:17px;line-height:1.6;color:#8A6015;font-variant-numeric:tabular-nums">{{ d.when }}</span>
+          <span style="font-family:'Noto Serif Devanagari',serif;font-weight:500;font-size:21px;line-height:1.5;color:#161C2E">{{ d.what }}</span>
+          <span style="font-size:16px;line-height:1.75;color:#161C2E">{{ d.note }}</span>
+        </li>
+      </sc-for>
+    </ol>
+  </section>
+
+  <dc-import name="CtaBox" lang="{{ lang }}" hint-size="100%,430px"></dc-import>
+
+  <dc-import name="SiteFooter" lang="{{ lang }}" hint-size="100%,320px"></dc-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400}}">
+const S = {
+  hi: {
+    kicker: "प्रतियोगिता",
+    title: "भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता",
+    lede: "मध्यप्रदेश के विद्यार्थियों के लिए निःशुल्क प्रतियोगिता, जिसका विषय 64 कलाएँ, 14 विद्याएँ, महर्षि सांदीपनि तथा भारतीय ज्ञान परंपरा है।",
+    ctaPrimary: "पंजीकरण करें",
+    ctaTake: "भाग लें",
+    ctaAgain: "प्रमाण पत्र देखें",
+    ctaSecondary: "नियम पढ़ें",
+    prizeLine: "102 चयनित विजेताओं को एक-एक लाख रुपये की छात्रवृत्ति।",
+    whoTitle: "कौन भाग ले सकता है",
+    categories: [
+      { name: "विद्यालय स्तर", who: "कक्षा 9 से 12 तक के विद्यार्थी", count: "51 छात्रवृत्तियाँ", kind: "school" },
+      { name: "महाविद्यालय/विश्वविद्यालय स्तर", who: "महाविद्यालय, विश्वविद्यालय, पॉलिटेक्निक अथवा आईटीआई के विद्यार्थी", count: "51 छात्रवृत्तियाँ", kind: "college" }
+    ],
+    examEyebrow: "प्रतियोगी परीक्षा के अभ्यर्थी",
+    examTitle: "प्रवेश परीक्षाओं की तैयारी कर रहे विद्यार्थी भी आमंत्रित हैं।",
+    formatTitle: "प्रतियोगिता का स्वरूप",
+    format: [
+      { value: "30", label: "प्रश्न, प्रत्येक में एक सही विकल्प" },
+      { value: "10 मिनट", label: "कुल समय, समय समाप्त होने पर स्वतः जमा" }
+    ],
+    datesTitle: "तिथियाँ",
+    dates: [
+      { when: "29 जुलाई 2026", what: "महर्षि सांदीपनि गुरु पर्व आरंभ", note: "प्रतियोगिता प्रारंभ" },
+      { when: "4 सितम्बर 2026", what: "श्रीकृष्ण जन्माष्टमी", note: "प्रविष्टियों की अंतिम तिथि" },
+      { when: "1 नवंबर 2026", what: "मध्यप्रदेश स्थापना दिवस", note: "छात्रवृत्ति वितरण" }
+    ],
+    closeTitle: "प्रतियोगिता में सम्मिलित हों"
+  },
+  en: {
+    kicker: "The competition",
+    title: "Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita",
+    lede: "A free competition for students of Madhya Pradesh on the 64 Kalas, the 14 Vidyas, Maharishi Sandipani and the Indian knowledge tradition.",
+    ctaPrimary: "Register now",
+    ctaTake: "Take part",
+    ctaAgain: "View certificate",
+    ctaSecondary: "Read the rules",
+    prizeLine: "A scholarship of one lakh rupees each for 102 selected winners.",
+    whoTitle: "Who can participate",
+    categories: [
+      { name: "Vidyalaya Star", who: "Students of Classes 9 to 12", count: "51 scholarships", kind: "school" },
+      { name: "Mahavidyalaya Star", who: "Students of colleges, universities, polytechnics or ITIs", count: "51 scholarships", kind: "college" }
+    ],
+    examEyebrow: "Entrance-exam candidates",
+    examTitle: "Entrance-exam aspirants are just as welcome to take part.",
+    formatTitle: "Format",
+    format: [
+      { value: "30", label: "Questions, one correct option each" },
+      { value: "10 minutes", label: "Total time, auto-submits when time expires" }
+    ],
+    datesTitle: "Dates",
+    dates: [
+      { when: "29 July 2026", what: "Maharishi Sandipani Guru Parv begins", note: "Competition opens" },
+      { when: "4 September 2026", what: "Shri Krishna Janmashtami", note: "Last date for entries" },
+      { when: "1 November 2026", what: "Madhya Pradesh Sthapana Diwas", note: "Scholarship distribution" }
+    ],
+    closeTitle: "Enter the competition"
+  }
+};
+
+const CAT_STYLE = {
+  school: { bg: "linear-gradient(150deg,#FFFFFF 0%,#FDF6E8 100%)", border: "#EFE0C4", blob: "radial-gradient(circle,rgba(232,193,115,.24) 0%,rgba(232,193,115,0) 70%)", iconBg: "#F4EBD8", iconFg: "#8A6015", pillBg: "#F4EBD8", pillFg: "#6B4A10" },
+  college: { bg: "linear-gradient(150deg,#FFFFFF 0%,#F0F3FB 100%)", border: "#DDE3F2", blob: "radial-gradient(circle,rgba(39,64,139,.16) 0%,rgba(39,64,139,0) 70%)", iconBg: "#E7ECF8", iconFg: "#27408B", pillBg: "#E7ECF8", pillFg: "#22366F" }
+};
+const F_ACCENTS = ["#E8C173", "#27408B", "#8A6015", "#3F6B58", "#B4483A"];
+const EXAM_ROW_A = ["NEET UG", "JEE Main", "JEE Advanced", "CUET", "BITSAT", "GATE", "CAT", "XAT", "CLAT", "AILET", "NDA", "CDS", "AFCAT"];
+const EXAM_ROW_B = ["UPSC CSE", "MPPSC", "SSC CGL", "IBPS PO", "UGC NET", "CA", "CS", "CMA", "NIFT", "NID", "NTSE", "MP PAT", "MP PET"];
+
+class Component extends DCLogic {
+  state = { lang: null, signedIn: null, attempts: 0 };
+
+  componentDidMount() {
+    try { const saved = localStorage.getItem("skpn_lang"); if (saved === "hi" || saved === "en") this.setState({ lang: saved }); } catch (e) {}
+    try {
+      const si = localStorage.getItem("skpn_signed_in") === "1";
+      const at = Number(localStorage.getItem("skpn_attempts") || 0);
+      if (si || at) this.setState({ signedIn: si, attempts: at });
+    } catch (e) {}
+  }
+
+  get lang() { return this.state.lang || this.props.language || "hi"; }
+
+  renderVals() {
+    const lang = this.lang, t = S[lang];
+    const signedIn = this.state.signedIn ?? (this.props.signedIn ?? false);
+    const attempts = this.state.attempts || 0;
+    return {
+      lang: lang,
+      t: Object.assign({}, t, { ctaPrimary: signedIn ? (attempts > 0 ? t.ctaAgain : t.ctaTake) : t.ctaPrimary }),
+      primaryHref: signedIn ? (attempts > 0 ? "Certificates.dc.html" : "Quiz.dc.html") : "Register.dc.html",
+      categories: t.categories.map(c => Object.assign({}, c, CAT_STYLE[c.kind], {
+        isSchool: c.kind === "school",
+        isCollege: c.kind === "college"
+      })),
+      examsA: EXAM_ROW_A.concat(EXAM_ROW_A),
+      examsB: EXAM_ROW_B.concat(EXAM_ROW_B),
+      format: t.format.map((f, i) => Object.assign({}, f, { accent: F_ACCENTS[i % F_ACCENTS.length] })),
+      dates: t.dates.map((d, i) => Object.assign({}, d, {
+        dotBg: i === 0 ? "#E8C173" : "#FBF7F0",
+        dotBorder: i === 0 ? "#B98F3C" : "#DCD1BC",
+        line: i === t.dates.length - 1 ? "transparent" : "#E3D9C6"
+      })),
+      toggleLang: () => {
+        const next = this.lang === "hi" ? "en" : "hi";
+        try { localStorage.setItem("skpn_lang", next); } catch (e) {}
+        this.setState({ lang: next });
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

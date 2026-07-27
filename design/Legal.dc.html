@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FBF7F0; }
+  * { box-sizing: border-box; }
+  a { color: #27408B; text-decoration: none; }
+  a:hover { color: #8A6015; }
+  button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offset: 2px; }
+  @media (max-width: 980px) {
+    [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
+    [data-e~="menu-btn"] { display: inline-flex !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="pad"] { padding-left: 18px !important; padding-right: 18px !important; }
+    [data-e~="card"] { padding: 24px 20px !important; }
+  }
+</style>
+<script src="assets/site.js"></script>
+</helmet>
+
+<div style="background:#FBF7F0;color:#161C2E;font-family:'Noto Sans Devanagari',system-ui,sans-serif;min-width:320px;overflow-x:clip">
+  <dc-import name="SiteHeader" lang="{{ lang }}" active="home" on-toggle-lang="{{ toggleLang }}" hint-size="100%,68px"></dc-import>
+
+  <section data-e="pad" style="max-width:880px;margin:0 auto;padding:48px 30px 78px">
+    <div role="tablist" style="display:flex;gap:24px;border-bottom:1px solid #E8DFCE;margin-bottom:34px">
+      <button type="button" role="tab" aria-selected="{{ privacyOn }}" onClick="{{ showPrivacy }}" style="padding:10px 2px 14px;min-height:48px;background:none;border:0;border-bottom:2px solid {{ privacyLine }};cursor:pointer;font-family:'Noto Serif Devanagari',serif;font-size:18.5px;line-height:1.5;color:{{ privacyFg }}">{{ t.privacyTab }}</button>
+      <button type="button" role="tab" aria-selected="{{ termsOn }}" onClick="{{ showTerms }}" style="padding:10px 2px 14px;min-height:48px;background:none;border:0;border-bottom:2px solid {{ termsLine }};cursor:pointer;font-family:'Noto Serif Devanagari',serif;font-size:18.5px;line-height:1.5;color:{{ termsFg }}">{{ t.termsTab }}</button>
+    </div>
+
+    <h1 style="margin:0 0 12px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(25px,3.6vw,34px);line-height:1.3;color:#14203E">{{ doc.title }}</h1>
+    <p style="margin:0 0 32px;max-width:60ch;font-size:17.5px;line-height:1.85;color:#161C2E">{{ doc.lede }}</p>
+
+    <div style="display:flex;flex-direction:column;gap:22px">
+      <sc-for list="{{ doc.sections }}" as="s" hint-placeholder-count="4">
+        <section data-e="card" style="padding:26px 30px;background:#FFFFFF;border-radius:20px;box-shadow:0 2px 4px rgba(20,32,62,.05),0 12px 28px rgba(20,32,62,.05)">
+          <h2 data-reveal style="margin:0 0 12px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:20px;line-height:1.45;color:#14203E">{{ s.title }}</h2>
+          <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ s.points }}" as="p" hint-placeholder-count="3">
+              <li data-reveal style="display:flex;gap:12px;align-items:flex-start">
+                <span aria-hidden="true" style="margin-top:9px;width:7px;height:7px;flex:0 0 auto;border-radius:50%;background:#E8C173"></span>
+                <span style="font-size:17px;line-height:1.85;color:#161C2E">{{ p }}</span>
+              </li>
+            </sc-for>
+          </ul>
+        </section>
+      </sc-for>
+    </div>
+
+    <p style="margin:24px 0 0;font-size:16.5px;line-height:1.8;color:#161C2E">{{ t.questions }} <a href="About.dc.html#sampark">{{ t.contactLink }}</a></p>
+  </section>
+
+  <dc-import name="SiteFooter" lang="{{ lang }}" hint-size="100%,300px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1000}}">
+const S = {
+  hi: {
+    privacyTab: "गोपनीयता सूचना",
+    termsTab: "उपयोग की शर्तें",
+    questions: "कोई प्रश्न हो तो",
+    contactLink: "संपर्क करें",
+    privacy: {
+      title: "गोपनीयता सूचना",
+      lede: "हम कौन सी जानकारी लेते हैं, क्यों लेते हैं और कौन देख सकता है।",
+      sections: [
+        { title: "हम क्या लेते हैं", points: [
+          "मोबाइल नंबर, जो आपकी पहचान है।",
+          "नाम, ईमेल, जन्म तिथि, लिंग तथा पता।",
+          "श्रेणी, पढ़ाई का स्तर तथा संस्था का नाम।",
+          "प्रतियोगिता के उत्तर, अंक तथा लिया गया समय।"
+        ] },
+        { title: "उपयोग किसलिए", points: [
+          "प्रतियोगिता संचालित करने, मेरिट सूची बनाने तथा परिणाम प्रकाशित करने के लिए।",
+          "छात्रवृत्ति संबंधी कार्यवाही तथा चयन होने पर आपसे संपर्क करने के लिए।",
+          "किसी अन्य कार्य के लिए नहीं। जानकारी बेची नहीं जाती और विज्ञापन नहीं दिखाए जाते।"
+        ] },
+        { title: "कौन देख सकता है", points: [
+          "न्यास तथा संस्कृति विभाग के अधिकृत कर्मचारी एवं चयन समिति।",
+          "चयनित विद्यार्थियों के नाम, जिला तथा संस्था परिणाम में प्रकाशित हो सकते हैं।"
+        ] },
+        { title: "आपके अधिकार", points: [
+          "आप जान सकते हैं कि आपकी कौन सी जानकारी हमारे पास है।",
+          "वास्तविक त्रुटि के सुधार अथवा शिकायत हेतु shrikrishnapatheynyas@gmail.com पर लिखें।"
+        ] }
+      ]
+    },
+    terms: {
+      title: "उपयोग की शर्तें",
+      lede: "इस वेबसाइट का उपयोग करने पर ये शर्तें लागू होती हैं।",
+      sections: [
+        { title: "प्रयोजन", points: [
+          "यह वेबसाइट श्रीकृष्ण पाथेय न्यास, भोपाल द्वारा संचालित है।",
+          "इसका प्रयोजन न्यास की जानकारी देना तथा भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता संचालित करना है।"
+        ] },
+        { title: "आपकी ज़िम्मेदारी", points: [
+          "पंजीकरण में सही जानकारी दें। गलत जानकारी पर प्रविष्टि निरस्त मानी जाएगी।",
+          "एक विद्यार्थी एक ही पंजीकरण करे और प्रतियोगिता केवल एक बार दे।",
+          "प्रतियोगिता के दौरान किसी अन्य व्यक्ति की सहायता अथवा अनुचित साधन का प्रयोग न करें।"
+        ] },
+        { title: "सामग्री", points: [
+          "इस वेबसाइट की सामग्री, चिह्न तथा चित्र न्यास अथवा संबंधित अधिकारियों के हैं।",
+          "अनुमति के बिना व्यावसायिक उपयोग न करें।"
+        ] },
+        { title: "परिवर्तन एवं निर्णय", points: [
+          "नियम एवं तिथियाँ परिवर्तित हो सकती हैं। परिवर्तन इसी वेबसाइट पर प्रकाशित किए जाएँगे।",
+          "प्रतियोगिता एवं चयन संबंधी सभी विषयों में न्यास का निर्णय अंतिम होगा। न्यायक्षेत्र भोपाल।",
+          "हिन्दी संस्करण प्रमाणिक है, अंग्रेज़ी अनुवाद सुविधा हेतु है।"
+        ] }
+      ]
+    }
+  },
+  en: {
+    privacyTab: "Privacy notice",
+    termsTab: "Terms of use",
+    questions: "If you have a question,",
+    contactLink: "contact us",
+    privacy: {
+      title: "Privacy notice",
+      lede: "What we collect, why we collect it and who can see it.",
+      sections: [
+        { title: "What we collect", points: [
+          "Your mobile number, which is your identity here.",
+          "Name, email, date of birth, gender and address.",
+          "Category, level of education and name of institution.",
+          "Your answers, score and time taken in the competition."
+        ] },
+        { title: "Why we use it", points: [
+          "To run the competition, prepare merit lists and publish results.",
+          "To carry out the scholarship process and contact you if you are selected.",
+          "For nothing else. We do not sell your information and we do not show advertising."
+        ] },
+        { title: "Who can see it", points: [
+          "Authorised staff of the Nyas and the Department of Culture, and the selection committee.",
+          "Names, districts and institutions of selected students may appear in published results."
+        ] },
+        { title: "Your rights", points: [
+          "You may ask what information about you we hold.",
+          "For a genuine correction or a grievance, write to shrikrishnapatheynyas@gmail.com."
+        ] }
+      ]
+    },
+    terms: {
+      title: "Terms of use",
+      lede: "These terms apply when you use this website.",
+      sections: [
+        { title: "Purpose", points: [
+          "This website is operated by Shri Krishna Pathey Nyas, Bhopal.",
+          "Its purpose is to publish information about the Nyas and to run the Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita."
+        ] },
+        { title: "Your responsibility", points: [
+          "Give correct information at registration. False information cancels the entry.",
+          "Register once and take the competition only once.",
+          "Do not take help from another person or use any unfair method during the quiz."
+        ] },
+        { title: "Content", points: [
+          "The content, marks and images on this website belong to the Nyas or the relevant authorities.",
+          "Do not use them commercially without permission."
+        ] },
+        { title: "Changes and decisions", points: [
+          "Rules and dates may change, and changes will be published on this website.",
+          "In all matters concerning the competition and selection, the decision of the Nyas is final. Jurisdiction is Bhopal.",
+          "The Hindi version is authoritative; the English translation is a courtesy."
+        ] }
+      ]
+    }
+  }
+};
+
+class Component extends DCLogic {
+  state = { lang: null, doc: null };
+
+  componentDidMount() {
+    try { const saved = localStorage.getItem("skpn_lang"); if (saved === "hi" || saved === "en") this.setState({ lang: saved }); } catch (e) {}
+    try {
+      const q = new URLSearchParams(window.location.search).get("doc");
+      if (q === "terms" || q === "privacy") this.setState({ doc: q });
+    } catch (e) {}
+  }
+
+  get lang() { return this.state.lang || this.props.language || "hi"; }
+  get doc() { return this.state.doc || this.props.doc || "privacy"; }
+
+  renderVals() {
+    const lang = this.lang, t = S[lang];
+    const isPrivacy = this.doc !== "terms";
+    return {
+      lang: lang,
+      t: t,
+      doc: isPrivacy ? t.privacy : t.terms,
+      privacyOn: isPrivacy, termsOn: !isPrivacy,
+      privacyFg: isPrivacy ? "#14203E" : "#161C2E",
+      termsFg: isPrivacy ? "#161C2E" : "#14203E",
+      privacyLine: isPrivacy ? "#8A6015" : "transparent",
+      termsLine: isPrivacy ? "transparent" : "#8A6015",
+      showPrivacy: () => this.setState({ doc: "privacy" }),
+      showTerms: () => this.setState({ doc: "terms" }),
+      toggleLang: () => {
+        const next = lang === "hi" ? "en" : "hi";
+        try { localStorage.setItem("skpn_lang", next); } catch (e) {}
+        this.setState({ lang: next });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

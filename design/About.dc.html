@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FBF7F0; }
+  * { box-sizing: border-box; }
+  a { color: #27408B; text-decoration: none; }
+  a:hover { color: #8A6015; }
+  ::selection { background: #F1DFB6; color: #14203E; }
+  @keyframes ab-glow { 0%,100% { opacity:.34; transform:scale(1); } 50% { opacity:.8; transform:scale(1.05); } }
+  @keyframes ab-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+  @media (max-width: 980px) {
+    [data-g="two"] { grid-template-columns: minmax(0,1fr) !important; }
+    [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
+    [data-e~="menu-btn"] { display: inline-flex !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="pad"] { padding-left: 18px !important; padding-right: 18px !important; }
+    [data-e~="section"] { padding-top: 52px !important; padding-bottom: 52px !important; }
+    [data-e~="card"] { padding: 24px 20px !important; }
+    [data-e~="hero"] { padding-top: 46px !important; padding-bottom: 46px !important; }
+    [data-e~="row"] { flex-direction: column !important; align-items: flex-start !important; gap: 4px !important; }
+    [data-e~="rowval"] { margin-left: 0 !important; text-align: left !important; }
+    [data-e~="mark"] { width: 176px !important; height: 176px !important; }
+  }
+</style>
+<script src="assets/site.js"></script>
+</helmet>
+
+<div style="background:#FBF7F0;color:#161C2E;font-family:'Noto Sans Devanagari',system-ui,sans-serif;min-width:320px;overflow-x:hidden">
+  <dc-import name="SiteHeader" lang="{{ lang }}" active="about" on-toggle-lang="{{ toggleLang }}" hint-size="100%,68px"></dc-import>
+
+  <section style="position:relative;overflow:hidden;background:#070B1E">
+    <img src="assets/teaching.png" alt="" width="2560" height="1440" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 28%;opacity:.55" />
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(7,11,30,.66) 0%, rgba(7,11,30,.92) 100%)"></div>
+    <div data-e="pad hero" style="position:relative;max-width:1220px;margin:0 auto;padding:76px 30px 66px">
+      <p style="margin:0 0 14px;font-family:'Noto Serif Devanagari',serif;font-size:17px;letter-spacing:.01em;color:#E8C173;line-height:1.9">{{ t.kicker }}</p>
+      <h1 style="margin:0 0 18px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(30px,4.6vw,52px);line-height:1.26;color:#FFF9EC;max-width:22ch;text-wrap:balance">{{ t.title }}</h1>
+      <p style="margin:0;max-width:56ch;font-size:clamp(16.5px,1.9vw,19px);line-height:1.85;color:#E9E4D8">{{ t.lede }}</p>
+    </div>
+  </section>
+
+  <dc-import name="Leadership" lang="{{ lang }}" hint-size="100%,620px"></dc-import>
+
+  <section style="background:#F6F0E4;border-top:1px solid #EFE5D3;border-bottom:1px solid #EFE5D3">
+    <div data-e="pad section" style="max-width:1220px;margin:0 auto;padding:76px 30px">
+      <h2 data-reveal style="margin:0 0 34px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(24px,3.2vw,32px);line-height:1.35;color:#14203E">{{ t.objectsTitle }}</h2>
+      <ul style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+        <sc-for list="{{ objects }}" as="o" hint-placeholder-count="8">
+          <li data-reveal data-e="card" style="position:relative;overflow:hidden;padding:26px 28px;background:#FFFFFF;border-radius:20px;box-shadow:0 2px 4px rgba(20,32,62,.05),0 12px 28px rgba(20,32,62,.06);display:flex;flex-direction:column;gap:14px;transition:transform .18s ease,box-shadow .18s ease" style-hover="transform:translateY(-3px);box-shadow:0 6px 12px rgba(20,32,62,.07),0 22px 44px rgba(20,32,62,.1)">
+            <span aria-hidden="true" style="position:absolute;left:0;top:0;bottom:0;width:4px;background:{{ o.accent }}"></span>
+            <span style="width:38px;height:38px;flex:0 0 auto;border-radius:12px;background:{{ o.tint }};color:{{ o.ink }};display:flex;align-items:center;justify-content:center;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:16px">{{ o.n }}</span>
+            <span style="font-size:16.5px;line-height:1.8;color:#161C2E">{{ o.text }}</span>
+          </li>
+        </sc-for>
+      </ul>
+    </div>
+  </section>
+
+  <section data-e="pad section" data-g="two" style="max-width:1220px;margin:0 auto;padding:80px 30px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:44px;align-items:center">
+    <div>
+      <h2 data-reveal style="margin:0 0 16px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(24px,3.2vw,32px);line-height:1.35;color:#14203E">{{ t.sandipaniTitle }}</h2>
+      <p style="margin:0 0 16px;font-size:17.5px;line-height:1.9;color:#161C2E">{{ t.sandipaniP1 }}</p>
+      <p style="margin:0;font-size:17.5px;line-height:1.9;color:#161C2E">{{ t.sandipaniP2 }}</p>
+    </div>
+    <div style="position:relative;overflow:hidden;border-radius:24px;box-shadow:0 18px 44px rgba(20,32,62,.18)">
+      <img src="assets/cosmic-spiral.png" alt="{{ t.illoAlt }}" width="924" height="540" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover" />
+    </div>
+  </section>
+
+  <section id="sampark" data-e="pad section" style="max-width:1220px;margin:0 auto;padding:80px 30px;scroll-margin-top:96px">
+    <div data-e="card" style="position:relative;overflow:hidden;max-width:760px;padding:34px;border-radius:24px;background:linear-gradient(150deg,#FFFFFF 0%,#FDF7EA 100%);border:1px solid #EFE0C4;box-shadow:0 2px 4px rgba(20,32,62,.05),0 18px 40px rgba(20,32,62,.08);display:flex;flex-direction:column;gap:22px">
+      <div aria-hidden="true" style="position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.28) 0%,rgba(232,193,115,0) 70%)"></div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'Noto Serif Devanagari',serif;font-size:15.5px;letter-spacing:.01em;color:#161C2E;line-height:1.8">{{ t.officeLabel }}</span>
+        <span style="font-size:18px;line-height:1.7;color:#161C2E">{{ t.officeValue }}</span>
+      </div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'Noto Serif Devanagari',serif;font-size:15.5px;letter-spacing:.01em;color:#161C2E;line-height:1.8">{{ t.phoneLabel }}</span>
+        <a href="tel:+917554535064" style="font-family:'Noto Serif Devanagari',serif;font-size:clamp(19px,2.4vw,25px);line-height:1.5;color:#14203E;text-decoration:none" style-hover="color:#8A6015">{{ t.phoneValue }}</a>
+      </div>
+      <div style="position:relative;display:flex;flex-direction:column;gap:6px">
+        <span style="font-family:'Noto Serif Devanagari',serif;font-size:15.5px;letter-spacing:.01em;color:#161C2E;line-height:1.8">{{ t.emailLabel }}</span>
+        <a href="mailto:shrikrishnapatheynyas@gmail.com" style="font-family:'Noto Serif Devanagari',serif;font-size:clamp(19px,2.4vw,25px);line-height:1.5;color:#14203E;word-break:break-word" style-hover="color:#8A6015">shrikrishnapatheynyas@gmail.com</a>
+      </div>
+      <a href="mailto:shrikrishnapatheynyas@gmail.com" style="position:relative;min-height:56px;padding:16px 30px;border-radius:999px;background:#14203E;color:#FDF3DF;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:17.5px;font-weight:600;line-height:1.5;text-decoration:none;align-self:flex-start" style-hover="background:#1E2C52;color:#FFF9EC">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#FDF3DF" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block"><rect x="3" y="5" width="18" height="14" rx="2.5"></rect><path d="M3.5 6.5 12 13l8.5-6.5"></path></svg>
+        {{ t.writeToUs }}
+      </a>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" lang="{{ lang }}" hint-size="100%,320px"></dc-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1400}}">
+const ACCENTS = [
+  ["#E8C173", "#FAF1DC", "#7A5412"],
+  ["#27408B", "#E7ECF8", "#22366F"],
+  ["#8A6015", "#F6EBD6", "#6B4A10"],
+  ["#3F6B58", "#E7F1EC", "#2E5142"]
+];
+
+
+const S = {
+  hi: {
+    kicker: "हमारे बारे में",
+    title: "श्रीकृष्ण पाथेय न्यास",
+    lede: "राष्ट्र में नव जागरण तथा उत्कर्ष के लिये भारत वर्ष और विश्व के पथ प्रदर्शक, युगावतार भगवान श्रीकृष्ण द्वारा उज्जैन, मध्यप्रदेश को केन्द्र में रख कर की गई यात्रा के विभिन्न स्थलों के पुरान्वेषण तथा उन्हें तीर्थ के रुप में विकसित करने तथा सम्बन्धित क्षेत्रों के साहित्य, संस्कृति का संरक्षण, संवर्धन करने के उद्देश्य से मध्यप्रदेश शासन, संस्कृति विभाग द्वारा श्रीकृष्ण पाथेय न्यास की स्थापना की गयी।",
+    illoAlt: "ज्योतिर्मय ब्रह्मांड का प्रतीकात्मक चित्र",
+    objectsTitle: "न्यास के उद्देश्य",
+    objects: [
+      "मध्यप्रदेश में भगवान श्रीकृष्ण की यात्राओं से जुड़े स्थलों की पहचान, विकास, संरक्षण तथा उनका अभिलेखन, फ़ोटोग्राफ़ी, फ़िल्मांकन एवं चित्रांकन।",
+      "इन स्थलों के मंदिरों, जल संरचनाओं, वन संपदा एवं उद्यानों का संरक्षण तथा राष्ट्रीय एवं अंतर्राष्ट्रीय स्तर पर प्रचार।",
+      "उज्जैन में 64 कलाओं एवं 14 विद्याओं की औपचारिक शिक्षा हेतु सांदीपनि गुरुकुल की स्थापना।",
+      "सभागार, सामुदायिक भवन तथा धर्मशालाओं का निर्माण एवं संचालन।",
+      "शिक्षा, संस्कृति, कृषि तथा गौ एवं पशुधन पालन की विरासत का विकास।",
+      "नई पीढ़ी को भगवान श्रीकृष्ण की कथा एवं यात्रा स्थलों से भावनात्मक तथा अनुभवात्मक रूप से जोड़ना।",
+      "पर्यटकों, शोधार्थियों, युवाओं एवं विद्यार्थियों के लिए पुस्तकालय, संग्रहालय तथा सूचना केंद्रों की स्थापना।",
+      "उन ऋषियों, संतों, विचारकों, कवियों, लेखकों, कलाकारों एवं वैज्ञानिकों के योगदान का अभिलेखन जिन्होंने श्रीकृष्ण को जगद्गुरु के रूप में स्थापित किया।"
+    ],
+    sandipaniTitle: "गुरू सांदीपनि और श्रीकृष्‍ण",
+    sandipaniP1: "भगवान श्रीकृष्ण का व्यक्तित्व केवल उनकी लीलाओं और पराक्रम से नहीं, बल्कि महर्षि सांदीपनि के आश्रम में प्राप्त शिक्षा, संस्कार और अनुशासन से पूर्ण हुआ। वहीं उन्होंने 14 विद्याओं, 64 कलाओं तथा भारतीय ज्ञान परंपरा के माध्यम से विवेक, सेवा, धैर्य, कर्तव्य और नेतृत्व का पाठ सीखा। यही गुरु–शिष्य परंपरा उनके जीवन की सबसे बड़ी शक्ति बनी और आगे चलकर उन्हें जगद्गुरु के रूप में प्रतिष्ठित किया।",
+    sandipaniP2: "इसी आदर्श पर आधारित भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता विद्यार्थियों को 64 कलाओं, 14 विद्याओं और भारतीय ज्ञान परंपरा के अध्ययन के लिए प्रेरित कर ज्ञान, संस्कृति और संस्कार से जुड़े राष्ट्रनिर्माण के मूल्यों को सुदृढ़ करने का प्रयास है।",
+    emailLabel: "आधिकारिक ईमेल",
+    officeLabel: "कार्यालय",
+    officeValue: "श्रीकृष्ण पाथेय न्यास, प्रथम तल, रवीन्द्र भवन सभागार, पॉलिटेक्निक चौराहा, भोपाल, मध्यप्रदेश – 462003",
+    phoneLabel: "दूरभाष",
+    phoneValue: "0755 4535064",
+    writeToUs: "ईमेल लिखें"
+  },
+  en: {
+    kicker: "About us",
+    title: "Shri Krishna Pathey Nyas",
+    lede: "Shri Krishna Pathey Nyas was established by the Department of Culture, Government of Madhya Pradesh, to research the various places along the journey undertaken by Yugavatar Bhagwan Shri Krishna — guide to Bharatvarsh and the world for the nation’s renewal and ascent — with Ujjain, Madhya Pradesh at its centre, to develop them as places of pilgrimage, and to protect and promote the literature and culture of the regions concerned.",
+    illoAlt: "Symbolic illustration of a luminous cosmos",
+    objectsTitle: "Objects of the trust",
+    objects: [
+      "Identify, develop, protect and preserve the places in Madhya Pradesh associated with the travels of Bhagwan Shri Krishna, and document them through recording, photography, filming and illustration.",
+      "Protect and manage the temples, water structures, forest wealth and gardens within those sites, and promote them nationally and internationally.",
+      "Establish a Sandipani Gurukul at Ujjain for formal instruction in the 64 Kalas and 14 Vidyas.",
+      "Build and manage auditoria, community centres and dharmshalas.",
+      "Develop the heritage of education, culture, agriculture, and cow and livestock husbandry.",
+      "Connect the younger generation, emotionally and experientially, to the story of Bhagwan Shri Krishna and the destinations of his journeys.",
+      "Establish libraries, museums and information centres for tourists, researchers, youth and students.",
+      "Document the contribution of the sages, saints, thinkers, poets, writers, artists and scientists who helped establish Shri Krishna as Jagadguru."
+    ],
+    sandipaniTitle: "Guru Sandipani and Shri Krishna",
+    sandipaniP1: "The personality of Bhagwan Shri Krishna was completed not by his leelas and valour alone, but by the education, character and discipline he received at the ashram of Maharishi Sandipani. There, through the 14 Vidyas, the 64 Kalas and the Indian knowledge tradition, he learned discernment, service, patience, duty and leadership. That guru–shishya parampara became the greatest strength of his life and later established him as Jagadguru.",
+    sandipaniP2: "Founded on that ideal, the Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita encourages students to study the 64 Kalas, the 14 Vidyas and the Indian knowledge tradition, and so strengthens the nation-building values that rest on knowledge, culture and character.",
+    emailLabel: "Official email",
+    officeLabel: "Office",
+    officeValue: "Shri Krishna Pathey Nyas, Pratham Tal, Ravindra Bhawan Sabhagar, Polytechnic Chauraha, Bhopal, Madhya Pradesh – 462003",
+    phoneLabel: "Phone",
+    phoneValue: "0755 4535064",
+    writeToUs: "Write an email"
+  }
+};
+
+class Component extends DCLogic {
+  state = { lang: null };
+
+  componentDidMount() {
+    try { const saved = localStorage.getItem("skpn_lang"); if (saved === "hi" || saved === "en") this.setState({ lang: saved }); } catch (e) {}
+  }
+
+  get lang() { return this.state.lang || this.props.language || "hi"; }
+
+  renderVals() {
+    const lang = this.lang, t = S[lang];
+    return {
+      lang: lang,
+      t: t,
+      objects: t.objects.map((text, i) => {
+        const a = ACCENTS[i % ACCENTS.length];
+        return { text: text, n: String(i + 1).padStart(2, "0"), accent: a[0], tint: a[1], ink: a[2] };
+      }),
+      toggleLang: () => {
+        const next = this.lang === "hi" ? "en" : "hi";
+        try { localStorage.setItem("skpn_lang", next); } catch (e) {}
+        this.setState({ lang: next });
+      }
+    };
+  }
+}
+
+</script>
+</body>
+</html>

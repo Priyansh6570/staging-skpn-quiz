@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FBF7F0; }
+  * { box-sizing: border-box; }
+  a { color: #27408B; text-decoration: none; }
+  a:hover { color: #8A6015; }
+  ::selection { background: #F1DFB6; color: #14203E; }
+  input, button { font-family: 'Noto Sans Devanagari', system-ui, sans-serif; }
+  input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offset: 2px; }
+  @keyframes lg-inA { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes lg-inB { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes lg-glow { 0%,100% { opacity:.3; transform:scale(1); } 50% { opacity:.75; transform:scale(1.06); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; } }
+  @media (max-width: 900px) {
+    [data-e~="split"] { grid-template-columns: minmax(0,1fr) !important; }
+    [data-e~="aside"] { min-height: 0 !important; padding: 18px 20px !important; gap: 14px !important; }
+    [data-e~="asidebody"] { display: none !important; }
+    [data-e~="asideslide"] { flex-direction: row !important; align-items: center !important; gap: 12px !important; }
+    [data-e~="slidevalue"] { font-size: 20px !important; }
+  }
+  @media (max-width: 980px) {
+    [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
+    [data-e~="menu-btn"] { display: inline-flex !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="pad"] { padding-left: 14px !important; padding-right: 14px !important; }
+    [data-e~="form"] { padding: 26px 20px !important; }
+  }
+</style>
+<script src="assets/site.js"></script>
+</helmet>
+
+<div style="background:#FBF7F0;color:#161C2E;font-family:'Noto Sans Devanagari',system-ui,sans-serif;min-width:320px;overflow-x:clip">
+  <dc-import name="SiteHeader" lang="{{ lang }}" active="home" on-toggle-lang="{{ toggleLang }}" hint-size="100%,68px"></dc-import>
+
+  <section data-e="pad" style="max-width:1080px;margin:0 auto;padding:40px 30px 80px">
+    <div data-e="split" style="display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);border-radius:26px;overflow:hidden;box-shadow:0 2px 6px rgba(20,32,62,.06),0 22px 52px rgba(20,32,62,.14);align-items:stretch">
+
+      <aside data-e="aside" style="position:relative;overflow:hidden;background:#070B1E;min-height:500px;padding:36px 34px;display:flex;flex-direction:column;gap:24px">
+        <img src="assets/cosmic-halo.png" alt="" width="924" height="540" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 40%;opacity:.5" />
+        <div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(170deg, rgba(7,11,30,.5) 0%, rgba(7,11,30,.87) 54%, rgba(5,8,22,.97) 100%)"></div>
+        <div aria-hidden="true" style="position:absolute;right:-14%;top:-12%;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%);animation:lg-glow 9s ease-in-out infinite"></div>
+
+        <div style="position:relative;display:flex;align-items:center;gap:12px">
+          <span style="width:46px;height:46px;flex:0 0 auto;border-radius:50%;background:#04060F;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(232,193,115,.4)">
+            <img src="uploads/skpn-logo.png" alt="" width="34" height="34" style="display:block;width:34px;height:34px" />
+          </span>
+          <span style="font-family:'Noto Serif Devanagari',serif;font-size:15.5px;line-height:1.45;color:#FFF9EC">{{ t.asideOrg }}</span>
+        </div>
+
+        <div data-e="asidebody" style="position:relative;margin-top:auto;display:flex;flex-direction:column;gap:12px">
+          <p style="margin:0;font-family:'Noto Serif Devanagari',serif;font-size:16.5px;letter-spacing:.01em;color:#E8C173;line-height:1.9">{{ t.asideKicker }}</p>
+          <h2 style="margin:0;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(23px,2.5vw,30px);line-height:1.32;color:#FFF9EC;text-wrap:balance">{{ t.asideTitle }}</h2>
+        </div>
+
+        <div style="position:relative;padding-top:20px;border-top:1px solid rgba(232,193,115,.24);display:flex;flex-direction:column;gap:14px">
+          <div data-e="asideslide" style="min-height:64px;display:flex;flex-direction:column;gap:5px;animation:{{ slideAnim }} .45s cubic-bezier(.22,.61,.36,1)">
+            <span data-e="slidevalue" style="font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:26px;line-height:1.25;color:#E8C173;white-space:nowrap">{{ slide.value }}</span>
+            <span style="font-size:15.5px;line-height:1.7;color:#E9E4D8">{{ slide.label }}</span>
+          </div>
+          <div aria-hidden="true" style="display:flex;gap:6px">
+            <sc-for list="{{ dots }}" as="d" hint-placeholder-count="4">
+              <span style="width:{{ d.w }};height:4px;border-radius:2px;background:{{ d.bg }};transition:width .3s ease,background .3s ease"></span>
+            </sc-for>
+          </div>
+        </div>
+      </aside>
+
+      <div data-e="form" style="padding:38px 36px;background:#FFFFFF;display:flex;flex-direction:column;gap:24px">
+        <div>
+          <h1 style="margin:0 0 8px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(25px,3.2vw,33px);line-height:1.3;color:#14203E">{{ t.title }}</h1>
+          <p style="margin:0;font-size:17px;line-height:1.8;color:#161C2E">{{ t.lede }}</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <label style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:16px;line-height:1.6;color:#161C2E">{{ t.mobileLabel }}</span>
+            <span style="display:flex;align-items:stretch;border:1px solid {{ mobileBorder }};border-radius:14px;background:#FCFAF4;overflow:hidden">
+              <span aria-hidden="true" style="flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:0 13px;background:#F1E9DA;border-right:1px solid #E3D9C6">
+                <svg viewBox="0 0 30 20" width="26" height="18" aria-hidden="true" focusable="false" style="display:block;border-radius:3px;box-shadow:0 0 0 1px rgba(20,32,62,.14)">
+                  <rect width="30" height="20" fill="#FFFFFF"></rect>
+                  <rect width="30" height="6.667" fill="#FF9933"></rect>
+                  <rect y="13.333" width="30" height="6.667" fill="#138808"></rect>
+                  <circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" stroke-width="0.7"></circle>
+                  <circle cx="15" cy="10" r="0.6" fill="#000080"></circle>
+                </svg>
+                <span style="font-size:16.5px;line-height:1.6;color:#161C2E;font-variant-numeric:tabular-nums">+91</span>
+              </span>
+              <input type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" value="{{ mobile }}" onInput="{{ onMobile }}" placeholder="00000 00000" style="flex:1 1 auto;min-width:0;min-height:58px;padding:14px 16px;border:0;background:transparent;font-size:19px;letter-spacing:.04em;line-height:1.6;color:#161C2E;font-variant-numeric:tabular-nums" />
+            </span>
+            <span style="font-size:15px;line-height:1.7;color:#A03A2B;display:{{ mobileMsgDisplay }}">{{ t.mobileInvalid }}</span>
+          </label>
+
+          <a href="{{ goHref }}" onClick="{{ markSignedIn }}" style="min-height:58px;padding:16px 28px;border-radius:999px;background:{{ goBg }};color:{{ goFg }};display:flex;align-items:center;justify-content:center;font-size:17.5px;font-weight:600;line-height:1.5;pointer-events:{{ goEvents }};text-decoration:none">{{ t.continue }}</a>
+        </div>
+
+        <p style="margin:auto 0 0;padding-top:20px;border-top:1px solid #F0EADD;font-size:16.5px;line-height:1.8;color:#161C2E">{{ t.noAccount }} <a href="Register.dc.html">{{ t.register }}</a></p>
+      </div>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" lang="{{ lang }}" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1160}}">
+const S = {
+  hi: {
+    title: "साइन इन",
+    lede: "जिस मोबाइल नंबर से पंजीकरण किया था, वही नंबर दर्ज करें।",
+    asideOrg: "श्रीकृष्ण पाथेय न्यास, भोपाल",
+    asideKicker: "गुरु पूर्णिमा, 29 जुलाई 2026",
+    asideTitle: "भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता",
+    slides: [
+      { value: "₹1,00,000", label: "छात्रवृत्ति" },
+      { value: "102", label: "विजेताओं को प्रायोजन" },
+      { value: "30", label: "प्रश्न" },
+      { value: "10", label: "मिनट" }
+    ],
+    mobileLabel: "मोबाइल नंबर",
+    mobileInvalid: "6, 7, 8 अथवा 9 से प्रारंभ होने वाला 10 अंकों का नंबर लिखें",
+    continue: "साइन इन करें",
+    noAccount: "खाता नहीं है?",
+    register: "पंजीकरण करें"
+  },
+  en: {
+    title: "Sign in",
+    lede: "Enter the same mobile number you registered with.",
+    asideOrg: "Shri Krishna Pathey Nyas, Bhopal",
+    asideKicker: "Guru Purnima, 29 July 2026",
+    asideTitle: "Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita",
+    slides: [
+      { value: "₹1,00,000", label: "Scholarship" },
+      { value: "102", label: "Winners sponsored" },
+      { value: "30", label: "Questions" },
+      { value: "10", label: "Minutes" }
+    ],
+    mobileLabel: "Mobile number",
+    mobileInvalid: "Enter a 10-digit number starting with 6, 7, 8 or 9",
+    continue: "Sign in",
+    noAccount: "No account yet?",
+    register: "Register"
+  }
+};
+
+class Component extends DCLogic {
+  state = { lang: null, mobile: "", touched: false, slide: 0 };
+
+  componentDidMount() {
+    try { const saved = localStorage.getItem("skpn_lang"); if (saved === "hi" || saved === "en") this.setState({ lang: saved }); } catch (e) {}
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    this._rot = setInterval(() => this.setState(s => ({ slide: s.slide + 1 })), 2000);
+  }
+  componentWillUnmount() { if (this._rot) clearInterval(this._rot); }
+
+  get lang() { return this.state.lang || this.props.language || "hi"; }
+
+  renderVals() {
+    const lang = this.lang, t = S[lang], s = this.state;
+    const ok = /^[6-9]\d{9}$/.test(s.mobile);
+    const bad = s.touched && s.mobile.length > 0 && !ok;
+    const i = s.slide % t.slides.length;
+    return {
+      lang: lang,
+      t: t,
+      slide: t.slides[i],
+      slideAnim: s.slide % 2 === 0 ? "lg-inA" : "lg-inB",
+      dots: t.slides.map((_, n) => ({ w: n === i ? "22px" : "8px", bg: n === i ? "#E8C173" : "rgba(232,193,115,.32)" })),
+      mobile: s.mobile,
+      onMobile: e => this.setState({ mobile: e.target.value.replace(/\D/g, "").slice(0, 10), touched: true }),
+      mobileBorder: bad ? "#A03A2B" : "#DCD1BC",
+      mobileMsgDisplay: bad ? "block" : "none",
+      goHref: ok ? "Home v5.dc.html" : "#",
+      goBg: ok ? "#14203E" : "#EDE6D7",
+      goFg: ok ? "#FDF3DF" : "#161C2E",
+      goEvents: ok ? "auto" : "none",
+      markSignedIn: () => { try { localStorage.setItem("skpn_signed_in", "1"); } catch (e) {} },
+      toggleLang: () => {
+        const next = this.lang === "hi" ? "en" : "hi";
+        try { localStorage.setItem("skpn_lang", next); } catch (e) {}
+        this.setState({ lang: next });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

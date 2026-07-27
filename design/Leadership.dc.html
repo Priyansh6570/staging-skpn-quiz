@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  @media (max-width: 980px) {
+    [data-g="lead"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="leadpad"] { padding-left: 18px !important; padding-right: 18px !important; }
+    [data-e~="leadthumbs"] > div:last-child { margin-left: 0 !important; }
+  }
+</style>
+</helmet>
+<section data-e="leadpad" style="max-width:1220px;margin:0 auto;padding:92px 30px 96px;font-family:'Noto Sans Devanagari',system-ui,sans-serif">
+  <h2 style="margin:0 0 40px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(27px,3.6vw,42px);line-height:1.3;color:#14203E">श्रीकृष्ण पाथेय न्यास</h2>
+
+  <div data-g="lead" style="display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1fr);gap:48px;align-items:center">
+    <div style="position:relative;width:100%;max-width:390px;justify-self:center">
+      <span aria-hidden="true" style="position:absolute;left:-16px;top:22px;bottom:22px;width:76px;border-radius:26px;background:#F1E6D0"></span>
+      <span aria-hidden="true" style="position:absolute;right:-14px;bottom:-14px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.5) 0%,rgba(232,193,115,0) 70%)"></span>
+      <div style="position:relative;border-radius:26px;overflow:hidden;aspect-ratio:4/5;background:linear-gradient(160deg,#182246 0%,#080C1E 100%);box-shadow:0 8px 18px rgba(20,32,62,.1),0 36px 70px rgba(20,32,62,.22)">
+        <sc-for list="{{ leaders }}" as="l" hint-placeholder-count="4">
+          <img src="{{ l.img }}" alt="{{ l.name }}" loading="lazy" decoding="async" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 12%;opacity:{{ l.op }};transform:{{ l.imgTransform }};transition:opacity .5s ease,transform 1.1s cubic-bezier(.22,.61,.36,1)" />
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <h3 style="margin:0;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(28px,3.6vw,40px);line-height:1.2;color:#14203E;text-wrap:balance">{{ activeName }}</h3>
+      <p style="margin:0;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(20px,2.4vw,25px);line-height:1.45;color:#14203E;max-width:32ch">{{ activeOffice }}</p>
+      <span style="align-self:flex-start;margin-top:4px;padding:9px 20px;border-radius:999px;background:#F4EBD8;border:1px solid #E7D6B2;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:19px;line-height:1.5;color:#6B4A10">{{ activeRole }}</span>
+
+      <div data-e="leadthumbs" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:16px">
+        <div style="display:flex;gap:10px">
+          <sc-for list="{{ leaders }}" as="l" hint-placeholder-count="4">
+            <button type="button" onClick="{{ l.select }}" aria-label="{{ l.name }}" aria-pressed="{{ l.isActive }}" style="width:62px;height:62px;flex:0 0 auto;padding:0;border-radius:50%;overflow:hidden;cursor:pointer;border:2px solid {{ l.ring }};background:#F1E6D0;box-shadow:{{ l.shadow }};opacity:{{ l.thumbOp }};transform:{{ l.thumbTransform }};transition:transform .3s cubic-bezier(.22,.61,.36,1),opacity .3s ease,border-color .3s ease,box-shadow .3s ease" style-hover="opacity:1;transform:scale(1.06)">
+              <img src="{{ l.img }}" alt="" loading="lazy" decoding="async" style="display:block;width:100%;height:100%;object-fit:cover;object-position:50% 12%" />
+            </button>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:10px;margin-left:auto">
+          <button type="button" onClick="{{ railPrev }}" aria-label="{{ prevLabel }}" style="width:52px;height:52px;border:1px solid #DCD1BC;border-radius:50%;background:#FFFFFF;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(20,32,62,.08);transition:background .18s ease" style-hover="background:#F4EBD8">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#14203E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="display:block"><path d="M14.5 5.5 8 12l6.5 6.5"></path></svg>
+          </button>
+          <button type="button" onClick="{{ railNext }}" aria-label="{{ nextLabel }}" style="width:52px;height:52px;border:1px solid #DCD1BC;border-radius:50%;background:#FFFFFF;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(20,32,62,.08);transition:background .18s ease" style-hover="background:#F4EBD8">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="#14203E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" style="display:block"><path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hi&quot;,&quot;en&quot;],&quot;default&quot;:&quot;hi&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const LEADERS = [
+  { img: "uploads/dr%20mohan%20yadav.jpg",
+    hi: ["अध्यक्ष", "डॉ. मोहन यादव", "माननीय मुख्यमंत्री, मध्यप्रदेश"],
+    en: ["Chairperson", "Dr. Mohan Yadav", "Hon'ble Chief Minister, Madhya Pradesh"] },
+  { img: "uploads/shiv%20shekhar%20shukla.jpg",
+    hi: ["न्यासी सचिव", "श्री शिवशेखर शुक्ला", "अपर मुख्य सचिव, संस्कृति"],
+    en: ["Trustee Secretary", "Shri Shiv Shekhar Shukla", "Additional Chief Secretary, Culture"] },
+  { img: "uploads/dhermend%20singh%20lodhi.jpg",
+    hi: ["उपाध्यक्ष", "श्री धर्मेंद्र भाव सिंह लोधी", "माननीय संस्कृति राज्यमंत्री (स्वतंत्र प्रभार)"],
+    en: ["Vice-Chairperson", "Shri Dharmendra Bhav Singh Lodhi", "Hon'ble Minister of State for Culture (Independent Charge)"] },
+  { img: "uploads/shriram%20tiwari.png",
+    hi: ["मुख्य कार्यपालक अधिकारी", "श्री श्रीराम तिवारी", "माननीय मुख्यमंत्री जी के सांस्कृतिक सलाहकार"],
+    en: ["Chief Executive Officer", "Shri Shriram Tiwari", "Cultural Adviser to the Hon'ble Chief Minister"] }
+];
+
+class Component extends DCLogic {
+  state = { active: 0 };
+
+  renderVals() {
+    const lang = this.props.lang === "en" ? "en" : "hi";
+    const active = this.state.active % LEADERS.length;
+    const n = LEADERS.length;
+    return {
+      activeRole: LEADERS[active][lang][0],
+      activeName: LEADERS[active][lang][1],
+      activeOffice: LEADERS[active][lang][2],
+      prevLabel: lang === "hi" ? "पिछला कार्ड" : "Previous card",
+      nextLabel: lang === "hi" ? "अगला कार्ड" : "Next card",
+      railPrev: () => this.setState(s => ({ active: (s.active - 1 + n) % n })),
+      railNext: () => this.setState(s => ({ active: (s.active + 1) % n })),
+      leaders: LEADERS.map((l, i) => ({
+        img: l.img,
+        name: l[lang][1],
+        isActive: i === active,
+        select: () => this.setState({ active: i }),
+        op: i === active ? 1 : 0,
+        imgTransform: i === active ? "scale(1)" : "scale(1.06)",
+        thumbOp: i === active ? 1 : 0.62,
+        thumbTransform: i === active ? "scale(1.08)" : "scale(1)",
+        ring: i === active ? "#E8C173" : "transparent",
+        shadow: i === active ? "0 8px 22px rgba(232,193,115,.42)" : "0 2px 8px rgba(20,32,62,.12)"
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

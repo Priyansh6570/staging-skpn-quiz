@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<footer style="position:relative;overflow:hidden;background:linear-gradient(180deg,#0B1226 0%,#070B1E 100%);font-family:'Noto Sans Devanagari',system-ui,sans-serif">
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,rgba(232,193,115,0),rgba(232,193,115,.55),rgba(232,193,115,0))"></div>
+  <div aria-hidden="true" style="position:absolute;right:-6%;top:-40%;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(232,193,115,.12) 0%,rgba(232,193,115,0) 70%)"></div>
+  <div data-g="foot" data-e="pad" style="position:relative;max-width:1220px;margin:0 auto;padding:56px 30px 30px;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr) minmax(0,.9fr);gap:40px">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <span style="width:52px;height:52px;flex:0 0 auto;border-radius:50%;background:#04060F;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1px rgba(232,193,115,.34)">
+          <img src="uploads/skpn-logo.png" alt="" width="40" height="40" loading="lazy" style="display:block;width:40px;height:40px" />
+        </span>
+        <img src="uploads/images.jpg" alt="मध्यप्रदेश शासन" width="44" height="44" loading="lazy" style="display:block;width:44px;height:44px;border-radius:50%" />
+      </div>
+      <p style="margin:0 0 6px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:19px;line-height:1.5;color:#FFF9EC">{{ t.org }}</p>
+      <p style="margin:0 0 14px;font-size:15.5px;line-height:1.7;color:#E4DFD2">{{ t.dept }}</p>
+      <p style="margin:0 0 10px;font-size:15.5px;line-height:1.7;color:#E4DFD2;max-width:34ch">{{ t.address }}</p>
+      <a href="mailto:shrikrishnapatheynyas@gmail.com" style="display:block;font-size:16px;line-height:1.7;color:#E8C173;text-decoration:none" style-hover="color:#FFF9EC">shrikrishnapatheynyas@gmail.com</a>
+      <a href="tel:+917554535064" style="display:block;margin-top:4px;font-size:16px;line-height:1.7;color:#E8C173;text-decoration:none" style-hover="color:#FFF9EC">0755 4535064</a>
+    </div>
+    <div>
+      <p style="margin:0 0 15px;font-family:'Noto Serif Devanagari',serif;font-size:15.5px;letter-spacing:.01em;color:rgba(232,193,115,.72);line-height:1.8">{{ t.linksTitle }}</p>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 20px">
+        <sc-for list="{{ links }}" as="l" hint-placeholder-count="5">
+          <a href="{{ l.href }}" style="font-size:16px;line-height:1.7;color:#E9E4D8;text-decoration:none" style-hover="color:#E8C173">{{ l.label }}</a>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <p style="margin:0 0 15px;font-family:'Noto Serif Devanagari',serif;font-size:15.5px;letter-spacing:.01em;color:rgba(232,193,115,.72);line-height:1.8">{{ t.followTitle }}</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="https://www.instagram.com/" target="_blank" rel="noopener" aria-label="Instagram" style="width:44px;height:44px;border-radius:13px;border:1px solid rgba(232,193,115,.3);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.14)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F1DFB6" stroke-width="1.7" stroke-linecap="round" aria-hidden="true" style="display:block"><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.1" cy="6.9" r="1.1" fill="#F1DFB6" stroke="none"></circle></svg>
+        </a>
+        <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label="Facebook" style="width:44px;height:44px;border-radius:13px;border:1px solid rgba(232,193,115,.3);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.14)">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block"><path d="M13.6 21v-7.7h2.7l.4-3.1h-3.1V8.2c0-.9.3-1.5 1.6-1.5h1.6V3.9c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1v2.3H7.6v3.1h2.8V21z" fill="#F1DFB6"></path></svg>
+        </a>
+        <a href="https://twitter.com/" target="_blank" rel="noopener" aria-label="X, formerly Twitter" style="width:44px;height:44px;border-radius:13px;border:1px solid rgba(232,193,115,.3);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.14)">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="display:block"><path d="M3.3 3h4.4l4 5.6L16.6 3H21l-6.2 7.4L21.4 21h-4.4l-4.3-6-4.9 6H3.4l6.6-7.9z" fill="#F1DFB6"></path></svg>
+        </a>
+        <a href="https://www.youtube.com/" target="_blank" rel="noopener" aria-label="YouTube" style="width:44px;height:44px;border-radius:13px;border:1px solid rgba(232,193,115,.3);display:flex;align-items:center;justify-content:center;text-decoration:none" style-hover="background:rgba(232,193,115,.14)">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="display:block"><path d="M21.3 8.2a2.6 2.6 0 00-1.8-1.8C17.8 6 12 6 12 6s-5.8 0-7.5.4A2.6 2.6 0 002.7 8.2C2.3 9.9 2.3 12 2.3 12s0 2.1.4 3.8a2.6 2.6 0 001.8 1.8C6.2 18 12 18 12 18s5.8 0 7.5-.4a2.6 2.6 0 001.8-1.8c.4-1.7.4-3.8.4-3.8s0-2.1-.4-3.8zM10.2 15V9l5.2 3z" fill="#F1DFB6"></path></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div data-e="pad" style="position:relative;max-width:1220px;margin:0 auto;padding:0 30px 34px">
+    <p style="margin:0;padding-top:22px;border-top:1px solid rgba(255,249,236,.1);font-size:14.5px;line-height:1.7;color:#D8D2C4">{{ t.copyright }}</p>
+  </div>
+</footer>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200,&quot;height&quot;:320}}">
+const T = {
+  hi: {
+    org: "श्रीकृष्ण पाथेय न्यास, भोपाल",
+    dept: "संस्कृति विभाग, मध्यप्रदेश शासन",
+    address: "प्रथम तल, रवीन्द्र भवन सभागार, पॉलिटेक्निक चौराहा, भोपाल, मध्यप्रदेश – 462003",
+    linksTitle: "लिंक",
+    followTitle: "जुड़ें",
+    copyright: "© 2026 श्रीकृष्ण पाथेय न्यास, भोपाल",
+    links: [
+      { label: "हमारे बारे में", href: "About.dc.html" },
+      { label: "प्रतियोगिता", href: "Pratiyogita.dc.html" },
+      { label: "नियम", href: "Rules.dc.html" },
+      { label: "संपर्क", href: "About.dc.html#sampark" },
+      { label: "गोपनीयता सूचना", href: "Legal.dc.html" },
+      { label: "उपयोग की शर्तें", href: "Legal.dc.html?doc=terms" }
+    ]
+  },
+  en: {
+    org: "Shri Krishna Pathey Nyas, Bhopal",
+    dept: "Department of Culture, Government of Madhya Pradesh",
+    address: "Pratham Tal, Ravindra Bhawan Sabhagar, Polytechnic Chauraha, Bhopal, Madhya Pradesh – 462003",
+    linksTitle: "Links",
+    followTitle: "Follow",
+    copyright: "© 2026 Shri Krishna Pathey Nyas, Bhopal",
+    links: [
+      { label: "About Us", href: "About.dc.html" },
+      { label: "Pratiyogita", href: "Pratiyogita.dc.html" },
+      { label: "Rules", href: "Rules.dc.html" },
+      { label: "Contact", href: "About.dc.html#sampark" },
+      { label: "Privacy Notice", href: "Legal.dc.html" },
+      { label: "Terms of Use", href: "Legal.dc.html?doc=terms" }
+    ]
+  }
+};
+
+class Component extends DCLogic {
+  renderVals() {
+    const t = T[this.props.lang === "en" ? "en" : "hi"];
+    return { t: t, links: t.links };
+  }
+}
+
+</script>
+</body>
+</html>

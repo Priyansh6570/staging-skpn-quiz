@@ -33,10 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 .env*.local
-design
+
+# the answer key — must never be committed and must never reach public/
 design/uploads/quiz-questions.json
 design/uploads/questions.json
-tests/baseline/
 
 # vercel
 .vercel

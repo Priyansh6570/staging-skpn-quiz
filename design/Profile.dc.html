@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FBF7F0; }
+  * { box-sizing: border-box; }
+  a { color: #27408B; text-decoration: none; }
+  a:hover { color: #8A6015; }
+  button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offset: 2px; }
+  @media (max-width: 980px) {
+    [data-g="two"] { grid-template-columns: minmax(0,1fr) !important; }
+    [data-g="foot"] { grid-template-columns: minmax(0,1fr) !important; gap: 30px !important; }
+    [data-e~="nav"], [data-e~="signin-top"] { display: none !important; }
+    [data-e~="menu-btn"] { display: inline-flex !important; }
+  }
+  @media (max-width: 640px) {
+    [data-e~="pad"] { padding-left: 18px !important; padding-right: 18px !important; }
+    [data-e~="card"] { padding: 22px 18px !important; }
+    [data-e~="row"] { flex-direction: column !important; align-items: flex-start !important; gap: 3px !important; }
+    [data-e~="rowval"] { margin-left: 0 !important; text-align: left !important; }
+    [data-e~="attempt"] { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+  }
+</style>
+<script src="assets/site.js"></script>
+</helmet>
+
+<div style="background:#FBF7F0;color:#161C2E;font-family:'Noto Sans Devanagari',system-ui,sans-serif;min-width:320px;overflow-x:hidden">
+  <dc-import name="SiteHeader" lang="{{ lang }}" active="home" signed-in="{{ true }}" has-certificates="{{ true }}" on-toggle-lang="{{ toggleLang }}" hint-size="100%,68px"></dc-import>
+
+  <section data-e="pad" style="max-width:1060px;margin:0 auto;padding:48px 30px 76px">
+    <div style="display:flex;align-items:center;gap:18px;margin-bottom:12px">
+      <span aria-hidden="true" style="width:64px;height:64px;flex:0 0 auto;border-radius:50%;background:#14203E;color:#FDF3DF;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif Devanagari',serif;font-size:24px;font-weight:600">{{ initials }}</span>
+      <div>
+        <h1 style="margin:0 0 4px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:clamp(24px,3.4vw,32px);line-height:1.3;color:#14203E">{{ student.fullName }}</h1>
+        <p style="margin:0;font-size:16.5px;line-height:1.7;color:#161C2E">{{ student.district }} · {{ categoryLabel }}</p>
+      </div>
+    </div>
+    <p style="margin:0 0 32px;max-width:64ch;font-size:16.5px;line-height:1.85;color:#161C2E">{{ t.lockNote }} <a href="mailto:shrikrishnapatheynyas@gmail.com">shrikrishnapatheynyas@gmail.com</a></p>
+
+    <div data-e="card" style="padding:28px 30px;background:#FFFFFF;border-radius:20px;box-shadow:0 2px 4px rgba(20,32,62,.05),0 14px 32px rgba(20,32,62,.06);margin-bottom:20px">
+      <h2 style="margin:0 0 18px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:21px;line-height:1.4;color:#14203E">{{ t.participation }}</h2>
+      <div data-e="attempt" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:24px">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="4">
+          <div style="padding:18px 20px;border-radius:16px;background:#F6F0E4;display:flex;flex-direction:column;gap:4px">
+            <span style="font-size:15px;line-height:1.6;color:#161C2E">{{ s.label }}</span>
+            <span style="font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:25px;line-height:1.3;color:#14203E;font-variant-numeric:tabular-nums">{{ s.value }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column">
+        <sc-for list="{{ attempts }}" as="a" hint-placeholder-count="3">
+          <li data-e="row" style="display:flex;align-items:baseline;gap:20px;padding:16px 2px;border-top:1px solid #F0EADD">
+            <span style="min-width:180px;font-size:16.5px;line-height:1.7;color:#161C2E;font-variant-numeric:tabular-nums">{{ a.date }}</span>
+            <span style="font-size:16px;line-height:1.7;color:#161C2E">{{ a.time }}</span>
+            <span style="font-size:16.5px;line-height:1.7;color:#8A6015">{{ a.status }}</span>
+            <a data-e="rowval" href="Certificates.dc.html" style="margin-left:auto;font-size:16px;line-height:1.7">{{ t.viewCertificate }} <span aria-hidden="true">→</span></a>
+          </li>
+        </sc-for>
+      </ul>
+      <div style="margin:20px 0 0;padding:18px 20px;border-radius:14px;background:#EAF3ED;border:1px solid #CFE3D6;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="display:inline-flex;align-items:center;gap:9px;padding:8px 16px;border-radius:999px;background:#2E6B4B;color:#F2FBF5;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:16.5px;line-height:1.5">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F2FBF5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block"><path d="M4.5 12.5 9.5 17.5 19.5 7"></path></svg>
+          {{ t.status }}
+        </span>
+        <span style="font-size:16px;line-height:1.8;color:#161C2E">{{ t.bestNote }}</span>
+      </div>
+    </div>
+
+    <div data-g="two" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start">
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="4">
+        <div data-e="card" style="padding:28px 30px;background:#FFFFFF;border-radius:20px;box-shadow:0 2px 4px rgba(20,32,62,.05),0 14px 32px rgba(20,32,62,.06)">
+          <h2 style="margin:0 0 16px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:20px;line-height:1.4;color:#14203E">{{ g.title }}</h2>
+          <dl style="margin:0;display:flex;flex-direction:column">
+            <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4">
+              <div data-e="row" style="display:flex;align-items:baseline;gap:18px;padding:13px 0;border-top:1px solid #F0EADD">
+                <dt style="min-width:150px;font-size:15.5px;line-height:1.7;color:#161C2E">{{ r.k }}</dt>
+                <dd data-e="rowval" style="margin:0 0 0 auto;font-size:16.5px;line-height:1.7;color:#161C2E;text-align:right">{{ r.v }}</dd>
+              </div>
+            </sc-for>
+          </dl>
+          <p style="margin:14px 0 0;font-size:15px;line-height:1.75;color:#161C2E;display:{{ g.noteDisplay }}">{{ g.note }}</p>
+        </div>
+      </sc-for>
+    </div>
+
+    <div data-e="card" style="margin-top:20px;padding:28px 30px;background:#FFFFFF;border-radius:20px;box-shadow:0 2px 4px rgba(20,32,62,.05),0 14px 32px rgba(20,32,62,.06)">
+      <h2 style="margin:0 0 8px;font-family:'Noto Serif Devanagari',serif;font-weight:600;font-size:20px;line-height:1.4;color:#14203E">{{ t.langTitle }}</h2>
+      <p style="margin:0 0 16px;font-size:16px;line-height:1.8;color:#161C2E">{{ t.langNote }}</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button type="button" onClick="{{ setHi }}" aria-pressed="{{ hiOn }}" style="min-height:50px;padding:13px 24px;border:1px solid {{ hiBorder }};border-radius:999px;background:{{ hiBg }};color:{{ hiFg }};cursor:pointer;font-size:16.5px;line-height:1.6">हिन्दी</button>
+        <button type="button" onClick="{{ setEn }}" aria-pressed="{{ enOn }}" style="min-height:50px;padding:13px 24px;border:1px solid {{ enBorder }};border-radius:999px;background:{{ enBg }};color:{{ enFg }};cursor:pointer;font-size:16.5px;line-height:1.6">English</button>
+      </div>
+    </div>
+
+    <div style="margin-top:26px;display:flex;flex-wrap:wrap;gap:12px">
+      <button type="button" onClick="{{ signOut }}" style="min-height:54px;padding:15px 26px;border:1px solid #DCD1BC;border-radius:999px;background:#FFFFFF;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:16.5px;line-height:1.5;color:#161C2E;font-family:inherit" style-hover="background:#F1E9DA">{{ t.signOut }}</button>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" lang="{{ lang }}" hint-size="100%,300px"></dc-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1200}}">
+const STUDENT = {
+  fullName: "अनन्या वर्मा",
+  fullNameEn: "Ananya Verma",
+  email: "ananya.verma@gmail.com",
+  mobile: "98XXXXXX21",
+  gender: { hi: "महिला", en: "Female" },
+  dob: "2010-06-14",
+  address: { hi: "वार्ड 7, गांधी मार्ग", en: "Ward 7, Gandhi Marg" },
+  city: { hi: "सीहोर", en: "Sehore" },
+  district: "Sehore",
+  districtHi: "सीहोर",
+  pin: "466001",
+  category: "vidyalaya",
+  level: { hi: "कक्षा 10", en: "Class 10" },
+  institution: { hi: "शासकीय उच्चतर माध्यमिक विद्यालय, सीहोर", en: "Government Higher Secondary School, Sehore" },
+  divyang: false,
+  provider: "mobile"
+};
+
+const ATTEMPTS = [
+  { date: "24 जुलाई 2026, 10:42", dateEn: "24 July 2026, 10:42", time: "09:12", timeEn: "09:12", score: "23 / 30" }
+];
+
+const S = {
+  hi: {
+    lockNote: "पंजीकरण के बाद जानकारी परिवर्तित नहीं की जा सकती। किसी वास्तविक त्रुटि के सुधार हेतु लिखें",
+    participation: "सहभागिता",
+    stats: ["प्रयास की तिथि", "लिया गया समय"],
+    status: "प्रतियोगिता पूर्ण",
+    viewCertificate: "प्रमाण पत्र",
+    bestNote: "प्रत्येक विद्यार्थी केवल एक बार प्रतियोगिता दे सकता है।",
+    groups: ["व्यक्तिगत जानकारी", "साइन इन", "पता", "शिक्षा"],
+    keys: {
+      name: "नाम", gender: "लिंग", dob: "जन्म तिथि", mobile: "मोबाइल नंबर",
+      email: "ईमेल", provider: "साइन इन का तरीका",
+      address: "पता", city: "शहर या गाँव", district: "जिला", state: "राज्य", pin: "पिन कोड",
+      category: "श्रेणी", level: "पढ़ाई का स्तर", institution: "संस्था", exam: "प्रतियोगी परीक्षा", divyang: "दिव्यांग श्रेणी"
+    },
+    mobileNote: "यही मोबाइल नंबर साइन इन के लिए उपयोग होता है।",
+    emailNote: "",
+    mobileSignIn: "मोबाइल नंबर से",
+    otpLabel: "ईमेल कोड से",
+    divyangNo: "नहीं",
+    divyangYes: "हाँ",
+    divyangNote: "दिव्यांग श्रेणी में चयन होने पर शासन द्वारा जारी दिव्यांगता प्रमाण पत्र प्रस्तुत करना अनिवार्य होगा।",
+    stateValue: "मध्यप्रदेश",
+    categories: { vidyalaya: "विद्यालय स्तर", mahavidyalaya: "महाविद्यालय/विश्वविद्यालय स्तर" },
+    langTitle: "भाषा",
+    langNote: "यह इस पृष्ठ की एकमात्र परिवर्तनीय सेटिंग है।",
+    startQuiz: "प्रतियोगिता प्रारंभ करें",
+    signOut: "साइन आउट"
+  },
+  en: {
+    lockNote: "Details cannot be changed after registration. For a genuine correction, write to",
+    participation: "Participation",
+    stats: ["Date of attempt", "Time taken"],
+    status: "Competition completed",
+    viewCertificate: "Certificate",
+    bestNote: "Each student may take the competition only once.",
+    groups: ["Personal details", "Sign in", "Address", "Education"],
+    keys: {
+      name: "Name", gender: "Gender", dob: "Date of birth", mobile: "Mobile number",
+      email: "Email", provider: "Sign-in method",
+      address: "Address", city: "City or village", district: "District", state: "State", pin: "PIN code",
+      category: "Category", level: "Level of education", institution: "Institution", exam: "Competitive exam", divyang: "Divyang category"
+    },
+    mobileNote: "This is the mobile number used to sign in.",
+    emailNote: "",
+    mobileSignIn: "With a mobile number",
+    otpLabel: "With an email code",
+    divyangNo: "No",
+    divyangYes: "Yes",
+    divyangNote: "If selected under the divyang category, a government-issued disability certificate must be produced.",
+    stateValue: "Madhya Pradesh",
+    categories: { vidyalaya: "Vidyalaya Star", mahavidyalaya: "Mahavidyalaya Star" },
+    langTitle: "Language",
+    langNote: "This is the only editable setting on this page.",
+    startQuiz: "Start the quiz",
+    signOut: "Sign out"
+  }
+};
+
+class Component extends DCLogic {
+  state = { lang: null, profile: null, attempt: null };
+
+  componentDidMount() {
+    try { const saved = localStorage.getItem("skpn_lang"); if (saved === "hi" || saved === "en") this.setState({ lang: saved }); } catch (e) {}
+    try {
+      const raw = localStorage.getItem("skpn_profile");
+      if (raw) this.setState({ profile: JSON.parse(raw) });
+      const at = localStorage.getItem("skpn_attempt");
+      if (at) this.setState({ attempt: JSON.parse(at) });
+    } catch (e) {}
+  }
+
+  signOut() {
+    try {
+      ["skpn_profile", "skpn_attempt", "skpn_attempts", "skpn_signed_in"].forEach(k => localStorage.removeItem(k));
+    } catch (e) {}
+    window.location.href = "Home v5.dc.html";
+  }
+
+  get lang() { return this.state.lang || this.props.language || "hi"; }
+
+  setLang(next) {
+    try { localStorage.setItem("skpn_lang", next); } catch (e) {}
+    this.setState({ lang: next });
+  }
+
+  renderVals() {
+    const lang = this.lang, t = S[lang], k = t.keys, hi = lang === "hi";
+    const pr = this.state.profile;
+    const at = this.state.attempt;
+    const P = pr ? {
+      name: pr.name || "—",
+      email: pr.email || "—",
+      mobile: pr.mobile || "—",
+      gender: pr.gender || "—",
+      dob: pr.dob || "—",
+      address: pr.address || "—",
+      city: pr.city || "—",
+      districtLabel: (hi ? pr.districtHi : pr.districtEn) || pr.district || "—",
+      pin: pr.pin || "—",
+      category: pr.category || "vidyalaya",
+      level: pr.level || "—",
+      institution: pr.institution || "—",
+      exam: pr.exam || (hi ? "नहीं" : "No"),
+      divyang: !!pr.divyang
+    } : {
+      name: hi ? STUDENT.fullName : STUDENT.fullNameEn,
+      email: STUDENT.email,
+      mobile: "+91 " + STUDENT.mobile,
+      gender: STUDENT.gender[lang],
+      dob: STUDENT.dob,
+      address: STUDENT.address[lang],
+      city: STUDENT.city[lang],
+      districtLabel: hi ? STUDENT.districtHi : STUDENT.district,
+      pin: STUDENT.pin,
+      category: STUDENT.category,
+      level: STUDENT.level[lang],
+      institution: STUDENT.institution[lang],
+      exam: hi ? "नहीं" : "No",
+      divyang: STUDENT.divyang
+    };
+    const attDate = at ? (hi ? at.dateHi : at.dateEn) : (hi ? "24 जुलाई 2026" : "24 July 2026");
+    const attClock = at ? at.clock : "10:42";
+    const attTaken = at ? at.taken : "09:12";
+    const name = P.name;
+    return {
+      lang: lang,
+      t: t,
+      student: { fullName: name, district: P.districtLabel },
+      initials: name.trim().charAt(0),
+      categoryLabel: t.categories[P.category],
+      stats: [
+        { label: t.stats[0], value: attDate },
+        { label: t.stats[1], value: attTaken }
+      ],
+      attempts: [{ date: attDate + ", " + attClock, time: (hi ? "समय " : "time ") + attTaken, status: hi ? "पूर्ण" : "Completed" }],
+      groups: [
+        { title: t.groups[0], note: t.mobileNote, noteDisplay: "block", rows: [
+          { k: k.name, v: P.name },
+          { k: k.gender, v: P.gender },
+          { k: k.dob, v: P.dob },
+          { k: k.mobile, v: P.mobile.indexOf("+91") === 0 ? P.mobile : "+91 " + P.mobile }
+        ] },
+        { title: t.groups[1], note: "", noteDisplay: "none", rows: [
+          { k: k.email, v: P.email },
+          { k: k.provider, v: t.mobileSignIn }
+        ] },
+        { title: t.groups[2], note: "", noteDisplay: "none", rows: [
+          { k: k.address, v: P.address },
+          { k: k.city, v: P.city },
+          { k: k.district, v: P.districtLabel },
+          { k: k.state, v: t.stateValue },
+          { k: k.pin, v: P.pin }
+        ] },
+        { title: t.groups[3], note: P.divyang ? t.divyangNote : "", noteDisplay: P.divyang ? "block" : "none", rows: [
+          { k: k.category, v: t.categories[P.category] },
+          { k: k.level, v: P.level },
+          { k: k.institution, v: P.institution },
+          { k: k.exam, v: P.exam },
+          { k: k.divyang, v: P.divyang ? t.divyangYes : t.divyangNo }
+        ] }
+      ],
+      hiOn: hi, enOn: !hi,
+      hiBg: hi ? "#14203E" : "#FCFAF4", hiFg: hi ? "#FDF3DF" : "#161C2E", hiBorder: hi ? "#14203E" : "#DCD1BC",
+      enBg: hi ? "#FCFAF4" : "#14203E", enFg: hi ? "#161C2E" : "#FDF3DF", enBorder: hi ? "#DCD1BC" : "#14203E",
+      signOut: () => this.signOut(),
+      setHi: () => this.setLang("hi"),
+      setEn: () => this.setLang("en"),
+      toggleLang: () => this.setLang(hi ? "en" : "hi")
+    };
+  }
+}
+
+</script>
+</body>
+</html>
