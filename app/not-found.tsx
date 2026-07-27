@@ -4,23 +4,13 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useLang, useSession } from "@/components/AppProviders";
-import { strings } from "@/lib/i18n";
-
-// The export has no 404 screen, so there is no copy for one. English until the department supplies
-// Hindi — see the report accompanying this change. The link label is a real design string.
-const NOT_FOUND_COPY: Record<"hi" | "en", { title: string; body: string } | null> = {
-  en: {
-    title: "This page could not be found",
-    body: "The address may be mistyped, or the page may have moved.",
-  },
-  hi: null,
-};
+import { custom, strings } from "@/lib/i18n";
 
 export default function NotFound() {
   const { lang, toggle: toggleLang } = useLang();
   const { session } = useSession();
   const s = strings(lang);
-  const copy = NOT_FOUND_COPY[lang] ?? NOT_FOUND_COPY.en!;
+  const copy = custom(lang).notFound;
 
   return (
     <div data-page="NotFound" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip" }}>

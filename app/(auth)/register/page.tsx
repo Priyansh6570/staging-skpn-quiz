@@ -8,11 +8,12 @@ import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useLang, useSession, useShell } from "@/components/AppProviders";
-import { strings, en } from "@/lib/i18n";
+import { custom, strings, en } from "@/lib/i18n";
 import { CATEGORY_KEYS, GENDER_KEYS } from "@/lib/registration";
 import { codeFromResponse } from "@/lib/errors";
 
 const ITEM = 44;
+const TODAY = Date.now();
 const YEARS = Array.from({ length: 2013 - 1900 + 1 }, (_, i) => 1900 + i);
 const daysInMonth = (m: number, y: number) =>
   [31, (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
@@ -47,10 +48,12 @@ export default function RegisterPage() {
   const { session, refresh } = useSession();
   const { showError, showMessage } = useShell();
   const t = strings(lang).Register.S;
+  const c = custom(lang).register;
   const DISTRICTS = strings(lang).Register.DISTRICTS;
   const LEVELS = strings(lang).Register.LEVELS;
   const MONTHS = strings(lang).Register.MONTHS;
-  const EXAMS = strings(lang).Register.EXAMS;
+  // Item 13: the client narrowed the list to these four.
+  const EXAMS = custom(lang).pratiyogita.examNames;
 
   const [step, setStep] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
@@ -151,12 +154,18 @@ export default function RegisterPage() {
       return missing;
     }
     const missing: string[] = [];
-    if (!rulesAccepted) missing.push(t.rulesLink);
-    if (!privacyAccepted) missing.push(t.privacyLink);
+    if (!rulesAccepted || !privacyAccepted) missing.push(t.rulesLink);
+    if (needsGuardian && form.guardianName.trim().length < 3) missing.push(t.guardianName);
     return missing;
   };
 
   const canAdvance = () => missingFields().length === 0;
+
+  // Item 15: derived from the date itself, so editing the date re-evaluates it immediately.
+  const ageYears = dobValid
+    ? Math.floor((TODAY - Date.UTC(dob.y, dob.m - 1, dob.d)) / (365.2425 * 86_400_000))
+    : null;
+  const needsGuardian = ageYears !== null && ageYears < 18;
 
   const ep = emailProblem();
   const mp = mobileProblem();
@@ -229,7 +238,7 @@ export default function RegisterPage() {
         institutionName: form.institution.trim(),
         competitiveExam: form.exam || null,
         isDivyang: form.divyang,
-        guardianName: form.guardianName.trim(),
+        guardianName: needsGuardian ? form.guardianName.trim() : "",
         rulesAccepted: true,
         privacyAccepted: true,
       }),
@@ -285,7 +294,15 @@ export default function RegisterPage() {
   const dobInk = "#161C2E";
   const openDob = () => { lockScroll(true); setPick({ y: dob.y || 2005, m: dob.m || 6, d: dob.d || 15 }); setDobOpen(true); };
   const closeDob = () => { lockScroll(false); setDobOpen(false); };
-  const confirmDob = () => { lockScroll(false); setDobOpen(false); setDob({ y: pick.y, m: pick.m, d: Math.min(pick.d, daysInMonth(pick.m, pick.y)) }); };
+  const confirmDob = () => {
+    lockScroll(false);
+    setDobOpen(false);
+    const chosen = { y: pick.y, m: pick.m, d: Math.min(pick.d, daysInMonth(pick.m, pick.y)) };
+    setDob(chosen);
+    // A new date can take the student over 18, and a guardian name must not survive that.
+    const age = Math.floor((TODAY - Date.UTC(chosen.y, chosen.m - 1, chosen.d)) / (365.2425 * 86_400_000));
+    if (age >= 18) setForm((f) => ({ ...f, guardianName: "" }));
+  };
   const dobModalDisplay = dobOpen ? "flex" : "none";
   const blockScroll = (e: React.SyntheticEvent) => { if (e.cancelable) e.preventDefault(); };
   const onYearWheel = (e: React.WheelEvent) => wheelStep(e, "y", YEARS.length, (i) => YEARS[i], YEARS.indexOf(pick.y));
@@ -317,6 +334,8 @@ export default function RegisterPage() {
   const levelDisplay = form.category && levelIndex >= 0 ? LEVELS[form.category][levelIndex] : t.levelPlaceholder;
   const levelInk = form.level ? "#161C2E" : "#7A6B4E";
   const openLevel = () => openPicker("level");
+  // Item 13: only school-level entrants are asked about entrance exams.
+  const showExam = form.category === "vidyalaya";
   const examDisplay = form.exam || t.examPlaceholder;
   const examInk = form.exam ? "#161C2E" : "#7A6B4E";
   const openExam = () => openPicker("exam");
@@ -348,7 +367,8 @@ export default function RegisterPage() {
 
   const categories = t.categories.map((c, i) => ({
     name: c.name, who: c.who, on: form.category === CATEGORY_KEYS[i],
-    select: () => setForm((f) => ({ ...f, category: CATEGORY_KEYS[i], level: "" })),
+    // Changing category clears the level and the exam, which only applies to vidyalaya.
+    select: () => setForm((f) => ({ ...f, category: CATEGORY_KEYS[i], level: "", exam: "" })),
     bg: form.category === CATEGORY_KEYS[i] ? "#F7F2E6" : "#FCFAF4",
     border: form.category === CATEGORY_KEYS[i] ? "#14203E" : "#DCD1BC",
     radioBorder: form.category === CATEGORY_KEYS[i] ? "#14203E" : "#B6BCC9",
@@ -362,6 +382,12 @@ export default function RegisterPage() {
   const divyangBg = divyang ? "#F7F2E6" : "#FCFAF4";
   const divyangNoticeDisplay = divyang ? "block" : "none";
 
+  // One checkbox now stands for both, so they flip together.
+  const toggleBothConsents = () => {
+    const next = !(rulesAccepted && privacyAccepted);
+    setRulesAccepted(next);
+    setPrivacyAccepted(next);
+  };
   const toggleRules = () => setRulesAccepted((v) => !v);
   const rulesBorder = rulesAccepted ? "#14203E" : "#DCD1BC";
   const rulesBg = rulesAccepted ? "#F7F2E6" : "#FCFAF4";
@@ -543,6 +569,7 @@ export default function RegisterPage() {
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><path d="M6 9.5 12 15.5l6-6"></path></svg>
                   </button>
                 </div>
+                {showExam ? (
                 <div style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.examLabel} <span style={{ padding: "3px 11px", borderRadius: "999px", background: "#F1E9DA", border: "1px solid #E3D9C6", fontSize: "14.5px", lineHeight: "1.6", color: "#161C2E" }}>{t.optional}</span></span>
                   <button type="button" onClick={openExam} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", color: `${examInk}` }}>
@@ -550,6 +577,7 @@ export default function RegisterPage() {
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><path d="M6 9.5 12 15.5l6-6"></path></svg>
                   </button>
                 </div>
+                ) : null}
                 <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
                   <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.institutionLabel}</span>
                   <input type="text" value={institution} onInput={onInstitution} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
@@ -564,14 +592,16 @@ export default function RegisterPage() {
 
             {isDeclare ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", border: `1px solid ${rulesBorder}`, borderRadius: "14px", background: `${rulesBg}` }}>
-                  <input type="checkbox" checked={rulesAccepted} onChange={toggleRules} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
-                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.rulesConsent} <Link href="/rules">{t.rulesLink}</Link></span>
+                <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", borderRadius: "16px", border: `1px solid ${rulesBorder}`, background: `${rulesBg}` }}>
+                  <input type="checkbox" checked={rulesAccepted && privacyAccepted} onChange={toggleBothConsents} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
+                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>
+                    {c.consent}{" "}
+                    <a href="/rules" target="_blank" rel="noopener noreferrer">{c.consentRulesLink}</a>
+                    {" · "}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer">{c.consentPrivacyLink}</a>
+                  </span>
                 </label>
-                <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", border: `1px solid ${privacyBorder}`, borderRadius: "14px", background: `${privacyBg}` }}>
-                  <input type="checkbox" checked={privacyAccepted} onChange={togglePrivacy} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
-                  <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.privacyConsent} <Link href="/privacy">{t.privacyLink}</Link></span>
-                </label>
+                {needsGuardian ? (
                 <div style={{ padding: "22px", borderRadius: "16px", background: "#F6F0E4", display: "flex", flexDirection: "column", gap: "14px" }}>
                   <p style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18px", lineHeight: "1.5", color: "#14203E" }}>{t.guardianTitle}</p>
                   <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
@@ -579,6 +609,7 @@ export default function RegisterPage() {
                     <input type="text" value={guardianName} onInput={onGuardianName} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FFFFFF", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
                   </label>
                 </div>
+                ) : null}
               </div>
             ) : null}
 

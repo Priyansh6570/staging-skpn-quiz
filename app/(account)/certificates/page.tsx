@@ -5,19 +5,10 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Loader from "@/components/Loader";
 import { useLang, useSession, useShell } from "@/components/AppProviders";
-import { strings } from "@/lib/i18n";
+import { custom, strings } from "@/lib/i18n";
 
 const CERTIFICATE_SRC = "/uploads/cert.jpeg";
 const FILE_NAME = "Medhavi Chhatravritti Pratiyogita Pramaan Patra.pdf";
-
-// The export has no copy for either state. English until the department supplies Hindi — see the
-// report accompanying this change.
-const RETRY_LABEL: Record<"hi" | "en", string | null> = { en: "Try again", hi: null };
-const DOWNLOADED_LABEL: Record<"hi" | "en", string | null> = { en: "Downloaded", hi: null };
-const LOAD_FAILED_LABEL: Record<"hi" | "en", string | null> = {
-  en: "The certificate could not be loaded.",
-  hi: null,
-};
 
 // The on-screen overlay's geometry, as fractions of the certificate rather than container query
 // units, so the exported file and the preview place the name identically.
@@ -81,6 +72,7 @@ export default function CertificatesPage() {
   const { session } = useSession();
   const { busy, showError } = useShell();
   const t = strings(lang).Certificates.S;
+  const c = custom(lang).certificate;
   const [name, setName] = useState("");
   const [imageState, setImageState] = useState<"loading" | "ready" | "failed">("loading");
   const [attempt, setAttempt] = useState(0);
@@ -187,8 +179,8 @@ export default function CertificatesPage() {
 
             {imageState === "failed" ? (
               <div data-e="certretry" style={{ position: "absolute", inset: "0", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px", padding: "24px", background: "#FFFDF7", textAlign: "center" }}>
-                <p style={{ margin: "0", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E", maxWidth: "36ch" }}>{LOAD_FAILED_LABEL[lang] ?? LOAD_FAILED_LABEL.en}</p>
-                <button type="button" onClick={retryImage} data-e="cta" style={{ minHeight: "54px", padding: "15px 28px", border: "1px solid #14203E", borderRadius: "999px", background: "#FCFAF4", color: "#14203E", cursor: "pointer", fontSize: "17px", fontWeight: "600", lineHeight: "1.5", fontFamily: "inherit" }}>{RETRY_LABEL[lang] ?? RETRY_LABEL.en}</button>
+                <p style={{ margin: "0", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E", maxWidth: "36ch" }}>{c.loadFailed}</p>
+                <button type="button" onClick={retryImage} data-e="cta" style={{ minHeight: "54px", padding: "15px 28px", border: "1px solid #14203E", borderRadius: "999px", background: "#FCFAF4", color: "#14203E", cursor: "pointer", fontSize: "17px", fontWeight: "600", lineHeight: "1.5", fontFamily: "inherit" }}>{c.retry}</button>
               </div>
             ) : null}
           </div>
@@ -196,7 +188,7 @@ export default function CertificatesPage() {
           <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", marginTop: "22px" }}>
             <a href={CERTIFICATE_SRC} download={fileName} onClick={download} aria-disabled={locked} data-e="download" style={{ minHeight: "54px", padding: "15px 28px", border: "0", borderRadius: "999px", background: locked ? "#EDE6D7" : "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: locked ? "#7A6B4E" : "#1E1503", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "10px", fontSize: "17px", fontWeight: "600", lineHeight: "1.5", textDecoration: "none", boxShadow: locked ? "none" : "0 10px 26px rgba(232,193,115,.28)", pointerEvents: locked ? "none" : "auto", cursor: locked ? "not-allowed" : "pointer", transition: "transform .2s ease" }}>
               <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke={locked ? "#7A6B4E" : "#1E1503"} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block" }}><path d="M12 4v11m0 0-4.2-4.2M12 15l4.2-4.2M4.5 19.5h15"></path></svg>
-              {justDownloaded ? (DOWNLOADED_LABEL[lang] ?? DOWNLOADED_LABEL.en) : t.download}
+              {justDownloaded ? c.downloaded : t.download}
             </a>
           </div>
         </div>

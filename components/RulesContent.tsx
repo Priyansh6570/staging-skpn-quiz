@@ -6,14 +6,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import { useLang, useSession } from "@/components/AppProviders";
+import { useLang, useSession, useShell } from "@/components/AppProviders";
 import { strings } from "@/lib/i18n";
+import { codeFromResponse } from "@/lib/errors";
 
 export default function RulesContent({ gated = false }: { gated?: boolean }) {
   const router = useRouter();
   const { lang, toggle: toggleLang } = useLang();
-  const { session } = useSession();
+  const { session, refresh } = useSession();
+  const { busy, showError } = useShell();
   const [accepted, setAccepted] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [active, setActive] = useState(0);
   const [progress, setProgress] = useState(0);
   const t = strings(lang).Rules.S;
@@ -70,7 +73,30 @@ export default function RulesContent({ gated = false }: { gated?: boolean }) {
   const signedIn = gated || (session.signedIn && session.attemptCount === 0);
   const hasCerts = session.hasCertificates;
   const blocked = !ok;
-  const continueHref = ok ? "/quiz/instructions" : "#";
+  const q = strings(lang).Quiz.T;
+  // The instructions screen is gone; its warnings move above the checkbox so they are still read
+  // before the clock starts.
+  const warnings = [q.insLede, ...q.instructions, q.insWarning];
+
+  const startAttempt = async () => {
+    if (!ok || starting) return;
+    setStarting(true);
+    const res = await busy(
+      fetch("/api/quiz/attempts", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ rulesAccepted: true }),
+      }).catch(() => null),
+    );
+    setStarting(false);
+    if (!res) { showError("network"); return; }
+    if (res.status === 409) { showError("already_attempted"); router.push("/quiz"); return; }
+    if (!res.ok) { showError(codeFromResponse(res.status, await res.json().catch(() => null))); return; }
+    const data = await res.json();
+    await refresh();
+    router.push(`/quiz/attempt/${data.attemptId}`);
+  };
+
   const continueBg = ok ? "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)" : "rgba(255,249,236,.12)";
   const continueFg = ok ? "#1E1503" : "#DBD5C7";
   const continueEvents = ok ? "auto" : "none";
@@ -78,7 +104,6 @@ export default function RulesContent({ gated = false }: { gated?: boolean }) {
   const checkBorder = ok ? "#E8C173" : "rgba(255,249,236,.28)";
   const checkBg = ok ? "rgba(232,193,115,.12)" : "rgba(255,255,255,.04)";
   const toggleAccept = () => setAccepted((a) => !a);
-  void router;
   return (
     <div data-page="Rules" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip" }}>
       <SiteHeader lang={lang} active="rules" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
@@ -138,7 +163,12 @@ export default function RulesContent({ gated = false }: { gated?: boolean }) {
             <div data-e="card" data-reveal style={{ position: "relative", overflow: "hidden", padding: "30px 32px", background: "linear-gradient(150deg,#101838 0%,#070B1E 100%)", borderRadius: "24px", boxShadow: "0 18px 44px rgba(20,32,62,.22)" }}>
               <span aria-hidden="true" style={{ position: "absolute", left: "-60px", bottom: "-80px", width: "280px", height: "280px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.18) 0%,rgba(232,193,115,0) 70%)", animation: "rl-glow 9s ease-in-out infinite" }}></span>
               <p style={{ position: "relative", margin: "0 0 10px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "15.5px", letterSpacing: ".01em", color: "#E8C173", lineHeight: "1.8" }}>{t.endLabel}</p>
-              <p style={{ position: "relative", margin: "0 0 22px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "20px", lineHeight: "1.7", color: "#FFF9EC" }}>{t.declaration}</p>
+              <p style={{ position: "relative", margin: "0 0 18px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "20px", lineHeight: "1.7", color: "#FFF9EC" }}>{t.declaration}</p>
+              <ul data-e="startwarnings" style={{ position: "relative", margin: "0 0 22px", padding: "18px 22px", listStyle: "none", display: "flex", flexDirection: "column", gap: "9px", borderRadius: "16px", background: "rgba(255,249,236,.07)", border: "1px solid rgba(232,193,115,.28)" }}>
+                {warnings.map((w, i) => (
+                  <li key={i} style={{ fontSize: "16px", lineHeight: "1.8", color: "#F6F2E9" }}>{w}</li>
+                ))}
+              </ul>
 
               <label style={{ position: "relative", display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", border: `1px solid ${checkBorder}`, borderRadius: "14px", background: `${checkBg}`, transition: "border-color .16s ease,background .16s ease" }}>
                 <input type="checkbox" checked={accepted} onChange={toggleAccept} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#E8C173", cursor: "pointer" }} />
@@ -147,7 +177,7 @@ export default function RulesContent({ gated = false }: { gated?: boolean }) {
 
               <div data-e="ctarow" style={{ position: "relative", display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", marginTop: "22px" }}>
                 <Link href="/pratiyogita" data-e="cta" style={{ padding: "15px 26px", minHeight: "54px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.36)", borderRadius: "999px", fontSize: "17px", lineHeight: "1.5", color: "#F6F2E9" }}>{t.back}</Link>
-                <a href={continueHref} aria-disabled={blocked} data-e="cta" style={{ padding: "16px 32px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: `${continueBg}`, color: `${continueFg}`, borderRadius: "999px", fontSize: "18px", fontWeight: "600", lineHeight: "1.5", pointerEvents: `${continueEvents}`, boxShadow: `${continueShadow}` }}>{t.accept}</a>
+                <button type="button" onClick={startAttempt} disabled={blocked || starting} data-e="cta" style={{ padding: "16px 32px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: `${continueBg}`, color: `${continueFg}`, borderRadius: "999px", fontSize: "18px", fontWeight: "600", lineHeight: "1.5", pointerEvents: `${continueEvents}`, boxShadow: `${continueShadow}` }}>{q.begin}</button>
               </div>
             </div>
             ) : null}

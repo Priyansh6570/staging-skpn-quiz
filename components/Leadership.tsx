@@ -7,14 +7,19 @@ import { strings, type Lang } from "@/lib/i18n";
 // extraction, so the paths sit here in the same order.
 const LEADER_IMAGES = [
   "/uploads/dr%20mohan%20yadav.jpg",
-  "/uploads/shiv%20shekhar%20shukla.jpg",
   "/uploads/dhermend%20singh%20lodhi.jpg",
+  "/uploads/shiv%20shekhar%20shukla.jpg",
   "/uploads/shriram%20tiwari.png",
 ];
 
+// Positions 2 and 3 are swapped at the client's request: Dharmendra Singh Lodhi before
+// Shiv Shekhar Shukla. The images above are reordered to match, so copy and photograph stay paired.
+const ORDER = [0, 2, 1, 3];
+
 export default function Leadership({ lang }: { lang: Lang }) {
   const [active, setActive] = useState(0);
-  const s = strings(lang).Leadership;
+  const source = strings(lang).Leadership;
+  const s = { ...source, LEADERS: ORDER.map((i) => source.LEADERS[i]) };
   const n = s.LEADERS.length;
 
   const activeRole = s.LEADERS[active][0];

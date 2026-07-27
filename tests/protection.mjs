@@ -36,7 +36,7 @@ const browser = await chromium.launch();
     return (await r.json()).attemptId;
   });
 
-  const routes = ["/", "/about", "/pratiyogita", "/rules", "/login", "/register", "/quiz/rules", "/quiz/instructions", `/quiz/attempt/${attemptId}`, "/certificates"];
+  const routes = ["/", "/about", "/pratiyogita", "/rules", "/login", "/register", "/quiz/rules", `/quiz/attempt/${attemptId}`, "/certificates"];
   for (const path of routes) {
     await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
     await page.waitForTimeout(400);

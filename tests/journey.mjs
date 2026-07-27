@@ -90,11 +90,6 @@ check("registration lands on /quiz/rules", page.url().includes("/quiz/rules"), p
 // --- rules -> instructions --------------------------------------------------------------------------
 await page.locator('input[type="checkbox"]').first().check();
 await page.waitForTimeout(200);
-await page.getByRole("link", { name: /आगे बढ़ें/ }).first().click();
-await page.waitForURL(/\/quiz\/instructions/, { timeout: 20000 }).catch(() => {});
-check("rules acceptance reaches /quiz/instructions", page.url().includes("/quiz/instructions"), page.url());
-
-// --- attempt -----------------------------------------------------------------------------------------
 await page.locator('button[data-e~="cta"]').last().click();
 await page.waitForURL(/\/quiz\/attempt\//, { timeout: 30000 }).catch(() => {});
 check("attempt starts", /\/quiz\/attempt\//.test(page.url()), page.url());

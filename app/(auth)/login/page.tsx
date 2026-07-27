@@ -6,18 +6,10 @@ import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useLang, useSession, useShell } from "@/components/AppProviders";
-import { strings } from "@/lib/i18n";
+import { custom, strings } from "@/lib/i18n";
 import { codeFromResponse } from "@/lib/errors";
 
 const MOBILE_RE = /^[6-9]\d{9}$/;
-
-// Client-supplied copy. The export has no equivalent string, so there is no Hindi for it and Hindi
-// readers see the English until the department provides it. Everything else on this page comes
-// from lib/i18n.
-const NO_REGISTRATION: Record<"hi" | "en", string | null> = {
-  en: "No registration found for this number",
-  hi: null,
-};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -83,7 +75,7 @@ export default function LoginPage() {
     setTouched(true);
     setNotRegistered(false);
   };
-  const notRegisteredMsg = NO_REGISTRATION[lang] ?? NO_REGISTRATION.en;
+  const notRegisteredMsg = custom(lang).errors.notRegistered;
   const notRegisteredDisplay = notRegistered ? "block" : "none";
   const mobileBorder = bad ? "#A03A2B" : "#DCD1BC";
   const mobileMsgDisplay = bad ? "block" : "none";

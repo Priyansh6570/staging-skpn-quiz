@@ -92,14 +92,14 @@ r = await call("/api/register/check-mobile", { method: "POST", body: JSON.string
 check("check-mobile now taken", r.body.available === false);
 
 // --- nothing before Begin may write an attempt --------------------------------------------------------
-r = await call("/quiz/instructions");
-check("instructions page loads", r.status === 200, `status ${r.status}`);
+r = await call("/quiz/rules");
+check("rules gate loads", r.status === 200, `status ${r.status}`);
 r = await call("/quiz");
 check("GET /quiz with no attempt redirects to the rules gate", r.status === 307 || r.status === 302, `status ${r.status}`);
 r = await call("/api/session");
 check("loading instructions writes no attempt", r.body.attemptCount === 0, `attemptCount ${r.body.attemptCount}`);
 await call("/");
-await call("/quiz/instructions");
+await call("/quiz/rules");
 r = await call("/api/session");
 check("away-and-back still writes no attempt", r.body.attemptCount === 0, `attemptCount ${r.body.attemptCount}`);
 
@@ -178,7 +178,7 @@ check("second attempt refused", r.status === 409, `status ${r.status}`);
     competitiveExam: null, isDivyang: false, guardianName: "", rulesAccepted: true, privacyAccepted: true }) });
   const first = await call("/api/quiz/attempts", { method: "POST", body: JSON.stringify({ rulesAccepted: true }) });
   await call("/");
-  await call("/quiz/instructions");
+  await call("/quiz/rules");
   const again = await call("/api/quiz/attempts", { method: "POST", body: JSON.stringify({ rulesAccepted: true }) });
   check("returning to instructions resumes the same attempt", again.status === 200 && again.body.attemptId === first.body.attemptId, `${again.status} ${again.body.attemptId} vs ${first.body.attemptId}`);
   cookie = saved;

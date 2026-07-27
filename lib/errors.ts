@@ -1,4 +1,5 @@
-import { strings, type Lang } from "@/lib/i18n";
+import { custom, strings } from "@/lib/i18n";
+import type { Lang } from "@/lib/models/types";
 
 export type ErrorCode =
   | "offline"
@@ -11,36 +12,22 @@ export type ErrorCode =
   | "save_failed"
   | "invalid_input";
 
-/**
- * Failures the export already has copy for, in both languages. These are real design strings, not
- * error text invented here.
- */
-const FROM_DESIGN: Partial<Record<ErrorCode, (s: ReturnType<typeof strings>) => string>> = {
-  offline: (s) => s.Quiz.T.offline,
-  already_attempted: (s) => s.Quiz.T.onceBody,
-  attempt_expired: (s) => s.Quiz.T.submittedAuto,
-};
-
-/**
- * Failures the export has no copy for at all. English only, because inventing Hindi for a
- * government portal is not this codebase's call — see the report accompanying this change.
- * Every entry here is a blocking copy request, not a finished string.
- */
-const AWAITING_HINDI: Record<string, string> = {
-  network: "Could not reach the server. Check your connection and try again.",
-  server: "Something went wrong at our end. Please try again.",
-  session_expired: "Your session has ended. Please sign in again.",
-  rate_limited: "Too many attempts. Please wait a moment and try again.",
-  save_failed: "Your last answer could not be saved. It will be retried automatically.",
-  invalid_input: "Some details are not valid. Please check the highlighted fields.",
-};
-
-export const MISSING_HINDI_ERROR_KEYS = Object.keys(AWAITING_HINDI);
-
 export function errorMessage(lang: Lang, code: ErrorCode): { message: string; missingCopy: boolean } {
-  const fromDesign = FROM_DESIGN[code];
-  if (fromDesign) return { message: fromDesign(strings(lang)), missingCopy: false };
-  return { message: AWAITING_HINDI[code] ?? AWAITING_HINDI.server, missingCopy: true };
+  // Three failures the export already has copy for; the rest are authored in lib/i18n/custom.ts.
+  const s = strings(lang);
+  const c = custom(lang);
+
+  switch (code) {
+    case "offline": return { message: s.Quiz.T.offline, missingCopy: false };
+    case "already_attempted": return { message: s.Quiz.T.onceBody, missingCopy: false };
+    case "attempt_expired": return { message: s.Quiz.T.submittedAuto, missingCopy: false };
+    case "network": return { message: c.errors.network, missingCopy: false };
+    case "session_expired": return { message: c.errors.sessionExpired, missingCopy: false };
+    case "rate_limited": return { message: c.errors.rateLimited, missingCopy: false };
+    case "save_failed": return { message: c.errors.saveFailed, missingCopy: false };
+    case "invalid_input": return { message: c.errors.invalidInput, missingCopy: false };
+    default: return { message: c.errors.server, missingCopy: false };
+  }
 }
 
 /** Maps an API error payload onto a code the catalogue knows. */

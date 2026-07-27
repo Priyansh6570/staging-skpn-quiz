@@ -1,5 +1,6 @@
 import { hi } from "./hi";
 import { en } from "./en";
+import { customEn, customHi, type CustomStrings } from "./custom";
 
 export type Lang = "hi" | "en";
 
@@ -8,7 +9,12 @@ export type Lang = "hi" | "en";
 export type Strings = typeof hi;
 
 const table: Record<Lang, Strings> = { hi, en };
+const customTable: Record<Lang, CustomStrings> = { hi: customHi, en: customEn };
+
+/** Copy with no source in the design export. See lib/i18n/custom.ts. */
+export const custom = (lang: Lang): CustomStrings => customTable[lang];
 
 export const strings = (lang: Lang): Strings => table[lang];
 
-export { hi, en };
+export { hi, en, customHi, customEn };
+export type { CustomStrings };

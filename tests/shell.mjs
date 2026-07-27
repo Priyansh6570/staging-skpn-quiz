@@ -101,7 +101,8 @@ const browser = await chromium.launch();
     route.request().method() === "POST"
       ? route.fulfill({ status: 409, contentType: "application/json", body: '{"error":"already_attempted"}' })
       : route.continue());
-  await page.goto(`${BASE}/quiz/instructions`, { waitUntil: "networkidle" });
+  await page.goto(`${BASE}/quiz/rules`, { waitUntil: "networkidle" });
+  await page.locator('input[type="checkbox"]').first().check().catch(() => {});
   await page.locator('button[data-e~="cta"]').last().click();
   await page.waitForTimeout(800);
   const text = await page.locator('[data-e~="toast"]').first().textContent().catch(() => "");

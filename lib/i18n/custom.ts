@@ -1,0 +1,120 @@
+/**
+ * Copy that has no source in the design export.
+ *
+ * Everything else in lib/i18n is extracted from design/*.dc.html and verified byte-identical.
+ * These strings are not: they are either supplied by the client in a change request, or written
+ * here because a screen the export never had needs words. The Hindi in this file has NOT been
+ * through the designer or the department — it needs a native proofread before launch. That is the
+ * one thing this file cannot verify about itself.
+ */
+
+export interface CustomStrings {
+  home: {
+    perStudent: string;
+  };
+  pratiyogita: {
+    examTitle: string;
+    examNames: string[];
+  };
+  register: {
+    consent: string;
+    consentRulesLink: string;
+    consentPrivacyLink: string;
+    guardianWhy: string;
+  };
+  quiz: {
+    beforeYouStart: string;
+  };
+  errors: {
+    network: string;
+    server: string;
+    sessionExpired: string;
+    rateLimited: string;
+    saveFailed: string;
+    invalidInput: string;
+    notRegistered: string;
+  };
+  certificate: {
+    retry: string;
+    downloaded: string;
+    loadFailed: string;
+  };
+  notFound: {
+    title: string;
+    body: string;
+  };
+}
+
+export const customHi: CustomStrings = {
+  home: {
+    perStudent: "प्रति छात्र छात्रवृत्ति",
+  },
+  pratiyogita: {
+    examTitle: "प्रवेश परीक्षाओं की तैयारी कर रहे विद्यार्थी भी भाग ले सकते हैं",
+    examNames: ["NEET", "JEE", "CLAT", "CAT"],
+  },
+  register: {
+    consent: "मुझे प्रतियोगिता के नियम स्वीकार हैं और मैं गोपनीयता सूचना से सहमत हूँ।",
+    consentRulesLink: "नियम",
+    consentPrivacyLink: "गोपनीयता सूचना",
+    guardianWhy: "आपकी आयु 18 वर्ष से कम है, इसलिए अभिभावक का नाम आवश्यक है।",
+  },
+  quiz: {
+    beforeYouStart: "प्रारंभ करने से पूर्व",
+  },
+  errors: {
+    network: "सर्वर से संपर्क नहीं हो सका। कृपया अपना कनेक्शन जाँचें और पुनः प्रयास करें।",
+    server: "कुछ त्रुटि हुई है। कृपया पुनः प्रयास करें।",
+    sessionExpired: "आपका सत्र समाप्त हो गया है। कृपया पुनः साइन इन करें।",
+    rateLimited: "बहुत अधिक प्रयास हुए हैं। कृपया कुछ क्षण प्रतीक्षा करें।",
+    saveFailed: "आपका पिछला उत्तर सुरक्षित नहीं हो सका। यह स्वतः पुनः भेजा जाएगा।",
+    invalidInput: "कुछ जानकारी अधूरी अथवा अमान्य है। कृपया चिह्नित फ़ील्ड जाँचें।",
+    notRegistered: "इस नंबर से कोई पंजीकरण नहीं मिला",
+  },
+  certificate: {
+    retry: "पुनः प्रयास करें",
+    downloaded: "डाउनलोड हो गया",
+    loadFailed: "प्रमाण पत्र लोड नहीं हो सका।",
+  },
+  notFound: {
+    title: "यह पृष्ठ नहीं मिला",
+    body: "संभव है कि पता गलत लिखा गया हो, अथवा यह पृष्ठ स्थानांतरित हो गया हो।",
+  },
+};
+
+export const customEn: CustomStrings = {
+  home: {
+    perStudent: "Scholarship per student",
+  },
+  pratiyogita: {
+    examTitle: "Students preparing for entrance examinations may also take part",
+    examNames: ["NEET", "JEE", "CLAT", "CAT"],
+  },
+  register: {
+    consent: "I accept the rules of the competition and agree to the privacy notice.",
+    consentRulesLink: "Rules",
+    consentPrivacyLink: "Privacy notice",
+    guardianWhy: "You are under 18, so a guardian's name is required.",
+  },
+  quiz: {
+    beforeYouStart: "Before you begin",
+  },
+  errors: {
+    network: "Could not reach the server. Check your connection and try again.",
+    server: "Something went wrong. Please try again.",
+    sessionExpired: "Your session has ended. Please sign in again.",
+    rateLimited: "Too many attempts. Please wait a moment and try again.",
+    saveFailed: "Your last answer could not be saved. It will be retried automatically.",
+    invalidInput: "Some details are missing or not valid. Please check the highlighted fields.",
+    notRegistered: "No registration found for this number",
+  },
+  certificate: {
+    retry: "Try again",
+    downloaded: "Downloaded",
+    loadFailed: "The certificate could not be loaded.",
+  },
+  notFound: {
+    title: "This page could not be found",
+    body: "The address may be mistyped, or the page may have moved.",
+  },
+};
