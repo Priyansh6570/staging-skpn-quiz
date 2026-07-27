@@ -610,7 +610,11 @@ export const en = {
     },
     "markup": {
       "alt0": "Shri Krishna Pathey Nyas"
-    }
+    },
+    "inline": [
+      "Vidya ",
+      "Kala "
+    ]
   },
   "Leadership": {
     "LEADERS": [
@@ -637,7 +641,11 @@ export const en = {
     ],
     "markup": {
       "text0": "श्रीकृष्ण पाथेय न्यास"
-    }
+    },
+    "inline": [
+      "Previous card",
+      "Next card"
+    ]
   },
   "Legal": {
     "S": {
@@ -902,7 +910,13 @@ export const en = {
       "text2": "→",
       "text3": "हिन्दी",
       "text4": "English"
-    }
+    },
+    "inline": [
+      "No",
+      "No",
+      "time ",
+      "Completed"
+    ]
   },
   "Quiz": {
     "T": {
@@ -978,7 +992,25 @@ export const en = {
       "text2": "!",
       "text3": "×",
       "text4": "!"
-    }
+    },
+    "inline": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "जनवरी",
+      "फरवरी",
+      "मार्च",
+      "अप्रैल",
+      "मई",
+      "जून",
+      "जुलाई",
+      "अगस्त",
+      "सितम्बर",
+      "अक्टूबर",
+      "नवंबर",
+      "दिसंबर"
+    ]
   },
   "Register": {
     "DISTRICTS": [

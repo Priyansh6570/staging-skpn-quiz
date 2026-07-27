@@ -125,6 +125,54 @@ function markupLiterals(markup, lang, component) {
   return out;
 }
 
+// --- copy that sits inside renderVals() rather than in a top-level table ----------------------
+
+// AUDIT.md §6.1 fixtures: a fake student and a fake attempt date, which must not reach i18n.
+const FIXTURE_VALUES = new Set(["अनन्या वर्मा", "Ananya Verma", "24 जुलाई 2026", "24 July 2026"]);
+
+const STR = String.raw`"((?:[^"\\]|\\.)*)"`;
+const HI_TEST = String.raw`(?:lang === "hi"|hi)`;
+const PAIR_RE = new RegExp(String.raw`${HI_TEST}\s*\?\s*${STR}[^:?]*?:\s*${STR}`, "g");
+const ARRAY_PAIR_RE = new RegExp(String.raw`${HI_TEST}\s*\?\s*\[([^\]]*)\]\s*:\s*\[([^\]]*)\]`, "g");
+const BARE_ARRAY_RE = /\[((?:\s*"(?:[^"\\]|\\.)*"\s*,?)+)\]/g;
+
+const parseList = (inner) => [...inner.matchAll(new RegExp(STR, "g"))].map((m) => m[1]);
+
+const DEVANAGARI_RE = /[ऀ-ॿ]/;
+
+/**
+ * Returns { hi, en } pairs so both files stay index-aligned by construction. Only pairs whose
+ * Hindi side is actually Devanagari are kept — the same ternary shape carries the language toggle
+ * and a lot of colour switching, none of which is copy.
+ */
+function inlinePairs(script) {
+  const found = [];
+  const claimed = [];
+  const claim = (m) => claimed.push([m.index, m.index + m[0].length]);
+  const taken = (m) => claimed.some(([a, b]) => m.index >= a && m.index < b);
+  const keep = (hi, en) => {
+    if (!DEVANAGARI_RE.test(hi) || FIXTURE_VALUES.has(hi)) return;
+    found.push({ index: found.length, hi, en });
+  };
+
+  for (const m of script.matchAll(ARRAY_PAIR_RE)) {
+    claim(m);
+    const [hiList, enList] = [parseList(m[1]), parseList(m[2])];
+    hiList.forEach((hi, i) => keep(hi, enList[i] ?? hi));
+  }
+  for (const m of script.matchAll(PAIR_RE)) {
+    if (taken(m)) continue;
+    claim(m);
+    keep(m[1], m[2]);
+  }
+  // A Devanagari array with no English sibling — the month names. Copied unchanged into both.
+  for (const m of script.matchAll(BARE_ARRAY_RE)) {
+    if (taken(m)) continue;
+    for (const v of parseList(m[1])) keep(v, v);
+  }
+  return found.map(({ hi, en }) => ({ hi, en }));
+}
+
 // --- per-file extraction ---------------------------------------------------------------------
 
 const componentName = (file) => file.replace(/\.dc\.html$/, "").replace(/[^A-Za-z0-9]+/g, "_");
@@ -164,6 +212,10 @@ function extract(file) {
     if (markupMatch) {
       const lits = markupLiterals(markupMatch[1], lang, name);
       if (Object.keys(lits).length) out.markup = lits;
+    }
+    if (scriptMatch) {
+      const pairs = inlinePairs(scriptMatch[1].slice(scriptMatch[1].indexOf("class Component")));
+      if (pairs.length) out.inline = pairs.map((p) => p[lang]);
     }
     return out;
   };

@@ -10,7 +10,11 @@
     "assets": "node scripts/copy-assets.mjs",
     "i18n": "node scripts/extract-strings.mjs",
     "indexes": "node --experimental-strip-types scripts/ensure-indexes.mjs",
-    "baseline": "node scripts/baseline.mjs"
+    "baseline": "node scripts/baseline.mjs",
+    "import-questions": "node scripts/import-questions.mjs",
+    "css": "node scripts/build-css.mjs",
+    "smoke": "node tests/smoke.mjs",
+    "sweep": "node scripts/sweep-attempts.mjs"
   },
   "dependencies": {
     "mongodb": "^7.5.0",
