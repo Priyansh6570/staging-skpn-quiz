@@ -9,6 +9,11 @@
  */
 
 export interface CustomStrings {
+  /** The floating notice, the only place the closed state is stated in words. */
+  competitionNoticeBanner: string;
+  /** Kept for when the closed state is reverted; nothing renders these two today. */
+  competitionPendingNotice: string;
+  competitionPendingDate: string;
   home: {
     perStudent: string;
   };
@@ -46,6 +51,9 @@ export interface CustomStrings {
 }
 
 export const customHi: CustomStrings = {
+  competitionNoticeBanner: "भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता की तिथि शीघ्र घोषित की जाएगी",
+  competitionPendingNotice: "पंजीयन शीघ्र प्रारंभ होगा · तिथि शीघ्र घोषित की जाएगी",
+  competitionPendingDate: "तिथि शीघ्र घोषित की जाएगी",
   home: {
     perStudent: "प्रति छात्र छात्रवृत्ति",
   },
@@ -83,6 +91,10 @@ export const customHi: CustomStrings = {
 };
 
 export const customEn: CustomStrings = {
+  competitionNoticeBanner:
+    "The date of the Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita will be announced shortly",
+  competitionPendingNotice: "Registration opens shortly · Date to be announced",
+  competitionPendingDate: "Date to be announced",
   home: {
     perStudent: "Scholarship per student",
   },

@@ -22,6 +22,65 @@ const COMPONENTS = new Set(["SiteHeader", "SiteFooter", "CtaBox", "Leadership"])
 // Home v5 / Rules variant, which is the superset of the two that exist in the export.
 const REDUCED_MOTION_BODY = " animation: none !important; transition: none !important; ";
 
+// components/CompetitionNotice.tsx has no design source — it exists only while the competition is
+// closed. Everything that cannot be an inline style lives here: keyframes, the pointer-events
+// discipline that keeps the dock from swallowing taps, the focus ring, and the mobile geometry.
+// The entry animation is declared with `both`, so the reduced-motion block below (animation: none)
+// leaves the notice at its final, visible state rather than hiding it.
+const NOTICE_CSS = `
+@keyframes skpn-notice-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+[data-e~="noticedock"] > * { pointer-events: auto; }
+[data-e~="noticedock"] :focus-visible, [data-e~="noticedock"]:focus-visible { outline: 2px solid #14203E; outline-offset: 2px; }
+@media (max-width: 700px) {
+  [data-e~="noticedock"] { left: 12px; right: 12px; bottom: 12px; }
+  [data-e~="noticecard"] { max-width: none; }
+  [data-e~="noticeroom"] { padding-bottom: 104px !important; }
+}
+`;
+
+// components/PageAura.tsx — the light field behind the plain body sections. The blob motion is
+// deliberately slow and small: it should register as the page breathing, not as something moving.
+// The veil reuses the hero's own star-field idea in warm ink, and is dropped on small screens where
+// a 460px tile is too dense to read as texture and the paint cost lands on the weakest devices.
+const AURA_CSS = `
+@keyframes skpn-aura-a { 0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: .88; } 50% { transform: translate3d(3%,4%,0) scale(1.09); opacity: 1; } }
+@keyframes skpn-aura-b { 0%, 100% { transform: translate3d(0,0,0) scale(1.05); opacity: .72; } 50% { transform: translate3d(-4%,3%,0) scale(1); opacity: 1; } }
+@keyframes skpn-aura-c { 0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: .78; } 50% { transform: translate3d(2%,-3%,0) scale(1.08); opacity: 1; } }
+@keyframes skpn-aura-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(-38px,-26px,0); } }
+[data-e~="auraveil"] {
+  background-image:
+    radial-gradient(1.6px 1.6px at 14% 22%, rgba(138,96,21,.22), transparent 60%),
+    radial-gradient(1.4px 1.4px at 72% 14%, rgba(138,96,21,.18), transparent 60%),
+    radial-gradient(1.8px 1.8px at 38% 68%, rgba(138,96,21,.16), transparent 60%),
+    radial-gradient(1.3px 1.3px at 86% 76%, rgba(138,96,21,.20), transparent 60%),
+    radial-gradient(1.5px 1.5px at 58% 42%, rgba(138,96,21,.14), transparent 60%),
+    radial-gradient(1.4px 1.4px at 24% 88%, rgba(138,96,21,.18), transparent 60%);
+  background-size: 460px 460px;
+}
+@media (max-width: 700px) {
+  [data-e~="aurablob"] { width: 112vw !important; height: 112vw !important; }
+  [data-e~="auraveil"] { display: none !important; }
+}
+`;
+
+// The About page's trustee board (components/Leadership.tsx, LeadershipBoard). Four portrait cards
+// on a wide screen; below 980px each card turns on its side so the photograph stays large and the
+// Devanagari names keep a full-width column instead of wrapping to four lines in a narrow one.
+// !important throughout because these override inline styles, exactly as the export's own
+// responsive rules do.
+const BOARD_CSS = `
+@media (max-width: 980px) {
+  [data-e~="boardgrid"] { grid-template-columns: minmax(0,1fr) !important; gap: 16px !important; }
+  [data-e~="boardcard"] { flex-direction: row !important; align-items: center !important; gap: 20px !important; padding: 18px !important; }
+  [data-e~="boardphoto"] { width: 136px !important; flex: 0 0 auto !important; aspect-ratio: 1 !important; }
+}
+@media (max-width: 560px) {
+  [data-e~="boardcard"] { gap: 14px !important; padding: 14px !important; }
+  [data-e~="boardphoto"] { width: 96px !important; border-radius: 14px !important; }
+  [data-e~="boardphoto"] > span { border-radius: 14px !important; }
+}
+`;
+
 const slug = (file) => file.replace(/\.dc\.html$/, "").replace(/\s+/g, "-");
 
 // --- parse ------------------------------------------------------------------------------------
@@ -189,6 +248,15 @@ for (const page of pages) {
   out += `\n/* ---------- ${page} ---------- */\n`;
   out += `${renderGroup(rules, page)}\n`;
 }
+
+out += `\n/* ---------- competition notice (no design source) ---------- */\n`;
+out += `${renderGroup(parseRules(NOTICE_CSS, "CompetitionNotice"), null)}\n`;
+
+out += `\n/* ---------- page aura (no design source) ---------- */\n`;
+out += `${renderGroup(parseRules(AURA_CSS, "PageAura"), null)}\n`;
+
+out += `\n/* ---------- About trustee board (no design source) ---------- */\n`;
+out += `${renderGroup(parseRules(BOARD_CSS, "LeadershipBoard"), null)}\n`;
 
 out += `\n/* ---------- reduced motion, last so it wins ---------- */\n`;
 out += `@media (prefers-reduced-motion: reduce) {\n  *, *::before, *::after {${REDUCED_MOTION_BODY}}\n}\n`;

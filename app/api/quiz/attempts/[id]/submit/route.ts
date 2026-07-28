@@ -5,6 +5,7 @@ import type { AttemptStatus } from "@/lib/models/types";
 import { requireOwnership, requireSession, setSession } from "@/lib/session";
 import { GRACE_SECONDS, TOTAL, scoreAnswers } from "@/lib/quiz";
 import { errorResponse, fail, json, sameOrigin } from "@/lib/api";
+import { competitionOpen } from "@/lib/competition";
 import { randomBytes } from "node:crypto";
 
 const Body = z.object({ reason: z.enum(["manual", "auto"]) });
@@ -13,6 +14,8 @@ const Body = z.object({ reason: z.enum(["manual", "auto"]) });
 const certificateNumber = () => `SKPN-${randomBytes(6).toString("hex").toUpperCase()}`;
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!competitionOpen()) return fail(403, "competition_closed");
+
   let session;
   try {
     session = await requireSession();

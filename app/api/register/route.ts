@@ -4,8 +4,10 @@ import type { User } from "@/lib/models/types";
 import { setSession } from "@/lib/session";
 import { RegistrationInput } from "@/lib/registration";
 import { clientIp, fail, json, rateLimit, sameOrigin } from "@/lib/api";
+import { competitionOpen } from "@/lib/competition";
 
 export async function POST(req: Request) {
+  if (!competitionOpen()) return fail(403, "competition_closed");
   if (!sameOrigin(req)) return fail(403, "bad_origin");
 
   // Deliberately generous, and never a hard IP block: a school computer lab and a district's only

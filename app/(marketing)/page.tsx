@@ -8,7 +8,8 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CtaBox from "@/components/CtaBox";
 import Leadership from "@/components/Leadership";
-import { useLang, useSession } from "@/components/AppProviders";
+import PageAura from "@/components/PageAura";
+import { useCompetitionOpen, useLang, useSession } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
 
 const DATE_STYLE = [
@@ -23,6 +24,7 @@ const STEP_ICONS = ["user", "doc", "clock", "cert"];
 export default function HomePage() {
   const { lang, toggle: toggleLang } = useLang();
   const { session } = useSession();
+  const competitionOpen = useCompetitionOpen();
   const s = strings(lang).Home_v5.S;
   const c = custom(lang);
   const inline = strings(lang).Home_v5.inline;
@@ -146,13 +148,17 @@ export default function HomePage() {
   const sylNext = () => nudgeSyl(1);
   const primaryHref = signedIn ? (attempts > 0 ? "/certificates" : "/quiz") : "/register";
   return (
-    <div data-page="Home-v5" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip" }}>
+    <div data-page="Home-v5" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip", isolation: "isolate" }}>
+      <PageAura />
 
       <SiteHeader lang={lang} active="home" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
 
       <section id="top" style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
-        <Image src="/assets/pathey.png" alt="" width={2560} height={1440} sizes="116vw" priority data-parallax="0.06" style={{ position: "absolute", left: "50%", top: "0", transform: "translateX(-50%)", width: "116%", height: "100%", objectFit: "cover", objectPosition: "50% 32%", opacity: ".6" }} />
-        <div style={{ position: "absolute", inset: "0", background: "radial-gradient(72% 58% at 50% 40%, rgba(7,11,30,.66) 0%, rgba(7,11,30,.92) 62%, rgba(5,8,22,.98) 100%)" }}></div>
+        {/* Wider than the hero and anchored left of centre: the artwork puts Shri Krishna on the
+            left and the light on the right, so this clears the medallion and the title off his face
+            and leaves him looking up towards them. */}
+        <Image src="/assets/newbg.jpg" alt="" width={1791} height={1007} sizes="150vw" priority data-parallax="0.06" style={{ position: "absolute", left: "38%", top: "0", transform: "translateX(-50%)", width: "150%", height: "100%", objectFit: "cover", objectPosition: "50% 34%", opacity: ".72" }} />
+        <div style={{ position: "absolute", inset: "0", background: "radial-gradient(72% 58% at 50% 40%, rgba(7,11,30,.58) 0%, rgba(7,11,30,.84) 62%, rgba(5,8,22,.94) 100%)" }}></div>
         <div aria-hidden="true" style={{ position: "absolute", inset: "-10%", backgroundImage: "radial-gradient(1.5px 1.5px at 12% 22%, rgba(255,238,196,.85), transparent 60%),radial-gradient(1.2px 1.2px at 78% 16%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.6px 1.6px at 34% 68%, rgba(255,238,196,.6), transparent 60%),radial-gradient(1.1px 1.1px at 88% 74%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.4px 1.4px at 60% 40%, rgba(255,238,196,.5), transparent 60%),radial-gradient(1.2px 1.2px at 22% 86%, rgba(255,238,196,.55), transparent 60%)", backgroundSize: "520px 520px", animation: "v5-drift 46s linear infinite alternate", opacity: ".7" }}></div>
 
         <div data-e="pad hero-body" style={{ position: "relative", maxWidth: "1000px", margin: "0 auto", padding: "88px 30px 66px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "22px" }}>
@@ -169,18 +175,23 @@ export default function HomePage() {
 
           <h1 data-reveal style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(32px,5vw,58px)", lineHeight: "1.24", color: "#FFF9EC", maxWidth: "20ch", textWrap: "balance", textShadow: "0 2px 30px rgba(0,0,0,.4)" }}>{t.heroTitle}</h1>
 
+          {competitionOpen ? (
           <div data-reveal style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap", justifyContent: "center" }}>
             <span style={{ width: "38px", height: "1px", background: "rgba(232,193,115,.7)" }}></span>
             <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "clamp(16px,2vw,20px)", lineHeight: "1.6", color: "#F5E5C2" }}>{heroDateHead}<br data-e="datebreak" />{heroDateTail}</span>
             <span style={{ width: "38px", height: "1px", background: "rgba(232,193,115,.7)" }}></span>
           </div>
+          ) : null}
 
           <p data-reveal style={{ margin: "0", maxWidth: "44ch", fontSize: "clamp(16.5px,1.9vw,19px)", lineHeight: "1.85", color: "#E9E4D8" }}>{t.heroLede}</p>
 
+          {/* Both calls to action lead to closed routes — register and rules — so the row goes. */}
+          {competitionOpen ? (
           <div data-reveal data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center", width: "100%", maxWidth: "540px", marginTop: "8px" }}>
             <a href={primaryHref} data-e="cta" style={{ padding: "17px 34px", minHeight: "58px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", borderRadius: "999px", fontSize: "18px", fontWeight: "600", lineHeight: "1.5", boxShadow: "0 14px 36px rgba(232,193,115,.28)", transition: "transform .2s ease,box-shadow .2s ease" }}>{t.ctaPrimary}</a>
             <Link href="/rules" data-e="cta" style={{ padding: "17px 30px", minHeight: "58px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.42)", borderRadius: "999px", fontSize: "18px", lineHeight: "1.5", color: "#FFF9EC", transition: "background .2s ease" }}>{t.ctaSecondary}</Link>
           </div>
+          ) : null}
         </div>
 
         <div style={{ position: "relative", borderTop: "1px solid rgba(255,247,225,.14)", background: "rgba(5,8,20,.82)" }}>
@@ -285,6 +296,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* The three-date timeline. No date is announced, so the whole section goes. */}
+      {competitionOpen ? (
       <section data-e="pad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "88px 30px" }}>
         <ol data-e="datesgrid" style={{ margin: "0", padding: "0", listStyle: "none", display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: "20px" }}>
           {dates.map((d, dIndex) => (
@@ -303,8 +316,9 @@ export default function HomePage() {
           ))}
         </ol>
       </section>
+      ) : null}
 
-      <CtaBox lang={lang} signedIn={signedIn} attempts={attempts} />
+      {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} attempts={attempts} /> : null}
 
       <SiteFooter lang={lang} />
     </div>

@@ -16,22 +16,37 @@ const LEADER_IMAGES = [
 // Shiv Shekhar Shukla. The images above are reordered to match, so copy and photograph stay paired.
 const ORDER = [0, 2, 1, 3];
 
+/**
+ * Copy and photograph paired in one place, because both layouts read it and putting a minister's
+ * face beside the wrong name on a government site is not a bug you get to fix quietly.
+ */
+function members(lang: Lang) {
+  const source = strings(lang).Leadership.LEADERS;
+  return ORDER.map((sourceIndex, position) => ({
+    role: source[sourceIndex][0],
+    name: source[sourceIndex][1],
+    office: source[sourceIndex][2],
+    img: LEADER_IMAGES[position],
+  }));
+}
+
+/** Home: one large portrait, thumbnails and a prev/next rail. */
 export default function Leadership({ lang }: { lang: Lang }) {
   const [active, setActive] = useState(0);
   const source = strings(lang).Leadership;
-  const s = { ...source, LEADERS: ORDER.map((i) => source.LEADERS[i]) };
-  const n = s.LEADERS.length;
+  const list = members(lang);
+  const n = list.length;
 
-  const activeRole = s.LEADERS[active][0];
-  const activeName = s.LEADERS[active][1];
-  const activeOffice = s.LEADERS[active][2];
-  const [prevLabel, nextLabel] = s.inline;
+  const activeRole = list[active].role;
+  const activeName = list[active].name;
+  const activeOffice = list[active].office;
+  const [prevLabel, nextLabel] = source.inline;
   const railPrev = () => setActive((a) => (a - 1 + n) % n);
   const railNext = () => setActive((a) => (a + 1) % n);
 
-  const leaders = s.LEADERS.map((l, i) => ({
-    img: LEADER_IMAGES[i],
-    name: l[1],
+  const leaders = list.map((l, i) => ({
+    img: l.img,
+    name: l.name,
     isActive: i === active,
     select: () => setActive(i),
     op: i === active ? 1 : 0,
@@ -43,7 +58,7 @@ export default function Leadership({ lang }: { lang: Lang }) {
   }));
   return (
     <section data-e="leadpad" style={{ maxWidth: "1220px", margin: "0 auto", padding: "92px 30px 96px", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif" }}>
-      <h2 style={{ margin: "0 0 40px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(27px,3.6vw,42px)", lineHeight: "1.3", color: "#14203E" }}>श्रीकृष्ण पाथेय न्यास</h2>
+      <h2 style={{ margin: "0 0 40px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(27px,3.6vw,42px)", lineHeight: "1.3", color: "#14203E" }}>{source.markup.text0}</h2>
 
       <div data-g="lead" style={{ display: "grid", gridTemplateColumns: "minmax(0,.78fr) minmax(0,1fr)", gap: "48px", alignItems: "center" }}>
         <div style={{ position: "relative", width: "100%", maxWidth: "390px", justifySelf: "center" }}>
@@ -80,6 +95,50 @@ export default function Leadership({ lang }: { lang: Lang }) {
           </div>
         </div>
       </div>
+    </section>
+  );
+}
+
+// One accent per office-holder, drawn from the palette the About page already uses on its objects
+// list, so the board reads as part of that page rather than a transplant from Home.
+const BOARD_ACCENTS = [
+  { rule: "#E8C173", tint: "#FAF1DC", ink: "#7A5412" },
+  { rule: "#27408B", tint: "#E7ECF8", ink: "#22366F" },
+  { rule: "#8A6015", tint: "#F6EBD6", ink: "#6B4A10" },
+  { rule: "#3F6B58", tint: "#E7F1EC", ink: "#2E5142" },
+];
+
+/**
+ * About: all four at once, no carousel. Same copy, same photographs, same order — the difference is
+ * that nothing is hidden behind a control, which is what a trustee list on an About page is for.
+ * Four portrait cards above 980px; below that each card turns on its side into a photo-and-text row.
+ */
+export function LeadershipBoard({ lang }: { lang: Lang }) {
+  const source = strings(lang).Leadership;
+  const list = members(lang).map((m, i) => ({ ...m, ...BOARD_ACCENTS[i % BOARD_ACCENTS.length] }));
+
+  return (
+    <section data-e="leadpad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "80px 30px", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif" }}>
+      <h2 data-reveal style={{ margin: "0 0 34px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(24px,3.2vw,32px)", lineHeight: "1.35", color: "#14203E" }}>{source.markup.text0}</h2>
+
+      <ul data-e="boardgrid" style={{ margin: "0", padding: "0", listStyle: "none", display: "grid", gridTemplateColumns: "repeat(4,minmax(0,1fr))", gap: "20px" }}>
+        {list.map((m, mIndex) => (
+          <li key={mIndex} data-reveal data-e="boardcard" style={{ position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", gap: "16px", padding: "18px 18px 26px", background: "linear-gradient(160deg,#FFFFFF 0%,#FDF7EA 100%)", borderRadius: "24px", border: "1px solid #EFE0C4", borderTop: `3px solid ${m.rule}`, boxShadow: "0 2px 4px rgba(20,32,62,.05),0 16px 36px rgba(20,32,62,.07)" }}>
+            <span aria-hidden="true" style={{ position: "absolute", right: "-44px", top: "-44px", width: "168px", height: "168px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.24) 0%,rgba(232,193,115,0) 70%)" }}></span>
+
+            <div data-e="boardphoto" style={{ position: "relative", borderRadius: "18px", overflow: "hidden", aspectRatio: "4/5", background: "linear-gradient(160deg,#182246 0%,#080C1E 100%)", boxShadow: "0 8px 18px rgba(20,32,62,.12)" }}>
+              <img src={m.img} alt={m.name} loading="lazy" decoding="async" style={{ display: "block", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 12%" }} />
+              <span aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "18px", boxShadow: "inset 0 0 0 1px rgba(232,193,115,.34)" }}></span>
+            </div>
+
+            <div data-e="boardtext" style={{ position: "relative", minWidth: "0", display: "flex", flexDirection: "column", gap: "9px" }}>
+              <span style={{ alignSelf: "flex-start", padding: "6px 14px", borderRadius: "999px", background: `${m.tint}`, border: `1px solid ${m.rule}`, color: `${m.ink}`, fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "14.5px", lineHeight: "1.6" }}>{m.role}</span>
+              <h3 style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(19px,1.7vw,23px)", lineHeight: "1.35", color: "#14203E", textWrap: "balance" }}>{m.name}</h3>
+              <p style={{ margin: "0", fontSize: "15.5px", lineHeight: "1.7", color: "#161C2E", textWrap: "pretty" }}>{m.office}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

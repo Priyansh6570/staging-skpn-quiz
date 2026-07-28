@@ -3,7 +3,8 @@
 import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import Leadership from "@/components/Leadership";
+import { LeadershipBoard } from "@/components/Leadership";
+import PageAura from "@/components/PageAura";
 import { useLang, useSession } from "@/components/AppProviders";
 import { strings } from "@/lib/i18n";
 
@@ -25,7 +26,8 @@ export default function AboutPage() {
   const signedIn = session.signedIn;
   const hasCerts = session.hasCertificates;
   return (
-    <div data-page="About" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "hidden" }}>
+    <div data-page="About" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "hidden", isolation: "isolate" }}>
+      <PageAura />
       <SiteHeader lang={lang} active="about" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
 
       <section style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
@@ -38,7 +40,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <Leadership lang={lang} />
+      <LeadershipBoard lang={lang} />
 
       <section style={{ background: "#F6F0E4", borderTop: "1px solid #EFE5D3", borderBottom: "1px solid #EFE5D3" }}>
         <div data-e="pad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "76px 30px" }}>

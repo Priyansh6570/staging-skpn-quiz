@@ -3,6 +3,7 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import PageAura from "@/components/PageAura";
 import { useLang, useSession } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
 
@@ -13,7 +14,8 @@ export default function NotFound() {
   const copy = custom(lang).notFound;
 
   return (
-    <div data-page="NotFound" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip" }}>
+    <div data-page="NotFound" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip", isolation: "isolate" }}>
+      <PageAura />
       <SiteHeader lang={lang} onToggleLang={toggleLang} signedIn={session.signedIn} hasCertificates={session.hasCertificates} />
 
       <section data-e="pad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "96px 30px 110px" }}>

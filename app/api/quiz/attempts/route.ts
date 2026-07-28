@@ -5,10 +5,13 @@ import type { Attempt } from "@/lib/models/types";
 import { requireSession, setSession } from "@/lib/session";
 import { DURATION_SECONDS, TOTAL, drawPaper } from "@/lib/quiz";
 import { errorResponse, fail, json, sameOrigin } from "@/lib/api";
+import { competitionOpen } from "@/lib/competition";
 
 const Body = z.object({ rulesAccepted: z.literal(true) });
 
 export async function POST(req: Request) {
+  if (!competitionOpen()) return fail(403, "competition_closed");
+
   let session;
   try {
     session = await requireSession();

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import PageAura from "@/components/PageAura";
 import { useLang, useSession } from "@/components/AppProviders";
 import { strings } from "@/lib/i18n";
 
@@ -29,7 +30,8 @@ export default function LegalDocument({ which }: { which: "privacy" | "terms" })
   const signedIn = session.signedIn;
   const hasCerts = session.hasCertificates;
   return (
-    <div data-page="Legal" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip" }}>
+    <div data-page="Legal" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip", isolation: "isolate" }}>
+      <PageAura />
       <SiteHeader lang={lang} active="home" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
 
       <section data-e="pad" style={{ maxWidth: "880px", margin: "0 auto", padding: "48px 30px 78px" }}>

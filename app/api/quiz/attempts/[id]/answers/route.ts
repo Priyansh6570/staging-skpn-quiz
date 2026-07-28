@@ -4,6 +4,7 @@ import { attempts } from "@/lib/models";
 import { requireOwnership, requireSession } from "@/lib/session";
 import { GRACE_SECONDS } from "@/lib/quiz";
 import { errorResponse, fail, json, sameOrigin } from "@/lib/api";
+import { competitionOpen } from "@/lib/competition";
 
 const Body = z.object({
   changes: z
@@ -19,6 +20,8 @@ const Body = z.object({
 });
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!competitionOpen()) return fail(403, "competition_closed");
+
   let session;
   try {
     session = await requireSession();

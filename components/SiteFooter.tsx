@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useCompetitionOpen } from "@/components/AppProviders";
 import { strings, type Lang } from "@/lib/i18n";
 
 // Order mirrors T.links in design/SiteFooter.dc.html; labels come from lib/i18n and the hrefs are
@@ -7,10 +10,14 @@ import { strings, type Lang } from "@/lib/i18n";
 const LINK_HREFS = ["/about", "/pratiyogita", "/rules", "/about#sampark", "/privacy", "/terms"];
 
 export default function SiteFooter({ lang }: { lang: Lang }) {
+  const competitionOpen = useCompetitionOpen();
   const s = strings(lang);
   const t = s.SiteFooter.T;
   const m = s.SiteFooter.markup;
-  const links = t.links.map((l, i) => ({ label: l.label, href: LINK_HREFS[i] }));
+  // /rules redirects while the competition is closed, so the link goes rather than bouncing.
+  const links = t.links
+    .map((l, i) => ({ label: l.label, href: LINK_HREFS[i] }))
+    .filter((l) => competitionOpen || l.href !== "/rules");
 
   return (
 <footer style={{ position: "relative", overflow: "hidden", background: "linear-gradient(180deg,#0B1226 0%,#070B1E 100%)", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif" }}>
@@ -19,10 +26,10 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
   <div data-g="foot" data-e="pad" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "56px 30px 30px", display: "grid", gridTemplateColumns: "minmax(0,1.35fr) minmax(0,1fr) minmax(0,.9fr)", gap: "40px" }}>
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
+        <img src="/uploads/images.jpg" alt={m.alt0} width="44" height="44" loading="lazy" style={{ display: "block", width: "44px", height: "44px", borderRadius: "50%" }} />
         <span style={{ width: "52px", height: "52px", flex: "0 0 auto", borderRadius: "50%", background: "#04060F", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 1px rgba(232,193,115,.34)" }}>
           <img src="/uploads/skpn-logo.png" alt="" width="40" height="40" loading="lazy" style={{ display: "block", width: "40px", height: "40px" }} />
         </span>
-        <img src="/uploads/images.jpg" alt={m.alt0} width="44" height="44" loading="lazy" style={{ display: "block", width: "44px", height: "44px", borderRadius: "50%" }} />
       </div>
       <p style={{ margin: "0 0 6px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "19px", lineHeight: "1.5", color: "#FFF9EC" }}>{t.org}</p>
       <p style={{ margin: "0 0 14px", fontSize: "15.5px", lineHeight: "1.7", color: "#E4DFD2" }}>{t.dept}</p>
@@ -44,7 +51,7 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
         <a href="https://instagram.com/shrikrishnapatheynyas/" target="_blank" rel="noopener" aria-label={m.ariaLabel0} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#F1DFB6" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true" style={{ display: "block" }}><rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5"></rect><circle cx="12" cy="12" r="4.1"></circle><circle cx="17.1" cy="6.9" r="1.1" fill="#F1DFB6" stroke="none"></circle></svg>
         </a>
-        <a href="https://www.facebook.com/" target="_blank" rel="noopener" aria-label={m.ariaLabel1} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+        <a href="https://www.facebook.com/shrikrishnapatheynyas" target="_blank" rel="noopener" aria-label={m.ariaLabel1} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
           <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style={{ display: "block" }}><path d="M13.6 21v-7.7h2.7l.4-3.1h-3.1V8.2c0-.9.3-1.5 1.6-1.5h1.6V3.9c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.4-4 4.1v2.3H7.6v3.1h2.8V21z" fill="#F1DFB6"></path></svg>
         </a>
         <a href="https://x.com/KrishnaPathey" target="_blank" rel="noopener" aria-label={m.ariaLabel2} style={{ width: "44px", height: "44px", borderRadius: "13px", border: "1px solid rgba(232,193,115,.3)", display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
@@ -56,7 +63,10 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
       </div>
     </div>
   </div>
-  <div data-e="pad" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "0 30px 34px" }}>
+  {/* noticeroom reserves the strip the floating notice occupies on narrow screens, so the
+      copyright line can always be scrolled clear of it. The footer's own dark background fills
+      the space, so nothing shows through. */}
+  <div data-e={competitionOpen ? "pad" : "pad noticeroom"} style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "0 30px 34px" }}>
     <p style={{ margin: "0", paddingTop: "22px", borderTop: "1px solid rgba(255,249,236,.1)", fontSize: "14.5px", lineHeight: "1.7", color: "#D8D2C4" }}>{t.copyright}</p>
   </div>
 </footer>

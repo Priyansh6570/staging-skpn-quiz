@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import AppProviders from "@/components/AppProviders";
+import CompetitionNotice from "@/components/CompetitionNotice";
+import { competitionOpen } from "@/lib/competition";
 import { hi } from "@/lib/i18n";
 import "./globals.css";
 
@@ -20,7 +22,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
           rel="stylesheet"
         />
-        <AppProviders>{children}</AppProviders>
+        {/* Read here, in the one server component every page passes through, so no page has to
+            fetch it and no page has to become dynamic to know it. */}
+        <AppProviders competitionOpen={competitionOpen()}>
+          {children}
+          {/* After children so it sits under the toast stack, which AppProviders renders last. */}
+          <CompetitionNotice />
+        </AppProviders>
       </body>
     </html>
   );

@@ -5,7 +5,8 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CtaBox from "@/components/CtaBox";
-import { useLang, useSession } from "@/components/AppProviders";
+import PageAura from "@/components/PageAura";
+import { useCompetitionOpen, useLang, useSession } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
 
 const CAT_STYLE = {
@@ -21,6 +22,7 @@ const PRIZE_BREAK = { hi: 4, en: 7 };
 export default function PratiyogitaPage() {
   const { lang, toggle: toggleLang } = useLang();
   const { session } = useSession();
+  const competitionOpen = useCompetitionOpen();
   const s = strings(lang).Pratiyogita.S;
   const c = custom(lang);
   const signedIn = session.signedIn;
@@ -51,7 +53,8 @@ export default function PratiyogitaPage() {
     line: i === s.dates.length - 1 ? "transparent" : "#E3D9C6",
   }));
   return (
-    <div data-page="Pratiyogita" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "hidden" }}>
+    <div data-page="Pratiyogita" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "hidden", isolation: "isolate" }}>
+      <PageAura />
       <SiteHeader lang={lang} active="pratiyogita" onToggleLang={toggleLang} signedIn={signedIn} hasCertificates={hasCerts} />
 
       <section style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
@@ -61,10 +64,13 @@ export default function PratiyogitaPage() {
           <p style={{ margin: "0 0 14px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "17px", letterSpacing: ".01em", color: "#E8C173", lineHeight: "1.9" }}>{t.kicker}</p>
           <h1 style={{ margin: "0 0 18px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(29px,4.4vw,50px)", lineHeight: "1.26", color: "#FFF9EC", maxWidth: "22ch", textWrap: "balance" }}>{t.title}</h1>
           <p style={{ margin: "0 0 30px", maxWidth: "54ch", fontSize: "clamp(16.5px,1.9vw,19px)", lineHeight: "1.85", color: "#E9E4D8" }}>{t.lede}</p>
+          {/* Both calls to action lead to closed routes — register and rules — so the row goes. */}
+          {competitionOpen ? (
           <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
             <a href={primaryHref} data-e="cta" style={{ padding: "16px 32px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#F6E0AC 0%,#E8C173 100%)", color: "#1E1503", borderRadius: "999px", fontSize: "18px", fontWeight: "600", lineHeight: "1.5", whiteSpace: "nowrap", transition: "transform .2s ease" }}>{t.ctaPrimary}</a>
             <Link href="/rules" data-e="cta" style={{ padding: "16px 28px", minHeight: "56px", display: "inline-flex", alignItems: "center", justifyContent: "center", border: "1px solid rgba(255,249,236,.4)", borderRadius: "999px", fontSize: "18px", lineHeight: "1.5", whiteSpace: "nowrap", color: "#FFF9EC" }}>{t.ctaSecondary}</Link>
           </div>
+          ) : null}
         </div>
       </section>
 
@@ -123,6 +129,8 @@ export default function PratiyogitaPage() {
         </div>
       </section>
 
+      {/* The तिथियाँ timeline. No date is announced, so the whole section goes. */}
+      {competitionOpen ? (
       <section data-e="pad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "80px 30px" }}>
         <h2 data-reveal style={{ margin: "0 0 34px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(24px,3.2vw,32px)", lineHeight: "1.35", color: "#14203E", textAlign: "center" }}>{t.datesTitle}</h2>
         <ol style={{ margin: "0 auto", padding: "0", maxWidth: "420px", listStyle: "none", display: "flex", flexDirection: "column" }}>
@@ -137,8 +145,9 @@ export default function PratiyogitaPage() {
           ))}
         </ol>
       </section>
+      ) : null}
 
-      <CtaBox lang={lang} signedIn={signedIn} attempts={attempts} />
+      {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} attempts={attempts} /> : null}
 
       <SiteFooter lang={lang} />
     </div>

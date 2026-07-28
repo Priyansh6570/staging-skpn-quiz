@@ -2,10 +2,12 @@ import { z } from "zod";
 import { users, MOBILE_RE } from "@/lib/models";
 import { getSession } from "@/lib/session";
 import { clientIp, fail, json, rateLimit, sameOrigin } from "@/lib/api";
+import { competitionOpen } from "@/lib/competition";
 
 const Body = z.object({ mobile: z.string().regex(MOBILE_RE) });
 
 export async function POST(req: Request) {
+  if (!competitionOpen()) return fail(403, "competition_closed");
   if (!sameOrigin(req)) return fail(403, "bad_origin");
 
   const ip = clientIp(req);

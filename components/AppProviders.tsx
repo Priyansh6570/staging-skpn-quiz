@@ -22,6 +22,11 @@ const SIGNED_OUT: SessionInfo = {
   signedIn: false, name: null, initial: null, attemptCount: 0, hasCertificates: false, lang: "hi",
 };
 
+// Whether registration, sign-in and the quiz are open. The value is decided server-side in the
+// root layout; the default here is closed, so a component reached outside the provider cannot
+// render a call to action that leads nowhere.
+const CompetitionContext = createContext(false);
+
 const LangContext = createContext<{ lang: Lang; toggle: () => void }>({ lang: "hi", toggle: () => {} });
 const SessionContext = createContext<{ session: SessionInfo; loaded: boolean; refresh: () => Promise<void> }>({
   session: SIGNED_OUT, loaded: false, refresh: async () => {},
@@ -33,6 +38,7 @@ const ShellContext = createContext<{
   showMessage: (text: string) => void;
 }>({ busy: (w) => w, setBusy: () => {}, showError: () => {}, showMessage: () => {} });
 
+export const useCompetitionOpen = () => useContext(CompetitionContext);
 export const useLang = () => useContext(LangContext);
 export const useSession = () => useContext(SessionContext);
 export const useShell = () => useContext(ShellContext);
@@ -42,7 +48,13 @@ const readLangCookie = (): Lang | null => {
   return m ? (m[1] as Lang) : null;
 };
 
-export default function AppProviders({ children }: { children: React.ReactNode }) {
+export default function AppProviders({
+  children,
+  competitionOpen,
+}: {
+  children: React.ReactNode;
+  competitionOpen: boolean;
+}) {
   // Server-renders in Hindi and corrects on mount, exactly as the export did — that keeps the
   // marketing pages static and CDN-cacheable instead of per-request rendered for one cookie.
   const [lang, setLang] = useState<Lang>("hi");
@@ -131,6 +143,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
   }, []);
 
   return (
+    <CompetitionContext.Provider value={competitionOpen}>
     <LangContext.Provider value={{ lang, toggle }}>
       <SessionContext.Provider value={{ session, loaded, refresh: async () => void (await refresh()) }}>
         <ShellContext.Provider value={{ busy, setBusy, showError, showMessage }}>
@@ -143,5 +156,6 @@ export default function AppProviders({ children }: { children: React.ReactNode }
         </ShellContext.Provider>
       </SessionContext.Provider>
     </LangContext.Provider>
+    </CompetitionContext.Provider>
   );
 }
