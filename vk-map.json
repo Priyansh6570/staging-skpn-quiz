@@ -1,0 +1,786 @@
+{
+  "$comment": "Map of the scanned Vidya/Kala book. Written before extraction; step 1 of the extraction job. Devanagari in this file is copied from lib/i18n, never authored or transcribed.",
+  "generated": "2026-07-29",
+  "source": {
+    "dir": "split",
+    "files": 220,
+    "naming": "001.jpg … 220.jpg, one book page each",
+    "pixelSize": "1350x1350",
+    "note": "Square is correct and confirmed: the PDF is 1296x648pt, so each book page is a 648pt square. Nothing was cropped. 1350px over 648pt is 150 dpi.",
+    "movedOutOfPublic": "Was public/split/. Moved to top-level split/ so the build cannot serve scans of a copyrighted book. po.pdf moved to top-level for the same reason."
+  },
+  "figures": {
+    "pdf": "po.pdf (top level, gitignored)",
+    "pdfPages": 110,
+    "pdfPageSize": "1296x648pt",
+    "spreadMapping": "PDF page N holds split pages 2N-1 and 2N, i.e. printed pages 2N+26 and 2N+27. Verified at both ends: page 1 = printed 28+29, page 110 = printed 246+247.",
+    "noOffset": "The PDF has 110 pages, not 144, and maps 1:1 onto the 110 spreads the splits came from. There is no index offset to correct. Figures are still keyed by printed page number as instructed.",
+    "embedded": {
+      "realImages": 307,
+      "smasks": 56,
+      "maxWidth": 1363,
+      "maxHeight": 865,
+      "largestSquare": "865x865",
+      "note": "The embedded originals are NOT higher resolution than the splits. A full-page plate is natively 865x865, which is 96 dpi over a 648pt page; the 1350px split is that same image upscaled. Extracting with pdfimages is still right — it yields the native encode with no re-render and no second JPEG generation — but it yields fewer pixels, not more. The 1363-wide items are short bands spanning the spread."
+    },
+    "tool": "poppler 24.08.0. choco install needs elevation and failed here (access denied on C:\\ProgramData\\chocolatey\\lib-bad); using the portable Release-24.08.0-0 build instead, which needs no admin."
+  },
+  "pageNumbering": {
+    "rule": "printedPage = fileIndex + 27",
+    "printedRange": [
+      28,
+      247
+    ],
+    "verifiedOnPrintedPages": [
+      37,
+      47,
+      57,
+      67,
+      77,
+      87,
+      89,
+      91,
+      94,
+      105,
+      107,
+      117,
+      127,
+      137,
+      147,
+      157,
+      167,
+      177,
+      187,
+      197,
+      207,
+      217,
+      227,
+      237,
+      247
+    ],
+    "unverifiedFiles": [
+      "001",
+      "061"
+    ],
+    "unverifiedNote": "Both are full-bleed plates that print no folio; their printed numbers (28, 88) are inferred from the offset, not read.",
+    "missingFromScan": "Printed pages 1–27 are absent. That is the front matter, any table of contents, the opening of the Vidya chapter, and probably the Rigveda and Yajurveda section heads. They cannot be recovered from this set."
+  },
+  "sections": {
+    "vidya": {
+      "printedFrom": 28,
+      "printedTo": 87,
+      "files": [
+        "001",
+        "060"
+      ],
+      "note": "Starts before the scan does — see missingFromScan. Book order differs from lib/i18n order.",
+      "headingsSeen": [
+        {
+          "file": "020",
+          "printed": 47,
+          "canonicalIndex": 3,
+          "match": "exact",
+          "canonical": {
+            "key": "Samaveda",
+            "nameHi": "सामवेद",
+            "glossHi": "चार वेद"
+          }
+        },
+        {
+          "file": "030",
+          "printed": 57,
+          "canonicalIndex": 4,
+          "match": "in-section",
+          "note": "subheading within the Atharvaveda section, not the section head",
+          "canonical": {
+            "key": "Atharvaveda",
+            "nameHi": "अथर्ववेद",
+            "glossHi": "चार वेद"
+          }
+        },
+        {
+          "file": "040",
+          "printed": 67,
+          "canonicalIndex": 9,
+          "match": "exact",
+          "canonical": {
+            "key": "Chhanda",
+            "nameHi": "छंद",
+            "glossHi": "छह वेदांग"
+          }
+        },
+        {
+          "file": "050",
+          "printed": 77,
+          "canonicalIndex": 13,
+          "match": "exact",
+          "note": "book heading is spaced धर्म शास्त्र",
+          "canonical": {
+            "key": "Dharmashastra",
+            "nameHi": "धर्मशास्त्र",
+            "glossHi": "कानून/नीति"
+          }
+        },
+        {
+          "file": "060",
+          "printed": 87,
+          "canonicalIndex": 12,
+          "match": "exact",
+          "note": "book heading carries a trailing विद्या. Note the book puts Dharmashastra before Nyaya, the reverse of lib/i18n order",
+          "canonical": {
+            "key": "Nyaya",
+            "nameHi": "न्याय",
+            "glossHi": "तर्कशास्त्र"
+          }
+        }
+      ],
+      "headingsNotYetLocated": [
+        {
+          "index": 1,
+          "key": "Rigveda"
+        },
+        {
+          "index": 2,
+          "key": "Yajurveda"
+        },
+        {
+          "index": 5,
+          "key": "Shiksha"
+        },
+        {
+          "index": 6,
+          "key": "Kalpa"
+        },
+        {
+          "index": 7,
+          "key": "Vyakarana"
+        },
+        {
+          "index": 8,
+          "key": "Nirukta"
+        },
+        {
+          "index": 10,
+          "key": "Jyotisha"
+        },
+        {
+          "index": 11,
+          "key": "Mimamsa"
+        },
+        {
+          "index": 14,
+          "key": "Purana"
+        }
+      ]
+    },
+    "kalaIntro": {
+      "printedFrom": 89,
+      "printedTo": 102,
+      "files": [
+        "062",
+        "075"
+      ],
+      "chapterOpener": {
+        "file": "062",
+        "printed": 89,
+        "romanised": "Adhyaya Tritiya — Kala ka arth evam swarup"
+      },
+      "note": "General essay on what kala means. Not a numbered kala; no canonical key applies."
+    },
+    "kalas": {
+      "printedFrom": 103,
+      "printedTo": 247,
+      "files": [
+        "076",
+        "220"
+      ],
+      "firstKalaBoundaryUncertain": "Kala 1 (गीत / Geet) ends on printed 105 and Kala 2 begins on 107, so Kala 1 opens around printed 103–104 (files 076–077). Not yet read.",
+      "anchors": [
+        {
+          "file": "080",
+          "printed": 107,
+          "bookNum": 2,
+          "canonicalIndex": 2,
+          "match": "exact",
+          "canonical": {
+            "key": "Vadya",
+            "nameHi": "वाद्य",
+            "glossHi": "वाद्ययंत्र बजाना"
+          }
+        },
+        {
+          "file": "100",
+          "printed": 127,
+          "bookNum": 10,
+          "canonicalIndex": 11,
+          "match": "exact",
+          "canonical": {
+            "key": "Shayana-rachana",
+            "nameHi": "शयनरचन",
+            "glossHi": "बिस्तर सजाना"
+          }
+        },
+        {
+          "file": "110",
+          "printed": 137,
+          "bookNum": 15,
+          "canonicalIndex": 16,
+          "match": "spacing-only",
+          "canonical": {
+            "key": "Shekharaka-yojana",
+            "nameHi": "शेखरकापीडयोजन",
+            "glossHi": "सिर पर मुकुट या फूल सजाना"
+          }
+        },
+        {
+          "file": "120",
+          "printed": 147,
+          "bookNum": 20,
+          "canonicalIndex": 21,
+          "match": "orthographic",
+          "note": "book writes the conjunct न्द where lib/i18n uses anusvara ंद; same word",
+          "canonical": {
+            "key": "Aindrajala",
+            "nameHi": "ऐंद्रजाल",
+            "glossHi": "जादू-गरी"
+          }
+        },
+        {
+          "file": "150",
+          "printed": 177,
+          "bookNum": 32,
+          "canonicalIndex": 33,
+          "match": "orthographic",
+          "note": "book heading and its shloka both read नाटक-; lib/i18n reads नाटिका-. One matra apart, same item",
+          "canonical": {
+            "key": "Natika-akhyayika",
+            "nameHi": "नाटिकाख्यायिकादर्शन",
+            "glossHi": "नाटक और कहानियों की रचना"
+          }
+        },
+        {
+          "file": "160",
+          "printed": 187,
+          "bookNum": 36,
+          "canonicalIndex": 37,
+          "match": "exact",
+          "note": "book heading carries a trailing कला",
+          "canonical": {
+            "key": "Takshana",
+            "nameHi": "तक्षण",
+            "glossHi": "बढ़ईगिरी / लकड़ी का काम"
+          }
+        },
+        {
+          "file": "170",
+          "printed": 197,
+          "bookNum": 39,
+          "canonicalIndex": 40,
+          "match": "exact",
+          "canonical": {
+            "key": "Dhatu-vada",
+            "nameHi": "धातुवाद",
+            "glossHi": "धातुओं को पिघलाना / धातु विज्ञान"
+          }
+        },
+        {
+          "file": "180",
+          "printed": 207,
+          "bookNum": 44,
+          "canonicalIndex": 46,
+          "match": "merged",
+          "note": "one book heading covers canonical 46 उत्सादन and 47 केशमार्जनकौशल together — the drift in the book's own numbering starts here",
+          "canonical": {
+            "key": "Utsadana",
+            "nameHi": "उत्सादन",
+            "glossHi": "मालिश करना"
+          }
+        },
+        {
+          "file": "190",
+          "printed": 217,
+          "bookNum": 49,
+          "canonicalIndex": null,
+          "match": "unmatched",
+          "romanised": "Nimitta-jnana",
+          "note": "shubha/ashubha omens. No canonical entry corresponds; not in the Vatsyayana 64",
+          "canonical": null
+        },
+        {
+          "file": "200",
+          "printed": 227,
+          "bookNum": 54,
+          "canonicalIndex": 58,
+          "match": "partial",
+          "note": "book heading is the first half of canonical अभिधानकोषछंदोज्ञान",
+          "canonical": {
+            "key": "Abhidhana-kosha",
+            "nameHi": "अभिधानकोषछंदोज्ञान",
+            "glossHi": "शब्दकोश और छंदों का ज्ञान"
+          }
+        },
+        {
+          "file": "210",
+          "printed": 237,
+          "bookNum": 59,
+          "canonicalIndex": 60,
+          "match": "exact",
+          "canonical": {
+            "key": "Dyuta-vishesha",
+            "nameHi": "द्यूतविशेष",
+            "glossHi": "शतरंज का ज्ञान"
+          }
+        },
+        {
+          "file": "220",
+          "printed": 247,
+          "bookNum": 64,
+          "canonicalIndex": null,
+          "match": "unmatched",
+          "romanised": "Vyayamiki",
+          "note": "physical exercise and मल्ल विद्या. Sits at the position of canonical 64 वैजयिकीविद्या but is a different word; not forced",
+          "canonical": null
+        }
+      ],
+      "density": "About 2 printed pages per kala from book 44 onward, about 2.5 before that."
+    }
+  },
+  "pageTypes": {
+    "method": "Pixel classification in Chromium: border ring tests whether the image bleeds to the trim; a row of body type is mostly light with a little ink, whereas a row through a photograph is neither.",
+    "validation": "Checked against 28 pages read by eye: 27 agree. The one disagreement (061) is a plate reported as having text, so extraction reads it and finds nothing. No text page is marked skippable — the errors run in the safe direction only.",
+    "counts": {
+      "text": 122,
+      "mixed": 19,
+      "plateFullbleed": 78,
+      "plateInset": 1
+    },
+    "text": [
+      "002",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "012",
+      "013",
+      "014",
+      "015",
+      "016",
+      "017",
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "026",
+      "028",
+      "029",
+      "030",
+      "031",
+      "034",
+      "036",
+      "037",
+      "038",
+      "040",
+      "042",
+      "043",
+      "046",
+      "048",
+      "050",
+      "052",
+      "053",
+      "054",
+      "056",
+      "058",
+      "060",
+      "062",
+      "063",
+      "064",
+      "065",
+      "068",
+      "069",
+      "070",
+      "074",
+      "076",
+      "077",
+      "080",
+      "082",
+      "083",
+      "084",
+      "086",
+      "088",
+      "089",
+      "092",
+      "094",
+      "096",
+      "098",
+      "100",
+      "102",
+      "104",
+      "106",
+      "108",
+      "110",
+      "112",
+      "114",
+      "116",
+      "118",
+      "120",
+      "122",
+      "124",
+      "126",
+      "128",
+      "129",
+      "132",
+      "134",
+      "136",
+      "138",
+      "139",
+      "142",
+      "144",
+      "146",
+      "148",
+      "150",
+      "152",
+      "154",
+      "156",
+      "158",
+      "160",
+      "162",
+      "164",
+      "166",
+      "168",
+      "170",
+      "172",
+      "174",
+      "176",
+      "178",
+      "180",
+      "182",
+      "184",
+      "186",
+      "188",
+      "190",
+      "192",
+      "194",
+      "196",
+      "198",
+      "200",
+      "202",
+      "204",
+      "206",
+      "208",
+      "210",
+      "212",
+      "214",
+      "216",
+      "218",
+      "220"
+    ],
+    "mixed": [
+      "010",
+      "018",
+      "044",
+      "061",
+      "066",
+      "071",
+      "078",
+      "093",
+      "101",
+      "103",
+      "111",
+      "117",
+      "133",
+      "135",
+      "145",
+      "157",
+      "165",
+      "179",
+      "193"
+    ],
+    "mixedNote": "Text plus a plate on the same page. Must be read.",
+    "noText": [
+      "001",
+      "003",
+      "011",
+      "019",
+      "027",
+      "032",
+      "033",
+      "035",
+      "039",
+      "041",
+      "045",
+      "047",
+      "049",
+      "051",
+      "055",
+      "057",
+      "059",
+      "067",
+      "072",
+      "073",
+      "075",
+      "079",
+      "081",
+      "085",
+      "087",
+      "090",
+      "091",
+      "095",
+      "097",
+      "099",
+      "105",
+      "107",
+      "109",
+      "113",
+      "115",
+      "119",
+      "121",
+      "123",
+      "125",
+      "127",
+      "130",
+      "131",
+      "137",
+      "140",
+      "141",
+      "143",
+      "147",
+      "149",
+      "151",
+      "153",
+      "155",
+      "159",
+      "161",
+      "163",
+      "167",
+      "169",
+      "171",
+      "173",
+      "175",
+      "177",
+      "181",
+      "183",
+      "185",
+      "187",
+      "189",
+      "191",
+      "195",
+      "197",
+      "199",
+      "201",
+      "203",
+      "205",
+      "207",
+      "209",
+      "211",
+      "213",
+      "215",
+      "217",
+      "219"
+    ],
+    "noTextNote": "Full-bleed or inset plates carrying no body type. Skip for transcription; they are still figure sources."
+  },
+  "extractionPlan": {
+    "contentPages": 141,
+    "skipPages": 79,
+    "batches": 15,
+    "order": [
+      "002",
+      "004",
+      "005",
+      "006",
+      "007",
+      "008",
+      "009",
+      "010",
+      "012",
+      "013",
+      "014",
+      "015",
+      "016",
+      "017",
+      "018",
+      "020",
+      "021",
+      "022",
+      "023",
+      "024",
+      "025",
+      "026",
+      "028",
+      "029",
+      "030",
+      "031",
+      "034",
+      "036",
+      "037",
+      "038",
+      "040",
+      "042",
+      "043",
+      "044",
+      "046",
+      "048",
+      "050",
+      "052",
+      "053",
+      "054",
+      "056",
+      "058",
+      "060",
+      "061",
+      "062",
+      "063",
+      "064",
+      "065",
+      "066",
+      "068",
+      "069",
+      "070",
+      "071",
+      "074",
+      "076",
+      "077",
+      "078",
+      "080",
+      "082",
+      "083",
+      "084",
+      "086",
+      "088",
+      "089",
+      "092",
+      "093",
+      "094",
+      "096",
+      "098",
+      "100",
+      "101",
+      "102",
+      "103",
+      "104",
+      "106",
+      "108",
+      "110",
+      "111",
+      "112",
+      "114",
+      "116",
+      "117",
+      "118",
+      "120",
+      "122",
+      "124",
+      "126",
+      "128",
+      "129",
+      "132",
+      "133",
+      "134",
+      "135",
+      "136",
+      "138",
+      "139",
+      "142",
+      "144",
+      "145",
+      "146",
+      "148",
+      "150",
+      "152",
+      "154",
+      "156",
+      "157",
+      "158",
+      "160",
+      "162",
+      "164",
+      "165",
+      "166",
+      "168",
+      "170",
+      "172",
+      "174",
+      "176",
+      "178",
+      "179",
+      "180",
+      "182",
+      "184",
+      "186",
+      "188",
+      "190",
+      "192",
+      "193",
+      "194",
+      "196",
+      "198",
+      "200",
+      "202",
+      "204",
+      "206",
+      "208",
+      "210",
+      "212",
+      "214",
+      "216",
+      "218",
+      "220"
+    ]
+  },
+  "canonicalKeys": {
+    "source": "lib/i18n/hi.ts — Home_v5.VIDYAS and Home_v5.KALAS, each entry [nameHi, glossHi, key, glossEn]",
+    "vidyas": 14,
+    "kalas": 64,
+    "keyField": "index 2 of each entry, e.g. Vadya, Dhatu-vada"
+  },
+  "unmatched": [
+    {
+      "bookNum": 49,
+      "file": "190",
+      "printed": 217,
+      "romanised": "Nimitta-jnana",
+      "note": "shubha/ashubha omens. No canonical entry corresponds; not in the Vatsyayana 64",
+      "headingHi": "not transcribed here — read the page"
+    },
+    {
+      "bookNum": 64,
+      "file": "220",
+      "printed": 247,
+      "romanised": "Vyayamiki",
+      "note": "physical exercise and मल्ल विद्या. Sits at the position of canonical 64 वैजयिकीविद्या but is a different word; not forced",
+      "headingHi": "not transcribed here — read the page"
+    }
+  ],
+  "flags": [
+    {
+      "kind": "numbering-drift",
+      "detail": "The book's own kala numbers do not track the lib/i18n index. Book 2=canonical 2, book 10=11, book 44=46, book 54=58. The book merges at least one canonical pair (46+47) and includes at least one item with no canonical counterpart, so a 1:1 mapping of 64 book sections onto 64 canonical keys does not exist. Match on name, never on number."
+    },
+    {
+      "kind": "missing-pages",
+      "detail": "Printed 1–27 absent, so the Vidya chapter opening and 9 of 14 vidya headings are not yet located. Rigveda and Yajurveda heads may be in the missing range."
+    },
+    {
+      "kind": "section-order",
+      "detail": "Book orders the vidyas differently from lib/i18n: Dharmashastra (77) precedes Nyaya (87)."
+    },
+    {
+      "kind": "boundary-unread",
+      "detail": "The Vidya→Kala boundary is pinned to printed 88/89 (file 061 plate, 062 chapter opener). The Kala 1 opening near printed 103 is still unread."
+    }
+  ],
+  "resolved": [
+    {
+      "kind": "source-in-public",
+      "detail": "split/ and po.pdf both moved out of public/ to the top level. Neither is web-served now."
+    },
+    {
+      "kind": "poppler",
+      "detail": "Installed as a portable build after choco failed without elevation."
+    }
+  ]
+}
