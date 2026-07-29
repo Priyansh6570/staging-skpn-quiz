@@ -27,14 +27,27 @@ const REDUCED_MOTION_BODY = " animation: none !important; transition: none !impo
 // discipline that keeps the dock from swallowing taps, the focus ring, and the mobile geometry.
 // The entry animation is declared with `both`, so the reduced-motion block below (animation: none)
 // leaves the notice at its final, visible state rather than hiding it.
+// The card floats clear of the bar rather than inside it, so a collapsed notice cannot thicken the
+// chrome: the top offset clears the 69px bar and leaves a gap, and the dock is inert to pointers
+// except over the card itself. The ring keeps pulsing after the drop-in because the date
+// announcement is the one thing every visitor arrives looking for; it animates box-shadow only, so
+// it composes with the entry keyframe rather than fighting it.
 const NOTICE_CSS = `
-@keyframes skpn-notice-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes skpn-notice-in { from { opacity: 0; transform: translateY(-20px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes skpn-notice-ring {
+  0%, 100% { box-shadow: 0 2px 4px rgba(20,32,62,.06), 0 18px 40px rgba(20,32,62,.2), 0 0 0 0 rgba(232,193,115,0); }
+  50% { box-shadow: 0 2px 4px rgba(20,32,62,.06), 0 18px 40px rgba(20,32,62,.2), 0 0 0 9px rgba(232,193,115,.26); }
+}
+@keyframes skpn-notice-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+[data-e~="noticedock"] {
+  position: fixed; left: 0; right: 0; top: 84px; z-index: 55;
+  display: flex; justify-content: center; padding: 0 30px; pointer-events: none;
+}
 [data-e~="noticedock"] > * { pointer-events: auto; }
-[data-e~="noticedock"] :focus-visible, [data-e~="noticedock"]:focus-visible { outline: 2px solid #14203E; outline-offset: 2px; }
+[data-e~="noticedock"] :focus-visible { outline: 2px solid #14203E; outline-offset: 2px; }
+[data-e~="noticecard"] { width: min(100%, 720px); }
 @media (max-width: 700px) {
-  [data-e~="noticedock"] { left: 12px; right: 12px; bottom: 12px; }
-  [data-e~="noticecard"] { max-width: none; }
-  [data-e~="noticeroom"] { padding-bottom: 104px !important; }
+  [data-e~="noticedock"] { top: 80px; padding: 0 14px; }
 }
 `;
 

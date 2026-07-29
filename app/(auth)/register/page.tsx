@@ -422,9 +422,7 @@ export default function RegisterPage() {
             <div aria-hidden="true" style={{ position: "absolute", left: "-12%", top: "-14%", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%)", animation: "rg-glow 9s ease-in-out infinite" }}></div>
 
             <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "12px" }}>
-              <span style={{ width: "46px", height: "46px", flex: "0 0 auto", borderRadius: "50%", background: "#04060F", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 1px rgba(232,193,115,.4)" }}>
-                <img src="/uploads/skpn-logo.png" alt="" width="34" height="34" style={{ display: "block", width: "34px", height: "34px" }} />
-              </span>
+              <img src="/uploads/skpn-logo.png" alt="" width="50" height="50" style={{ display: "block", width: "50px", height: "50px", flex: "0 0 auto", borderRadius: "50%" }} />
               <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "15.5px", lineHeight: "1.45", color: "#FFF9EC" }}>{t.asideOrg}</span>
             </div>
 
@@ -638,7 +636,7 @@ export default function RegisterPage() {
           <span style={{ display: `${spinnerDisplay}`, position: "relative", width: "104px", height: "104px" }}>
             <span aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "50%", border: "3px solid rgba(232,193,115,.22)" }}></span>
             <span aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "50%", border: "3px solid transparent", borderTopColor: "#E8C173", animation: "rg-spin 1s linear infinite" }}></span>
-            <img src="/uploads/skpn-logo.png" alt="" width="52" height="52" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "52px", height: "52px" }} />
+            <img src="/uploads/skpn-logo.png" alt="" width="64" height="64" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "64px", height: "64px", borderRadius: "50%" }} />
           </span>
           <span style={{ display: `${successDisplay}`, width: "104px", height: "104px", borderRadius: "50%", background: "#E8C173", alignItems: "center", justifyContent: "center", animation: "rg-pop .5s cubic-bezier(.22,1.2,.36,1)" }}>
             <svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="#1E1503" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block" }}><path d="M4.5 12.5 9.5 17.5 19.5 7"></path></svg>

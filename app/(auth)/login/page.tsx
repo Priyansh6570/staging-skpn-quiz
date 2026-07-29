@@ -99,9 +99,7 @@ export default function LoginPage() {
             <div aria-hidden="true" style={{ position: "absolute", right: "-14%", top: "-12%", width: "320px", height: "320px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%)", animation: "lg-glow 9s ease-in-out infinite" }}></div>
 
             <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "12px" }}>
-              <span style={{ width: "46px", height: "46px", flex: "0 0 auto", borderRadius: "50%", background: "#04060F", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 1px rgba(232,193,115,.4)" }}>
-                <img src="/uploads/skpn-logo.png" alt="" width="34" height="34" style={{ display: "block", width: "34px", height: "34px" }} />
-              </span>
+              <img src="/uploads/skpn-logo.png" alt="" width="50" height="50" style={{ display: "block", width: "50px", height: "50px", flex: "0 0 auto", borderRadius: "50%" }} />
               <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "15.5px", lineHeight: "1.45", color: "#FFF9EC" }}>{t.asideOrg}</span>
             </div>
 

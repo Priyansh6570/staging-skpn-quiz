@@ -162,13 +162,25 @@ export default function HomePage() {
         <div aria-hidden="true" style={{ position: "absolute", inset: "-10%", backgroundImage: "radial-gradient(1.5px 1.5px at 12% 22%, rgba(255,238,196,.85), transparent 60%),radial-gradient(1.2px 1.2px at 78% 16%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.6px 1.6px at 34% 68%, rgba(255,238,196,.6), transparent 60%),radial-gradient(1.1px 1.1px at 88% 74%, rgba(255,238,196,.7), transparent 60%),radial-gradient(1.4px 1.4px at 60% 40%, rgba(255,238,196,.5), transparent 60%),radial-gradient(1.2px 1.2px at 22% 86%, rgba(255,238,196,.55), transparent 60%)", backgroundSize: "520px 520px", animation: "v5-drift 46s linear infinite alternate", opacity: ".7" }}></div>
 
         <div data-e="pad hero-body" style={{ position: "relative", maxWidth: "1000px", margin: "0 auto", padding: "88px 30px 66px", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "22px" }}>
-          <div data-reveal style={{ position: "relative", width: "clamp(132px,17vw,186px)", height: "clamp(132px,17vw,186px)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "6px" }}>
-            <div style={{ position: "absolute", inset: "-52%", borderRadius: "50%", background: "radial-gradient(circle, rgba(232,193,115,.4) 0%, rgba(232,193,115,.12) 42%, rgba(232,193,115,0) 70%)", animation: "v5-glow 8s ease-in-out infinite" }}></div>
+          <div data-reveal style={{ position: "relative", width: "clamp(148px,19vw,208px)", height: "clamp(148px,19vw,208px)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "6px" }}>
+            <div style={{ position: "absolute", inset: "-52%", borderRadius: "50%", background: "radial-gradient(circle, rgba(232,193,115,.52) 0%, rgba(232,193,115,.16) 42%, rgba(232,193,115,0) 70%)", animation: "v5-glow 5s ease-in-out infinite" }}></div>
+            {/* A tight rim that breathes out of phase with the wide halo, so the seal reads as lit
+                from behind rather than pasted onto the artwork. */}
+            <div aria-hidden="true" style={{ position: "absolute", inset: "-3%", borderRadius: "50%", boxShadow: "0 0 28px 7px rgba(232,193,115,.5)", animation: "v5-glow 3.4s ease-in-out infinite" }}></div>
             <svg viewBox="-100 -100 200 200" width="100%" height="100%" aria-hidden="true" focusable="false" style={{ position: "absolute", inset: "-30%", width: "160%", height: "160%" }}>
-              <circle r="94" fill="none" stroke="rgba(232,193,115,.55)" strokeWidth="1.4" strokeDasharray="1.5 7.3" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "v5-spin 240s linear infinite" }}></circle>
-              <circle r="76" fill="none" stroke="rgba(232,193,115,.35)" strokeWidth="3.2" strokeDasharray="5 29.1" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "v5-spin-rev 300s linear infinite" }}></circle>
+              <circle r="94" fill="none" stroke="rgba(232,193,115,.55)" strokeWidth="1.4" strokeDasharray="1.5 7.3" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "v5-spin 28s linear infinite" }}></circle>
+              <circle r="76" fill="none" stroke="rgba(232,193,115,.35)" strokeWidth="3.2" strokeDasharray="5 29.1" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "v5-spin-rev 44s linear infinite" }}></circle>
             </svg>
-            <img src="/uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" style={{ position: "relative", width: "100%", height: "auto", display: "block", filter: "drop-shadow(0 14px 40px rgba(0,0,0,.6))" }} />
+            {/* A spark riding each dotted ring, counter-rotating. The insets put each carrier's
+                half-width on its ring's radius — the svg maps 200 viewBox units onto 160% of the
+                medallion, so r=94 lands at 75.2% and r=76 at 60.8% of the medallion's width. */}
+            <div aria-hidden="true" style={{ position: "absolute", inset: "-25.2%", animation: "v5-spin 16s linear infinite" }}>
+              <div style={{ position: "absolute", left: "50%", top: "0", width: "9%", height: "9%", transform: "translate(-50%,-50%)", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,245,220,.95) 0%, rgba(232,193,115,.5) 42%, rgba(232,193,115,0) 72%)" }}></div>
+            </div>
+            <div aria-hidden="true" style={{ position: "absolute", inset: "-10.8%", animation: "v5-spin-rev 11s linear infinite" }}>
+              <div style={{ position: "absolute", left: "50%", top: "0", width: "10%", height: "10%", transform: "translate(-50%,-50%)", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,248,230,1) 0%, rgba(232,193,115,.55) 40%, rgba(232,193,115,0) 70%)" }}></div>
+            </div>
+            <img src="/uploads/skpn-logo.png" alt="श्रीकृष्ण पाथेय न्यास" style={{ position: "relative", width: "100%", height: "auto", borderRadius: "50%", display: "block", filter: "drop-shadow(0 14px 40px rgba(0,0,0,.6))" }} />
           </div>
 
           <p data-reveal style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "clamp(16px,1.9vw,19px)", lineHeight: "1.6", color: "#E8C173", letterSpacing: ".02em" }}>{t.org}</p>

@@ -118,9 +118,9 @@ export default function SiteHeader({
     <Link href="/" style={{ display: "flex", alignItems: "center", gap: "12px", color: "inherit", textDecoration: "none", flex: "0 1 auto", minWidth: "0" }}>
       <img src="/uploads/images.jpg" alt={m.alt0} width="38" height="38" style={{ display: "block", width: "38px", height: "38px", borderRadius: "50%", flex: "0 0 auto" }} />
       <span style={{ width: "1px", height: "28px", background: "#E1D6C0", flex: "0 0 auto" }}></span>
-      <span style={{ width: "44px", height: "44px", flex: "0 0 auto", borderRadius: "50%", background: "radial-gradient(circle at 32% 28%,#1B2544 0%,#080C1E 72%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 1px rgba(232,193,115,.42),0 6px 16px rgba(7,11,30,.28)" }}>
-        <img src="/uploads/skpn-logo.png" alt={m.alt1} width="34" height="34" style={{ display: "block", width: "34px", height: "34px" }} />
-      </span>
+      {/* The seal is its own circular artwork on an opaque black plate, so it needs no backdrop —
+          only the 50% clip that drops the plate's square corners. */}
+      <img src="/uploads/skpn-logo.png" alt={m.alt1} width="48" height="48" style={{ display: "block", width: "48px", height: "48px", flex: "0 0 auto", borderRadius: "50%" }} />
       <span data-e="brandtext" style={{ display: "flex", flexDirection: "column", lineHeight: "1.25", minWidth: "0" }}>
         <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "16.5px", color: "#14203E" }}>{t.orgShort}</span>
         <span style={{ fontSize: "11px", color: "#161C2E" }}>{t.deptShort}</span>
@@ -152,9 +152,7 @@ export default function SiteHeader({
 
   <aside id="skpn-menu" role="dialog" aria-modal="true" aria-label={t.menuLabel} style={{ position: "fixed", top: "0", right: "0", bottom: "0", zIndex: "80", width: "min(86vw,340px)", background: "linear-gradient(180deg,#0B1226 0%,#070B1E 100%)", boxShadow: "-24px 0 60px rgba(4,6,15,.5)", display: "flex", flexDirection: "column", transform: drawerTransform, visibility: drawerVis, transition: "transform .36s cubic-bezier(.32,.72,.24,1),visibility .36s" }}>
     <div style={{ padding: "20px 22px", display: "flex", alignItems: "center", gap: "12px", borderBottom: "1px solid rgba(232,193,115,.2)" }}>
-      <span style={{ width: "42px", height: "42px", flex: "0 0 auto", borderRadius: "50%", background: "#04060F", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 1px rgba(232,193,115,.4)" }}>
-        <img src="/uploads/skpn-logo.png" alt="" width="32" height="32" style={{ display: "block", width: "32px", height: "32px" }} />
-      </span>
+      <img src="/uploads/skpn-logo.png" alt="" width="46" height="46" style={{ display: "block", width: "46px", height: "46px", flex: "0 0 auto", borderRadius: "50%" }} />
       <span style={{ flex: "1 1 auto", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "16px", lineHeight: "1.4", color: "#FFF9EC" }}>{t.orgShort}</span>
       <button type="button" onClick={() => setOpen(false)} aria-label={t.close} style={{ width: "44px", height: "44px", flex: "0 0 auto", border: "1px solid rgba(255,249,236,.24)", borderRadius: "12px", background: "rgba(255,255,255,.05)", color: "#FFF9EC", cursor: "pointer", fontSize: "20px", lineHeight: "1", fontFamily: "inherit" }}>{m.text2}</button>
     </div>

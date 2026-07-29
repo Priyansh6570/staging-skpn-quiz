@@ -227,13 +227,21 @@ button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offs
 [data-page="Rules"] [data-e~="toclist"]::-webkit-scrollbar { display: none; }
 
 /* ---------- competition notice (no design source) ---------- */
-@keyframes skpn-notice-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes skpn-notice-in { from { opacity: 0; transform: translateY(-20px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes skpn-notice-ring {
+  0%, 100% { box-shadow: 0 2px 4px rgba(20,32,62,.06), 0 18px 40px rgba(20,32,62,.2), 0 0 0 0 rgba(232,193,115,0); }
+  50% { box-shadow: 0 2px 4px rgba(20,32,62,.06), 0 18px 40px rgba(20,32,62,.2), 0 0 0 9px rgba(232,193,115,.26); }
+}
+@keyframes skpn-notice-beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
+[data-e~="noticedock"] {
+  position: fixed; left: 0; right: 0; top: 84px; z-index: 55;
+  display: flex; justify-content: center; padding: 0 30px; pointer-events: none;
+}
 [data-e~="noticedock"] > * { pointer-events: auto; }
-[data-e~="noticedock"] :focus-visible, [data-e~="noticedock"]:focus-visible { outline: 2px solid #14203E; outline-offset: 2px; }
+[data-e~="noticedock"] :focus-visible { outline: 2px solid #14203E; outline-offset: 2px; }
+[data-e~="noticecard"] { width: min(100%, 720px); }
 @media (max-width: 700px) {
-  [data-e~="noticedock"] { left: 12px; right: 12px; bottom: 12px; }
-  [data-e~="noticecard"] { max-width: none; }
-  [data-e~="noticeroom"] { padding-bottom: 104px !important; }
+  [data-e~="noticedock"] { top: 80px; padding: 0 14px; }
 }
 
 /* ---------- page aura (no design source) ---------- */

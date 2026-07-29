@@ -1,6 +1,12 @@
 import "./admin.css";
 
-export const metadata = { title: "SKPN Administration" };
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "SKPN Administration",
+  robots: { index: false, follow: false },
+  alternates: { canonical: null },
+};
 
 // Styling only. The session gate lives in (authed)/layout.tsx so the login screen, which is also
 // under /admin, is not redirected to itself.

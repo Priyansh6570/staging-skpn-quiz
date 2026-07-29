@@ -27,9 +27,7 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "16px" }}>
         <img src="/uploads/images.jpg" alt={m.alt0} width="44" height="44" loading="lazy" style={{ display: "block", width: "44px", height: "44px", borderRadius: "50%" }} />
-        <span style={{ width: "52px", height: "52px", flex: "0 0 auto", borderRadius: "50%", background: "#04060F", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 1px rgba(232,193,115,.34)" }}>
-          <img src="/uploads/skpn-logo.png" alt="" width="40" height="40" loading="lazy" style={{ display: "block", width: "40px", height: "40px" }} />
-        </span>
+        <img src="/uploads/skpn-logo.png" alt="" width="56" height="56" loading="lazy" style={{ display: "block", width: "56px", height: "56px", flex: "0 0 auto", borderRadius: "50%" }} />
       </div>
       <p style={{ margin: "0 0 6px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "19px", lineHeight: "1.5", color: "#FFF9EC" }}>{t.org}</p>
       <p style={{ margin: "0 0 14px", fontSize: "15.5px", lineHeight: "1.7", color: "#E4DFD2" }}>{t.dept}</p>
@@ -63,10 +61,7 @@ export default function SiteFooter({ lang }: { lang: Lang }) {
       </div>
     </div>
   </div>
-  {/* noticeroom reserves the strip the floating notice occupies on narrow screens, so the
-      copyright line can always be scrolled clear of it. The footer's own dark background fills
-      the space, so nothing shows through. */}
-  <div data-e={competitionOpen ? "pad" : "pad noticeroom"} style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "0 30px 34px" }}>
+  <div data-e="pad" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "0 30px 34px" }}>
     <p style={{ margin: "0", paddingTop: "22px", borderTop: "1px solid rgba(255,249,236,.1)", fontSize: "14.5px", lineHeight: "1.7", color: "#D8D2C4" }}>{t.copyright}</p>
   </div>
 </footer>

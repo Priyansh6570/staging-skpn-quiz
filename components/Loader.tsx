@@ -33,10 +33,8 @@ export default function Loader({ lang, visible }: { lang: Lang; visible: boolean
           <circle r="92" fill="none" stroke="rgba(232,193,115,.55)" strokeWidth="1.6" strokeDasharray="2 8" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "skpnSpin 9s linear infinite" }}></circle>
           <circle r="74" fill="none" stroke="rgba(232,193,115,.3)" strokeWidth="3.4" strokeDasharray="6 30" strokeLinecap="round" style={{ transformOrigin: "0 0", animation: "skpnSpinRev 14s linear infinite" }}></circle>
         </svg>
-        <span style={{ position: "relative", width: "88px", height: "88px", borderRadius: "50%", background: "#04060F", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 1px rgba(232,193,115,.3),0 12px 40px rgba(0,0,0,.6)" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/uploads/skpn-logo.png" alt="" style={{ width: "66px", height: "auto", display: "block" }} />
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/uploads/skpn-logo.png" alt="" style={{ position: "relative", width: "96px", height: "96px", borderRadius: "50%", display: "block", boxShadow: "0 12px 40px rgba(0,0,0,.6)" }} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", animation: "skpnRise .5s ease both" }}>
         <p style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "19px", lineHeight: "1.5", color: "#FFF9EC", letterSpacing: ".01em" }}>{s.SiteHeader.T.orgShort}</p>

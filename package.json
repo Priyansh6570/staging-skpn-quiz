@@ -13,6 +13,7 @@
     "baseline": "node scripts/baseline.mjs",
     "import-questions": "node scripts/import-questions.mjs",
     "css": "node scripts/build-css.mjs",
+    "brand": "node --experimental-strip-types scripts/build-brand.mjs",
     "smoke": "node tests/smoke.mjs",
     "sweep": "node scripts/sweep-attempts.mjs",
     "journey": "node tests/journey.mjs",
