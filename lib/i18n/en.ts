@@ -67,85 +67,99 @@ export const en = {
         "ऋग्वेद",
         "चार वेद",
         "Rigveda",
-        "The first of the four Vedas"
+        "The first of the four Vedas",
+        "ऋग्वेद"
       ],
       [
         "यजुर्वेद",
         "चार वेद",
         "Yajurveda",
-        "Mantras and method of yajna"
+        "Mantras and method of yajna",
+        "यजुर्वेद"
       ],
       [
         "सामवेद",
         "चार वेद",
         "Samaveda",
-        "The tradition of chant and music"
+        "The tradition of chant and music",
+        "सामवेद"
       ],
       [
         "अथर्ववेद",
         "चार वेद",
         "Atharvaveda",
-        "Everyday life, medicine and science"
+        "Everyday life, medicine and science",
+        "अथर्ववेद"
       ],
       [
         "शिक्षा",
         "उच्चारण विज्ञान",
         "Shiksha",
-        "Phonetics and articulation"
-      ],
-      [
-        "कल्प",
-        "कर्मकांड",
-        "Kalpa",
-        "Ritual and procedure"
-      ],
-      [
-        "व्याकरण",
-        "छह वेदांग",
-        "Vyakarana",
-        "Grammar"
-      ],
-      [
-        "निरुक्त",
-        "शब्द व्युत्पत्ति",
-        "Nirukta",
-        "Etymology"
+        "Phonetics and articulation",
+        "शिक्षा"
       ],
       [
         "छंद",
         "छह वेदांग",
         "Chhanda",
-        "Prosody and metre"
+        "Prosody and metre",
+        "छंद"
+      ],
+      [
+        "व्याकरण",
+        "छह वेदांग",
+        "Vyakarana",
+        "Grammar",
+        "व्याकरण शास्त्र"
+      ],
+      [
+        "निरुक्त",
+        "शब्द व्युत्पत्ति",
+        "Nirukta",
+        "Etymology",
+        "निरुक्त"
       ],
       [
         "ज्योतिष",
         "छह वेदांग",
         "Jyotisha",
-        "Astronomy and time-reckoning"
+        "Astronomy and time-reckoning",
+        "ज्योतिष"
       ],
       [
-        "मीमांसा",
-        "दर्शन",
-        "Mimamsa",
-        "Philosophy of interpretation"
+        "कल्प",
+        "कर्मकांड",
+        "Kalpa",
+        "Ritual and procedure",
+        "कल्प"
       ],
       [
-        "न्याय",
-        "तर्कशास्त्र",
-        "Nyaya",
-        "Logic and reasoning"
-      ],
-      [
-        "धर्मशास्त्र",
+        "धर्म शास्त्र",
         "कानून/नीति",
         "Dharmashastra",
-        "Law, ethics and conduct"
+        "Law, ethics and conduct",
+        "धर्म शास्त्र"
       ],
       [
         "पुराण",
         "अन्य चार",
         "Purana",
-        "History and narrative tradition"
+        "History and narrative tradition",
+        "पुराण"
+      ],
+      [
+        "मीमांसा",
+        "दर्शन",
+        "Mimamsa",
+        "Philosophy of interpretation",
+        "मीमांसा"
+      ],
+      [
+        "न्याय",
+        "तर्कशास्त्र",
+        "Nyaya",
+        "Logic and reasoning",
+        "न्याय विद्या"
       ]
     ],
     "KALAS": [
@@ -153,385 +167,449 @@ export const en = {
         "गीत",
         "गायन",
         "Geet",
-        "Singing"
+        "Singing",
+        "गीत"
       ],
       [
         "वाद्य",
         "वाद्ययंत्र बजाना",
         "Vadya",
-        "Playing instruments"
+        "Playing instruments",
+        "वाद्य"
       ],
       [
         "नृत्य",
         "अभिनय",
         "Nritya",
-        "Acting"
-      ],
-      [
-        "नाट्य",
-        "अभिनय",
-        "Natya",
-        "Acting"
+        "Acting",
+        "नृत्य / नृत्त कला"
       ],
       [
         "आलेख्य",
         "चित्रकला",
         "Alekhya",
-        "Painting"
+        "Painting",
+        "आलेख्य"
       ],
       [
         "विशेषकच्छेद्य",
         "तिलक व शारीरिक सजावट",
         "Visheshakachchhedya",
-        "Forehead marks and body adornment"
+        "Forehead marks and body adornment",
+        "विशेषकच्छेद्य"
       ],
       [
-        "तण्डुलकुसुमबलिविकार",
+        "तंडुलकुसुम वलिविकार",
         "चावल और फूलों से आकृतियां बनाना",
         "Tandula-kusuma",
-        "Rangoli with rice and flowers"
+        "Rangoli with rice and flowers",
+        "तंडुलकुसुम वलिविकार"
       ],
       [
         "पुष्पास्तरण",
         "फूलों की सेज सजाना",
         "Pushpastarana",
-        "Arranging flower beds"
+        "Arranging flower beds",
+        "पुष्पास्तरण"
       ],
       [
         "दशनवसनांगराग",
         "वस्त्र और अंगों को रंगना/सजाना",
         "Dashana-vasana-raga",
-        "Colouring teeth, cloth and limbs"
+        "Colouring teeth, cloth and limbs",
+        "दशनवसनांगराग कला"
       ],
       [
-        "मणिभूमिकाकर्म",
+        "मणिभूमिका कर्म",
         "जवाहरात जड़ना",
         "Manibhumika-karma",
-        "Setting jewels"
+        "Setting jewels",
+        "मणिभूमिका कर्म"
       ],
       [
-        "शयनरचन",
+        "शयन रचना",
         "बिस्तर सजाना",
         "Shayana-rachana",
-        "Preparing a bed chamber"
+        "Preparing a bed chamber",
+        "शयन रचना"
       ],
       [
-        "उदकवाद्य",
+        "उदक वाद्य",
         "जल तरंग बजाना",
         "Udaka-vadya",
-        "Music on water"
+        "Music on water",
+        "उदक वाद्य"
       ],
       [
-        "उदकघात",
+        "उदकाघात",
         "पानी से खेलना/छपछपाना",
         "Udaka-ghata",
-        "Water sport"
+        "Water sport",
+        "उदकाघात"
       ],
       [
-        "चित्रयोग",
+        "चित्राश्चयोग",
         "रंगों का मिश्रण",
         "Chitra-yoga",
-        "Mixing colours"
+        "Mixing colours",
+        "चित्राश्चयोग"
       ],
       [
-        "माल्यग्रथनविकल्प",
+        "माल्यग्रंथन",
         "माला गूंथना",
         "Malya-grathana",
-        "Weaving garlands"
+        "Weaving garlands",
+        "माल्यग्रंथन"
       ],
       [
-        "शेखरकापीडयोजन",
+        "शेखर कापीडयोजन",
         "सिर पर मुकुट या फूल सजाना",
         "Shekharaka-yojana",
-        "Crowns and head ornaments"
+        "Crowns and head ornaments",
+        "शेखर कापीडयोजन"
       ],
       [
-        "नेपथ्ययोग",
+        "नेपथ्य प्रयोग",
         "वेशभूषा धारण करना",
         "Nepathya-yoga",
-        "Costume and stagecraft"
+        "Costume and stagecraft",
+        "नेपथ्य प्रयोग"
       ],
       [
-        "कर्णपत्रभंग",
+        "कर्णपत्र भंग",
         "कान के आभूषण बनाना",
         "Karnapatra-bhanga",
-        "Making ear ornaments"
+        "Making ear ornaments",
+        "कर्णपत्र भंग"
       ],
       [
-        "गंधयुक्ति",
+        "गन्धायुक्ति",
         "इत्र और सुगंधित पदार्थ बनाना",
         "Gandha-yukti",
-        "Making perfume"
+        "Making perfume",
+        "गन्धायुक्ति"
       ],
       [
-        "भूषणयोजन",
+        "भूषण योजन",
         "गहने पहनना",
         "Bhushana-yojana",
-        "The art of adornment"
+        "The art of adornment",
+        "भूषण योजन"
       ],
       [
-        "ऐंद्रजाल",
+        "ऐन्द्रजाल",
         "जादू-गरी",
         "Aindrajala",
-        "Conjuring"
+        "Conjuring",
+        "ऐन्द्रजाल"
       ],
       [
-        "कौचुमारयोग",
+        "कौचुमार",
         "छद्म वेश या रूप बदलना",
         "Kauchumara-yoga",
-        "Changing one's appearance"
+        "Changing one's appearance",
+        "कौचुमार"
       ],
       [
         "हस्तलाघव",
         "हाथ की सफाई",
         "Hasta-laghava",
-        "Manual dexterity"
+        "Manual dexterity",
+        "हस्तलाघव"
       ],
       [
-        "विचित्रशाकयूषभक्ष्यविकार",
+        "विचित्रशाकयूषभक्ष्य विकार क्रिया",
         "स्वादिष्ट व्यंजन बनाना",
         "Vichitra-bhakshya",
-        "Cooking varied dishes"
+        "Cooking varied dishes",
+        "विचित्रशाकयूषभक्ष्य विकार क्रिया"
       ],
       [
-        "पानकरसरागासवयोजन",
+        "पानकरस-रागासव योजन",
         "पेय पदार्थ और शर्बत बनाना",
         "Panaka-rasa-yojana",
-        "Preparing drinks and syrups"
+        "Preparing drinks and syrups",
+        "पानकरस-रागासव योजन"
       ],
       [
-        "सूचीवानकर्म",
+        "सूचीवान कर्म",
         "सिलाई और बुनाई",
         "Suchi-vana-karma",
-        "Sewing and weaving"
+        "Sewing and weaving",
+        "सूचीवान कर्म"
       ],
       [
         "सूत्रक्रीड़ा",
         "धागों का खेल",
         "Sutra-krida",
-        "Games with threads"
+        "Games with threads",
+        "सूत्रक्रीड़ा"
       ],
       [
-        "वीणाडमरुकवाद्य",
+        "वीणाडमरूकवाद्यानि",
         "वीणा और डमरू बजाना",
         "Vina-damaruka",
-        "Playing vina and damaru"
+        "Playing vina and damaru",
+        "वीणाडमरूकवाद्यानि"
       ],
       [
         "प्रहेलिका",
         "पहेलियां बुझाना",
         "Prahelika",
-        "Composing riddles"
+        "Composing riddles",
+        "प्रहेलिका"
       ],
       [
         "प्रतिमाला",
         "श्लोक या तुकबंदी बनाना",
         "Pratimala",
-        "Verse-capping games"
+        "Verse-capping games",
+        "प्रतिमाला"
       ],
       [
-        "दुर्वाचकयोग",
+        "दुर्वाचक योग",
         "कठिन शब्दों के अर्थ समझना",
         "Durvachaka-yoga",
-        "Understanding difficult words"
+        "Understanding difficult words",
+        "दुर्वाचक योग"
       ],
       [
         "पुस्तकवाचन",
         "ग्रंथों का वाचन",
         "Pustaka-vachana",
-        "Reading aloud"
+        "Reading aloud",
+        "पुस्तकवाचन"
       ],
       [
-        "नाटिकाख्यायिकादर्शन",
+        "नाटकाख्यायिका दर्शन",
         "नाटक और कहानियों की रचना",
         "Natika-akhyayika",
-        "Knowledge of plays and tales"
+        "Knowledge of plays and tales",
+        "नाटकाख्यायिका दर्शन"
       ],
       [
         "काव्यसमस्यापूरण",
         "अधूरी कविता को पूरा करना",
         "Kavya-samasya-purana",
-        "Completing verses"
+        "Completing verses",
+        "काव्यसमस्यापूरण"
       ],
       [
-        "पट्टिकावेत्रवाणविकल्प",
+        "पट्टिकावेत्रवान विकल्प",
         "चटाई और टोकरी बुनना",
         "Pattika-vetra-vana",
-        "Weaving mats and baskets"
+        "Weaving mats and baskets",
+        "पट्टिकावेत्रवान विकल्प"
       ],
       [
-        "तर्ककर्म",
-        "कताई और कढ़ाई",
-        "Tarka-karma",
-        "Spinning and embroidery"
+        "तक्षकर्म",
+        "नक्काशी का शिल्प",
+        "Takshakarma",
+        "The craft of carving",
+        "तक्षकर्म"
       ],
       [
         "तक्षण",
         "बढ़ईगिरी / लकड़ी का काम",
         "Takshana",
-        "Carpentry"
+        "Carpentry",
+        "तक्षण कला"
       ],
       [
         "वास्तुविद्या",
         "भवन निर्माण और वास्तुकला",
         "Vastu-vidya",
-        "Architecture"
+        "Architecture",
+        "वास्तुविद्या"
       ],
       [
-        "रूप्यरत्नपरीक्षा",
+        "रूप्यरत्न परीक्षा",
         "चांदी और रत्नों की पहचान",
         "Rupya-ratna-pariksha",
-        "Assaying gems and metals"
+        "Assaying gems and metals",
+        "रूप्यरत्न परीक्षा"
       ],
       [
         "धातुवाद",
         "धातुओं को पिघलाना / धातु विज्ञान",
         "Dhatu-vada",
-        "Metallurgy"
+        "Metallurgy",
+        "धातुवाद"
       ],
       [
-        "मणिरागज्ञान",
+        "मणिरागाकर ज्ञान",
         "रत्नों के रंग की पहचान",
         "Mani-raga-jnana",
-        "Colouring gems"
+        "Colouring gems",
+        "मणिरागाकर ज्ञान"
       ],
       [
-        "आकरज्ञान",
-        "खदानों की पहचान",
-        "Akara-jnana",
-        "Knowledge of mines"
-      ],
-      [
-        "वृक्षायुर्वेदयोग",
+        "वृक्षायुर्वेद योग",
         "पेड़-पौधों की चिकित्सा",
         "Vrikshayurveda",
-        "Medicine for trees"
+        "Medicine for trees",
+        "वृक्षायुर्वेद योग"
       ],
       [
-        "मेषकुक्कुटलावकयुद्धविधि",
+        "मेषकुक्कुट लावकयुद्ध विधि",
         "पशु-पक्षियों के युद्ध का ज्ञान",
         "Mesha-kukkuta-vidhi",
-        "Training animals to contest"
+        "Training animals to contest",
+        "मेषकुक्कुट लावकयुद्ध विधि"
       ],
       [
-        "शुकसारिकाप्रलापन",
+        "शुक-सारिका प्रलापन",
         "तोता-मैना को बोलना सिखाना",
         "Shuka-sarika-pralapana",
-        "Teaching birds to speak"
+        "Teaching birds to speak",
+        "शुक-सारिका प्रलापन"
       ],
       [
-        "उत्सादन",
+        "उत्सादन-संवाहन-केशमर्दन कुशलता",
         "मालिश करना",
         "Utsadana",
-        "Massage and body care"
+        "Massage and body care",
+        "उत्सादन-संवाहन-केशमर्दन कुशलता"
       ],
       [
-        "केशमार्जनकौशल",
-        "बाल संवारना",
-        "Kesha-marjana",
-        "Hairdressing"
-      ],
-      [
-        "अक्षरमुष्टिकाकथन",
+        "अक्षरमुष्टि कथन",
         "इशारों में बात करना",
         "Akshara-mushtika",
-        "Sign language"
+        "Sign language",
+        "अक्षरमुष्टि कथन"
       ],
       [
-        "म्लेच्छितकलाविकल्प",
+        "म्लेच्छित विकल्प",
         "विदेशी भाषाएं सीखना",
         "Mlechchhita-kala",
-        "Learning foreign languages"
+        "Learning foreign languages",
+        "म्लेच्छित विकल्प"
       ],
       [
-        "देशभाषाज्ञान",
+        "देशभाषा विज्ञान",
         "क्षेत्रीय बोलियों का ज्ञान",
         "Desha-bhasha-jnana",
-        "Knowledge of regional languages"
+        "Knowledge of regional languages",
+        "देशभाषा विज्ञान"
       ],
       [
-        "पुष्पशकटिकानिर्मिति",
-        "शकुन-अपशकुन का ज्ञान",
+        "पुष्पशकटिका",
+        "फूलों को गूँथ कर या यष्टियों में लगाकर शकट छकड़ा, रथ आदि वाहनों को यथा आकार सजाना",
         "Pushpa-shakatika",
-        "Knowledge of omens"
+        "Decorating carts and vehicles with flowers",
+        "पुष्पशकटिका"
       ],
       [
-        "यंत्रमातृका",
+        "निमित्त ज्ञान",
+        "शकुन-अपशकुन का ज्ञान",
+        "Nimitta-jnana",
+        "Knowledge of omens",
+        "निमित्त ज्ञान"
+      ],
+      [
+        "यन्त्रमातृका",
         "मशीनों का संचालन",
         "Yantra-matrika",
-        "Building and running machines"
+        "Building and running machines",
+        "यन्त्रमातृका"
       ],
       [
         "धारणमातृका",
         "स्मरण शक्ति बढ़ाना",
         "Dharana-matrika",
-        "Strengthening memory"
+        "Strengthening memory",
+        "धारणमातृका"
       ],
       [
-        "सम्पाठ्य",
+        "सम्पाठ्यम्",
         "साथ मिलकर पढ़ना",
         "Sampathya",
-        "Reciting in unison"
+        "Reciting in unison",
+        "सम्पाठ्यम्"
       ],
       [
-        "मानसीकाव्यक्रिया",
+        "मानसी",
         "मन में कविता रचना",
         "Manasi-kavya-kriya",
-        "Extempore poetry"
+        "Extempore poetry",
+        "मानसी"
       ],
       [
-        "क्रियाविकल्प",
+        "अभिधानकोष",
+        "शब्दकोश",
+        "Abhidhana-kosha",
+        "Lexicography",
+        "अभिधानकोष"
+      ],
+      [
+        "छन्दोज्ञान",
+        "छंदों का ज्ञान",
+        "Chhando-jnana",
+        "Knowledge of prosody",
+        "छन्दोज्ञान"
+      ],
+      [
+        "क्रियाकल्प",
         "दूसरों का काम पूरा करना",
         "Kriya-vikalpa",
-        "Completing another's work"
+        "Completing another's work",
+        "क्रियाकल्प"
       ],
       [
-        "छलितकयोग",
+        "छलितयोग",
         "छल-कपट का ज्ञान",
         "Chhalitaka-yoga",
-        "Knowledge of deception"
-      ],
-      [
-        "अभिधानकोषछंदोज्ञान",
-        "शब्दकोश और छंदों का ज्ञान",
-        "Abhidhana-kosha",
-        "Lexicon and metre"
+        "Knowledge of deception",
+        "छलितयोग"
       ],
       [
         "वस्त्रगोपन",
         "वस्त्र छिपाना",
         "Vastra-gopana",
-        "Concealing garments"
+        "Concealing garments",
+        "वस्त्रगोपन"
       ],
       [
         "द्यूतविशेष",
         "शतरंज का ज्ञान",
         "Dyuta-vishesha",
-        "Knowledge of chess"
+        "Knowledge of chess",
+        "द्यूतविशेष"
       ],
       [
         "आकर्षक्रीड़ा",
         "चुंबक का खेल",
         "Akarsha-krida",
-        "Play with magnets"
+        "Play with magnets",
+        "आकर्षक्रीड़ा"
       ],
       [
-        "बालक्रीडनक",
+        "बालक्रीड़नक",
         "बच्चों के खेल",
         "Balakridanaka",
-        "Games for children"
+        "Games for children",
+        "बालक्रीड़नक"
       ],
       [
-        "वैनयिकीविद्या",
+        "वैनायिकी विद्या",
         "विनय और अनुशासन",
         "Vainayiki-vidya",
-        "Discipline and etiquette"
+        "Discipline and etiquette",
+        "वैनायिकी विद्या"
       ],
       [
-        "वैजयिकीविद्या",
+        "वैजयिकी विद्या",
         "विजय प्राप्त करने की कला",
         "Vaijayiki-vidya",
-        "The art of victory"
+        "The art of victory",
+        "वैजयिकी विद्या"
+      ],
+      [
+        "व्यायामिकी",
+        "शारीरिक और मानसिक उन्नति",
+        "Vyayamiki",
+        "Physical and mental development",
+        "व्यायामिकी"
       ]
     ],
     "S": {

@@ -38,6 +38,14 @@ yarn-error.log*
 design/uploads/quiz-questions.json
 design/uploads/questions.json
 
+# Source material for the Vidya/Kala extraction, not deliverables: the scanned book, the page
+# splits, and the full-resolution figures cut out of them. Only vidya-kala.json, vk-map.json and the
+# optimised figures ship. These live outside public/ so the build cannot serve a copyrighted book —
+# .gitignore keeps them out of git, it does not keep them out of a deployment.
+/split/
+/po.pdf
+/figures-raw/
+
 # vercel
 .vercel
 

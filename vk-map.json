@@ -744,7 +744,7 @@
       "printed": 217,
       "romanised": "Nimitta-jnana",
       "note": "shubha/ashubha omens. No canonical entry corresponds; not in the Vatsyayana 64",
-      "headingHi": "not transcribed here — read the page"
+      "headingHi": "निमित्त ज्ञान"
     },
     {
       "bookNum": 64,
@@ -752,7 +752,7 @@
       "printed": 247,
       "romanised": "Vyayamiki",
       "note": "physical exercise and मल्ल विद्या. Sits at the position of canonical 64 वैजयिकीविद्या but is a different word; not forced",
-      "headingHi": "not transcribed here — read the page"
+      "headingHi": "व्यायामिकी"
     }
   ],
   "flags": [
@@ -781,6 +781,26 @@
     {
       "kind": "poppler",
       "detail": "Installed as a portable build after choco failed without elevation."
+    },
+    {
+      "kind": "numbering-drift",
+      "detail": "Settled by the full read. The drift starts at book 4, not book 44: book 4 आलेख्य is canonical 5, because the book has no section for canonical 4 नाट्य. It widens at three merged headings — book 40 मणिरागाकर ज्ञान covers canonical 41+42, book 44 covers 46+47, and (recorded then corrected) book 53 मानसी covers 55 alone — and narrows again where the book splits canonical 58 अभिधानकोषछंदोज्ञान across two numbered sections, book 54 अभिधानकोष and book 55 छन्दोज्ञान."
+    },
+    {
+      "kind": "section-order",
+      "detail": "The book also reorders, not just drifts. Through printed 225-237 its sections run canonical 55, 58, 58, 56, 57, 59, 60 — canonical 56 and 57 come after 58. Matching on number would be wrong here in a way no single offset corrects."
+    },
+    {
+      "kind": "unmatched",
+      "detail": "Three book sections have no canonical counterpart: book 35 तक्षकर्म (printed 185), book 49 निमित्त ज्ञान (printed 217) and book 64 व्यायामिकी (printed 247). The last was recorded here as sitting at the position of canonical 64 वैजयिकीविद्या; that is now resolved — वैजयिकी विद्या is the book's own section 63 on printed 245, so व्यायामिकी is an extra item beyond the canonical sixty-four, not a substitute for the last one."
+    },
+    {
+      "kind": "canonical-coverage",
+      "detail": "Of the 64 canonical kalas, 62 are treated by the book: 60 have their own keyed entry and 2 more (42 आकरज्ञान, 47 केशमार्जनकौशल) are inside merged headings. Two are absent outright — canonical 4 नाट्य and canonical 36 तर्ककर्म. All 14 vidyas are keyed."
+    },
+    {
+      "kind": "gloss-slip",
+      "detail": "For a human to decide, not corrected: lib/i18n glosses canonical 51 पुष्पशकटिकानिर्मिति as 'शकुन-अपशकुन का ज्ञान', but the book's पुष्पशकटिका section (printed 215) is about decorating flower carts, and the omen material is its unmatched निमित्त ज्ञान section (printed 217). The gloss appears to have slipped one entry."
     }
   ]
 }

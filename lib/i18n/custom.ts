@@ -48,6 +48,24 @@ export interface CustomStrings {
     title: string;
     body: string;
   };
+  /**
+   * /vidya-kala. The Devanagari for these four is NOT yet written: the values below are the
+   * English text in both locales, deliberately, because no Hindi source exists for them and
+   * inventing Devanagari for a government page is not something this build will do. Every other
+   * label on those pages is reused from lib/i18n. Supply Hindi here before launch.
+   */
+  vidyaKala: {
+    /** TODO(hi): search field label over the 64 kalas. */
+    searchLabel: string;
+    /** Supplied by the client in the change request: "विस्तार से देखें" / "Browse". */
+    browseAll: string;
+    /** Composed from Home_v5.S.tabVidyas + the conjunction + tabKalas — never retyped. */
+    countLine: string;
+    /** TODO(hi): shown where an entry has no English description and the Hindi is displayed. */
+    hindiOnly: string;
+    /** TODO(hi): label for the book heading shown as scholarly detail. */
+    bookHeadingLabel: string;
+  };
 }
 
 export const customHi: CustomStrings = {
@@ -87,6 +105,13 @@ export const customHi: CustomStrings = {
   notFound: {
     title: "यह पृष्ठ नहीं मिला",
     body: "संभव है कि पता गलत लिखा गया हो, अथवा यह पृष्ठ स्थानांतरित हो गया हो।",
+  },
+  vidyaKala: {
+    searchLabel: "Search the 64 Kalas",
+    browseAll: "विस्तार से देखें",
+    countLine: "14 विद्याएँ और 64 कलाएँ",
+    hindiOnly: "Hindi only",
+    bookHeadingLabel: "Book heading",
   },
 };
 
@@ -128,5 +153,12 @@ export const customEn: CustomStrings = {
   notFound: {
     title: "This page could not be found",
     body: "The address may be mistyped, or the page may have moved.",
+  },
+  vidyaKala: {
+    searchLabel: "Search the 64 Kalas",
+    browseAll: "Browse",
+    countLine: "14 Vidyas and 64 Kalas",
+    hindiOnly: "Hindi only",
+    bookHeadingLabel: "Book heading",
   },
 };

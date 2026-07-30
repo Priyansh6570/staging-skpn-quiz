@@ -94,6 +94,174 @@ const BOARD_CSS = `
 }
 `;
 
+// components/VidyaKalaIndex.tsx and components/VidyaKalaEntry.tsx — the /vidya-kala pages. No design
+// source: the export never had them. Two things here cannot be inline styles.
+//
+// First, long-form Devanagari. The measure is set by measurement, not by eye: at 19px this font
+// averages ~7.75px per Devanagari cluster, so a 66ch cap rendered 77 characters per line. 48ch
+// lands it at ~65, inside the 60-70 the brief asks for — `ch` is defined from the font's "0" and
+// badly overestimates Devanagari. line-height is 1.95 because matras above and conjuncts below need
+// more leading than Latin at the same size; the 15,922-character Samaveda entry is the case that
+// proves it, and 1.6 makes that page unreadable.
+//
+// Second, the taxonomy. The 4/6/4 grouping is the only real hierarchy in the content, so each group
+// gets its own accent from the logo palette and its own column count: the four Vedas sit widest,
+// the six Vedangas tighten to three, the other four return to the Veda rhythm. The accent is keyed
+// off data-vkg rather than a class per group so the markup stays in the export's attribute idiom.
+//
+// The plate grid is built on the figures' true 865x865 — aspect-ratio:1 on the frame means a
+// missing image collapses the frame to nothing instead of leaving a ragged hole, which is what
+// renders today while figures[].file is null throughout.
+const VIDYAKALA_CSS = `
+/* ---- home: the drifting name columns ---- */
+@keyframes vk-drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(0,-50%,0); } }
+[data-e~="vkmarquee"] {
+  position: relative; display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0,1fr));
+  height: 420px; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 16%, #000 84%, transparent);
+}
+[data-e~="vkcol"] { will-change: transform; animation: vk-drift linear infinite; }
+[data-e~="vkcol"][data-vkc="0"] { animation-duration: 58s; }
+[data-e~="vkcol"][data-vkc="1"] { animation-duration: 74s; animation-direction: reverse; }
+[data-e~="vkcol"][data-vkc="2"] { animation-duration: 66s; }
+[data-e~="vkname"] {
+  display: block; padding: 9px 0; font-family: 'Noto Serif Devanagari', serif;
+  font-size: 20px; line-height: 1.5; color: rgba(255,249,236,.44); white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+[data-e~="vkname"][data-vkhi="1"] { color: #FFF9EC; }
+/* Without motion the columns stand still, which is the intended fallback: the names are the point. */
+@media (prefers-reduced-motion: reduce) {
+  [data-e~="vkmarquee"] { height: 300px; }
+}
+@media (max-width: 900px) {
+  [data-e~="vkmarquee"] { grid-template-columns: repeat(2, minmax(0,1fr)); height: 330px; }
+}
+@media (max-width: 560px) {
+  [data-e~="vkmarquee"] { grid-template-columns: minmax(0,1fr); height: 260px; }
+  [data-e~="vkname"] { font-size: 18px; }
+}
+
+/* ---- tabs ---- */
+[data-e~="vktabs"] { display: inline-flex; gap: 6px; padding: 6px; border-radius: 999px; background: rgba(47,69,110,.07); }
+[data-e~="vktab"] {
+  display: inline-flex; align-items: center; text-decoration: none;
+  min-height: 46px; padding: 11px 26px; border: 0; border-radius: 999px; cursor: pointer;
+  font-family: 'Noto Serif Devanagari', serif; font-size: 17.5px; line-height: 1.4;
+  background: transparent; color: #46506A; transition: background .2s ease, color .2s ease;
+}
+[data-e~="vktab"][aria-selected="true"] { background: #2F456E; color: #FFF9EC; }
+[data-e~="vktab"]:focus-visible { outline: 2px solid #2F456E; outline-offset: 3px; }
+
+/* ---- vidya taxonomy: the one real hierarchy, so it gets the strongest structure ---- */
+[data-e~="vkband"] { position: relative; padding: 34px 0 38px; border-top: 1px solid rgba(47,69,110,.14); }
+[data-e~="vkband"]:first-child { border-top: 0; }
+[data-e~="vkband"][data-vkg="0"] { --vk-accent: #2F456E; }
+[data-e~="vkband"][data-vkg="1"] { --vk-accent: #48887B; }
+[data-e~="vkband"][data-vkg="2"] { --vk-accent: #A02B2D; }
+[data-e~="vkbandhead"] { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 20px; margin-bottom: 22px; }
+[data-e~="vkglabel"] { color: var(--vk-accent); }
+[data-e~="vkghost"] {
+  font-family: 'Noto Serif Devanagari', serif; font-size: clamp(56px, 8vw, 104px); line-height: .82;
+  color: var(--vk-accent); opacity: .13; font-variant-numeric: tabular-nums; user-select: none;
+}
+[data-e~="vkbandgrid"] { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+[data-e~="vkbandgrid"][data-vkg="1"] { grid-template-columns: repeat(3, minmax(0,1fr)); }
+[data-e~="vkvcard"] {
+  position: relative; display: block; padding: 22px 24px 24px; border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--vk-accent) 22%, transparent);
+  background: #FFFDF8; text-decoration: none; color: inherit; overflow: hidden;
+  transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+[data-e~="vkvcard"]::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--vk-accent);
+  opacity: .5; transition: opacity .2s ease;
+}
+[data-e~="vkvcard"]:hover { border-color: var(--vk-accent); transform: translateY(-3px); box-shadow: 0 14px 30px rgba(20,32,62,.09); }
+[data-e~="vkvcard"]:hover::before { opacity: 1; }
+[data-e~="vkvcard"]:focus-visible { outline: 2px solid var(--vk-accent); outline-offset: 3px; }
+
+/* ---- kala index: no images, so the numeral and the type do the work ---- */
+@keyframes vk-rise { from { opacity: 0; transform: translate3d(0,10px,0); } to { opacity: 1; transform: none; } }
+[data-e~="vkgrid"] { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0,1fr)); }
+[data-e~="vkkcard"] {
+  position: relative; display: block; padding: 18px 18px 20px; border-radius: 16px;
+  border: 1px solid rgba(47,69,110,.15); background: #FFFDF8; text-decoration: none; color: inherit;
+  animation: vk-rise .32s cubic-bezier(.22,.61,.36,1) both;
+  transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+[data-e~="vkkcard"]:hover { border-color: #2F456E; transform: translateY(-3px); box-shadow: 0 14px 30px rgba(20,32,62,.09); }
+[data-e~="vkkcard"]:focus-visible { outline: 2px solid #2F456E; outline-offset: 3px; }
+[data-e~="vknum"] {
+  display: block; margin-bottom: 10px; font-family: 'Noto Serif Devanagari', serif;
+  font-size: 15px; line-height: 1; color: #A02B2D; font-variant-numeric: tabular-nums; letter-spacing: .06em;
+}
+[data-e~="vkempty"] { padding: 44px 0; font-size: 17px; line-height: 1.8; color: #6B6558; }
+
+/* ---- entry: long-form reading ---- */
+[data-e~="vkread"] { display: grid; gap: 44px; grid-template-columns: minmax(0,1fr) 148px; align-items: start; }
+[data-e~="vkprose"] { max-width: 48ch; font-size: 19px; line-height: 1.95; }
+[data-e~="vkprose"] p { margin: 0 0 1.35em; text-wrap: pretty; }
+[data-e~="vkprose"] p:last-child { margin-bottom: 0; }
+[data-e~="vkpage"] { scroll-margin-top: 96px; }
+
+[data-e~="vkrail"] { position: sticky; top: 96px; display: flex; flex-direction: column; gap: 2px; }
+[data-e~="vkraillink"] {
+  display: block; padding: 7px 12px; border-left: 2px solid rgba(47,69,110,.16);
+  font-size: 14.5px; line-height: 1.6; color: #7A7466; text-decoration: none;
+  font-variant-numeric: tabular-nums; transition: color .18s ease, border-color .18s ease;
+}
+[data-e~="vkraillink"]:hover { color: #2F456E; border-left-color: #2F456E; }
+[data-e~="vkraillink"][aria-current="true"] { color: #2F456E; border-left-color: #2F456E; font-weight: 600; }
+
+[data-e~="vkprogress"] { position: fixed; left: 0; top: 0; right: 0; height: 3px; z-index: 60; background: transparent; }
+[data-e~="vkprogress"] span { display: block; height: 100%; background: linear-gradient(90deg, #2F456E, #48887B); transform-origin: 0 50%; }
+
+/* Shlokas carry these pages. Distinct face, distinct colour, never in the prose flow. */
+[data-e~="vkshloka"] { margin: 46px 0; padding: 30px 0 0; border: 0; text-align: center; }
+[data-e~="vkshloka"] q { quotes: none; }
+[data-e~="vkrule"] { display: block; width: 58px; height: 2px; margin: 0 auto 24px; border-radius: 2px; background: #A02B2D; opacity: .55; }
+[data-e~="vkverse"] {
+  display: block; margin: 0 auto; max-width: 30em;
+  font-family: 'Noto Serif Devanagari', serif; font-weight: 600;
+  font-size: clamp(21px, 2.6vw, 28px); line-height: 1.9; color: #2F456E;
+  white-space: pre-line; text-wrap: balance;
+}
+[data-e~="vkcite"] { display: block; margin-top: 16px; font-size: 14.5px; line-height: 1.7; color: #8A8474; font-variant-numeric: tabular-nums; }
+
+[data-e~="vknav"] { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+[data-e~="vknavlink"] {
+  display: block; padding: 20px 22px; border-radius: 16px; border: 1px solid rgba(47,69,110,.16);
+  background: #FFFDF8; text-decoration: none; color: inherit;
+  transition: border-color .2s ease, transform .2s ease;
+}
+[data-e~="vknavlink"]:hover { border-color: #2F456E; transform: translateY(-2px); }
+[data-e~="vknavlink"]:focus-visible { outline: 2px solid #2F456E; outline-offset: 2px; }
+
+@media (max-width: 1180px) {
+  [data-e~="vkgrid"] { grid-template-columns: repeat(3, minmax(0,1fr)); }
+}
+@media (max-width: 1080px) {
+  [data-e~="vkread"] { grid-template-columns: minmax(0,1fr); gap: 26px; }
+  [data-e~="vkrail"] { position: static; flex-direction: row; flex-wrap: wrap; gap: 6px; }
+  [data-e~="vkraillink"] { border-left: 0; border-bottom: 2px solid rgba(47,69,110,.16); }
+  [data-e~="vkraillink"][aria-current="true"] { border-bottom-color: #2F456E; }
+  [data-e~="vkbandgrid"][data-vkg="1"] { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 820px) {
+  [data-e~="vkgrid"] { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 620px) {
+  [data-e~="vkprose"] { font-size: 18px; line-height: 1.9; }
+  [data-e~="vkgrid"] { grid-template-columns: minmax(0,1fr); }
+  [data-e~="vkbandgrid"], [data-e~="vkbandgrid"][data-vkg="1"] { grid-template-columns: minmax(0,1fr); }
+  [data-e~="vknav"] { grid-template-columns: minmax(0,1fr); }
+  [data-e~="vkbandhead"] { grid-template-columns: minmax(0,1fr); }
+  [data-e~="vkghost"] { display: none; }
+}
+`;
+
 const slug = (file) => file.replace(/\.dc\.html$/, "").replace(/\s+/g, "-");
 
 // --- parse ------------------------------------------------------------------------------------
@@ -270,6 +438,9 @@ out += `${renderGroup(parseRules(AURA_CSS, "PageAura"), null)}\n`;
 
 out += `\n/* ---------- About trustee board (no design source) ---------- */\n`;
 out += `${renderGroup(parseRules(BOARD_CSS, "LeadershipBoard"), null)}\n`;
+
+out += `\n/* ---------- vidya-kala pages (no design source) ---------- */\n`;
+out += `${renderGroup(parseRules(VIDYAKALA_CSS, "VidyaKala"), null)}\n`;
 
 out += `\n/* ---------- reduced motion, last so it wins ---------- */\n`;
 out += `@media (prefers-reduced-motion: reduce) {\n  *, *::before, *::after {${REDUCED_MOTION_BODY}}\n}\n`;

@@ -1,0 +1,149 @@
+==============================================================================
+PRINTED-95 CROSS-CHECK  —  book's boxed 64 vs lib/i18n Home_v5.KALAS
+==============================================================================
+
+1. DISCRETENESS
+   items parsed              : 64
+   numbering                 : 1..64 ascending
+   duplicate numbers         : none
+   missing numbers 1-64      : none
+   lib/i18n KALAS length     : 64
+   => exactly 64 discrete    : YES
+   note: 1 item(s) name more than one art inside a single number:
+         44. उत्सादन-सम्वाहन-केशमर्दन कुशलता
+
+2. MATCH SUMMARY
+   exact (ignoring spaces/danda)         : 28
+   differ only by a trailing कला/विद्या  : 1
+   compound-boundary difference          : 6
+   spelling differs, candidate proposed  : 23
+   no canonical name resembles it        : 6
+
+3. COMPOUND-BOUNDARY DIFFERENCES
+   book 10. शयन रचना
+        book extends -> canonical 11 शयनरचन (Shayana-rachana)
+   book 14. माल्यग्रथन
+        book shortens -> canonical 15 माल्यग्रथनविकल्प (Malya-grathana)
+   book 44. उत्सादन-सम्वाहन-केशमर्दन कुशलता
+        book extends -> canonical 46 उत्सादन (Utsadana)
+   book 48. पुष्पशकटिका
+        book shortens -> canonical 51 पुष्पशकटिकानिर्मिति (Pushpa-shakatika)
+   book 53. मानसी
+        book shortens -> canonical 55 मानसीकाव्यक्रिया (Manasi-kavya-kriya)
+   book 54. अभिधान कोष
+        book shortens -> canonical 58 अभिधानकोषछंदोज्ञान (Abhidhana-kosha)
+
+4a. SPELLING DIFFERENCES — same word, differs only by spacing or a trailing suffix
+   book 21. कौचुमार                            lib/i18n 22 कौचुमारयोग                   Kauchumara-yoga
+   book 25. सूचीवान कर्म                       lib/i18n 26 सूचीवानकर्म                  Suchi-vana-karma
+   book 30. दुर्वाचक योग                       lib/i18n 31 दुर्वाचकयोग                  Durvachaka-yoga
+   book 38. रूप्यरत्न परीक्षा                  lib/i18n 39 रूप्यरत्नपरीक्षा             Rupya-ratna-pariksha
+   book 41. वृक्षायुर्वेद योग                  lib/i18n 43 वृक्षायुर्वेदयोग             Vrikshayurveda
+   book 43. शुकसारिका प्रलापन                  lib/i18n 45 शुकसारिकाप्रलापन             Shuka-sarika-pralapana
+   book 63. वैजयिकी विद्या                     lib/i18n 64 वैजयिकीविद्या                Vaijayiki-vidya
+
+4b. SPELLING DIFFERENCES — candidate proposed, NEEDS CONFIRMATION
+    These differ by one or more characters. The candidate is the closest unclaimed
+    canonical name; it is a proposal for the proofreader, not a decision.
+   book 32. नाटकाख्यायिकादर्शन                 lib/i18n 33 नाटिकाख्यायिकादर्शन          Natika-akhyayika   (differs 5%)
+   book 15. शेखरकापीड्योजन                     lib/i18n 16 शेखरकापीडयोजन                Shekharaka-yojana   (differs 7%)
+   book 62. वैनायिकी विद्या                    lib/i18n 63 वैनयिकीविद्या                Vainayiki-vidya   (differs 7%)
+   book 17. कर्णपत्राभंग                       lib/i18n 18 कर्णपत्रभंग                  Karnapatra-bhanga   (differs 8%)
+   book 58. वस्त्रागोपन                        lib/i18n 59 वस्त्रगोपन                   Vastra-gopana   (differs 9%)
+   book 59. द्यूतीविशेष                        lib/i18n 60 द्यूतविशेष                   Dyuta-vishesha   (differs 9%)
+   book  6. तण्डुलकुसुमवलिविकारः               lib/i18n  7 तण्डुलकुसुमबलिविकार          Tandula-kusuma   (differs 10%)
+   book 18. गंधायुक्ति                         lib/i18n 19 गंधयुक्ति                    Gandha-yukti   (differs 10%)
+   book 57. छलितयोग                            lib/i18n 57 छलितकयोग                     Chhalitaka-yoga   (differs 13%)
+   book 33. काव्य समयापूरण                     lib/i18n 34 काव्यसमस्यापूरण              Kavya-samasya-purana   (differs 13%)
+   book 12. उदकाघात                            lib/i18n 13 उदकघात                       Udaka-ghata   (differs 14%)
+   book 34. पद्रिकावेत्रवानविकल्प              lib/i18n 35 पट्टिकावेत्रवाणविकल्प        Pattika-vetra-vana   (differs 14%)
+   book 47. देशभाषा विज्ञान                    lib/i18n 50 देशभाषाज्ञान                 Desha-bhasha-jnana   (differs 14%)
+   book  8. दशनवसनाङ्राग                       lib/i18n  9 दशनवसनांगराग                 Dashana-vasana-raga   (differs 17%)
+   book 46. म्लेच्छितविकल्प                    lib/i18n 49 म्लेच्छितकलाविकल्प           Mlechchhita-kala   (differs 17%)
+   book 56. क्रियाकल्प                         lib/i18n 56 क्रियाविकल्प                 Kriya-vikalpa   (differs 17%)
+   book 40. मणिरागाकरज्ञान                     lib/i18n 41 मणिरागज्ञान                  Mani-raga-jnana   (differs 21%)
+   book 27. वीणा डमरूकवाद्यानि                 lib/i18n 28 वीणाडमरुकवाद्य               Vina-damaruka   (differs 24%)
+   book 16. नेपथ्य प्रयोग                      lib/i18n 17 नेपथ्ययोग                    Nepathya-yoga   (differs 25%)
+   book 35. तक्षकर्म                           lib/i18n 36 तर्ककर्म                     Tarka-karma   (differs 25%)
+   book 52. संपाठ्य                            lib/i18n 54 सम्पाठ्य                     Sampathya   (differs 25%)
+   book 23. विचित्रशाकभूषभक्ष्याविकार क्रिया   lib/i18n 24 विचित्रशाकयूषभक्ष्यविकार     Vichitra-bhakshya   (differs 26%)
+   book 20. ऐन्द्रयजाल                         lib/i18n 21 ऐंद्रजाल                     Aindrajala   (differs 30%)
+
+5. IN THE BOOK, NOTHING IN lib/i18n RESEMBLES IT
+   book 13. चित्राश्ययोगा                      closest was 14 चित्रयोग at 38% difference
+   book 49. निमित्तज्ञान                       closest was 42 आकरज्ञान at 58% difference
+   book 50. यन्त्रमात्रिका                     closest was 52 यंत्रमातृका at 36% difference
+   book 55. छन्दोज्ञान                         closest was 42 आकरज्ञान at 50% difference
+   book 61. बालकड़नक                           closest was 62 बालक्रीडनक at 40% difference
+   book 64. व्यायामिकी                         closest was 52 यंत्रमातृका at 82% difference
+
+6. IN lib/i18n, NOT MATCHED BY ANY BOOK ITEM
+   lib/i18n  4 नाट्य                          Natya
+   lib/i18n 14 चित्रयोग                       Chitra-yoga
+   lib/i18n 42 आकरज्ञान                       Akara-jnana
+   lib/i18n 47 केशमार्जनकौशल                  Kesha-marjana
+   lib/i18n 52 यंत्रमातृका                    Yantra-matrika
+   lib/i18n 62 बालक्रीडनक                     Balakridanaka
+
+7. NUMBERING DRIFT (book number vs lib/i18n index, matched items only)
+   book  4 -> lib/i18n  5   Alekhya
+   book  5 -> lib/i18n  6   Visheshakachchhedya
+   book  6 -> lib/i18n  7   Tandula-kusuma
+   book  7 -> lib/i18n  8   Pushpastarana
+   book  8 -> lib/i18n  9   Dashana-vasana-raga
+   book  9 -> lib/i18n 10   Manibhumika-karma
+   book 11 -> lib/i18n 12   Udaka-vadya
+   book 12 -> lib/i18n 13   Udaka-ghata
+   book 15 -> lib/i18n 16   Shekharaka-yojana
+   book 16 -> lib/i18n 17   Nepathya-yoga
+   book 17 -> lib/i18n 18   Karnapatra-bhanga
+   book 18 -> lib/i18n 19   Gandha-yukti
+   book 19 -> lib/i18n 20   Bhushana-yojana
+   book 20 -> lib/i18n 21   Aindrajala
+   book 21 -> lib/i18n 22   Kauchumara-yoga
+   book 22 -> lib/i18n 23   Hasta-laghava
+   book 23 -> lib/i18n 24   Vichitra-bhakshya
+   book 24 -> lib/i18n 25   Panaka-rasa-yojana
+   book 25 -> lib/i18n 26   Suchi-vana-karma
+   book 26 -> lib/i18n 27   Sutra-krida
+   book 27 -> lib/i18n 28   Vina-damaruka
+   book 28 -> lib/i18n 29   Prahelika
+   book 29 -> lib/i18n 30   Pratimala
+   book 30 -> lib/i18n 31   Durvachaka-yoga
+   book 31 -> lib/i18n 32   Pustaka-vachana
+   book 32 -> lib/i18n 33   Natika-akhyayika
+   book 33 -> lib/i18n 34   Kavya-samasya-purana
+   book 34 -> lib/i18n 35   Pattika-vetra-vana
+   book 35 -> lib/i18n 36   Tarka-karma
+   book 36 -> lib/i18n 37   Takshana
+   book 37 -> lib/i18n 38   Vastu-vidya
+   book 38 -> lib/i18n 39   Rupya-ratna-pariksha
+   book 39 -> lib/i18n 40   Dhatu-vada
+   book 40 -> lib/i18n 41   Mani-raga-jnana
+   book 41 -> lib/i18n 43   Vrikshayurveda
+   book 42 -> lib/i18n 44   Mesha-kukkuta-vidhi
+   book 43 -> lib/i18n 45   Shuka-sarika-pralapana
+   book 45 -> lib/i18n 48   Akshara-mushtika
+   book 46 -> lib/i18n 49   Mlechchhita-kala
+   book 47 -> lib/i18n 50   Desha-bhasha-jnana
+   book 51 -> lib/i18n 53   Dharana-matrika
+   book 52 -> lib/i18n 54   Sampathya
+   book 58 -> lib/i18n 59   Vastra-gopana
+   book 59 -> lib/i18n 60   Dyuta-vishesha
+   book 60 -> lib/i18n 61   Akarsha-krida
+   book 62 -> lib/i18n 63   Vainayiki-vidya
+   book 63 -> lib/i18n 64   Vaijayiki-vidya
+   items whose number differs: 47 of 52 matched
+
+8. CAVEATS ON SECTIONS 5 AND 6
+   The 34% similarity cut-off is arbitrary. Where an item in section 5 sits next to an
+   unclaimed lib/i18n entry of almost the same name, it is very likely the same art and
+   only just failed the cut-off:
+     book 13 चित्राश्ययोगा  ~  lib/i18n 14 चित्रयोग (Chitra-yoga) at 38%
+     book 50 यन्त्रमात्रिका  ~  lib/i18n 52 यंत्रमातृका (Yantra-matrika) at 36%
+     book 61 बालकड़नक  ~  lib/i18n 62 बालक्रीडनक (Balakridanaka) at 40%
+   Matching is greedy, so where the book SPLITS one canonical compound into two numbers
+   the first number claims the canonical entry and the second falls into section 5.
+   Cross-read section 5 against section 3 before concluding anything is missing.
+
+   lib/i18n is unchanged by this script.

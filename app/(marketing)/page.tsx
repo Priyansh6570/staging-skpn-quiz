@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import CtaBox from "@/components/CtaBox";
 import Leadership from "@/components/Leadership";
 import PageAura from "@/components/PageAura";
+import VidyaKalaTeaser from "@/components/VidyaKalaTeaser";
 import { useCompetitionOpen, useLang, useSession } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
 
@@ -27,27 +28,12 @@ export default function HomePage() {
   const competitionOpen = useCompetitionOpen();
   const s = strings(lang).Home_v5.S;
   const c = custom(lang);
-  const inline = strings(lang).Home_v5.inline;
-  const VIDYAS = strings(lang).Home_v5.VIDYAS;
-  const KALAS = strings(lang).Home_v5.KALAS;
 
-  const [tab, setTab] = useState<"vidyas" | "kalas">("vidyas");
-  const [index, setIndex] = useState(0);
-  const [tick, setTick] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [sylP, setSylP] = useState(0);
-  const [sylRatio, setSylRatio] = useState(0.35);
-  const sylRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLElement | null>(null);
 
   const signedIn = session.signedIn;
   const attempts = session.attemptCount;
   const hasCerts = session.hasCertificates || attempts > 0;
-  const hi = lang === "hi";
-  const isVidyas = tab === "vidyas";
-  const list = isVidyas ? VIDYAS : KALAS;
-  const current = index % list.length;
-  const cur = list[current];
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -72,30 +58,6 @@ export default function HomePage() {
     };
   }, []);
 
-  useEffect(() => {
-    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = setInterval(() => {
-      setIndex((i) => (i + 1) % list.length);
-      setTick((n) => n + 1);
-    }, 3800);
-    return () => clearInterval(timer);
-  }, [paused, list.length]);
-
-  const onSylScroll = () => {
-    const el = sylRef.current;
-    if (!el) return;
-    const max = Math.max(1, el.scrollWidth - el.clientWidth);
-    setSylP(Math.min(1, Math.max(0, el.scrollLeft / max)));
-    setSylRatio(Math.min(1, el.clientWidth / Math.max(1, el.scrollWidth)));
-  };
-  const nudgeSyl = (dir: number) => {
-    const el = sylRef.current;
-    if (el) el.scrollBy({ left: dir * Math.max(208, el.clientWidth * 0.8), behavior: "smooth" });
-  };
-  const pick = (i: number) => { setIndex(i); setPaused(true); setTick((n) => n + 1); };
-
-  const groupOf = (i: number) =>
-    (isVidyas ? inline[0] : inline[1]) + String(i + 1).padStart(2, "0");
 
   const t = { ...s, ctaPrimary: signedIn ? (attempts > 0 ? s.ctaCert : s.ctaTake) : s.ctaPrimaryOut };
 
@@ -120,32 +82,6 @@ export default function HomePage() {
     isCert: STEP_ICONS[i] === "cert",
   }));
   const dates = s.dates.map((d, i) => ({ ...d, ...DATE_STYLE[i % 3], step: s.dateSteps[i] }));
-  const feature = { group: groupOf(current), name: hi ? cur[0] : cur[2], meaning: hi ? cur[1] : cur[3] };
-  const featureAnim = tick % 2 === 0 ? "v5-inA" : "v5-inB";
-  const items = list.map((it, i) => ({
-    name: hi ? it[0] : it[2],
-    n: String(i + 1).padStart(2, "0"),
-    select: () => pick(i),
-    bg: i === current ? "rgba(232,193,115,.16)" : "rgba(255,255,255,.045)",
-    fg: i === current ? "#FFF9EC" : "#F2EEE4",
-    border: i === current ? "#E8C173" : "rgba(232,193,115,.22)",
-    numFg: i === current ? "#E8C173" : "rgba(232,193,115,.55)",
-  }));
-  const vidyaSelected = isVidyas;
-  const kalaSelected = !isVidyas;
-  const vidyaBg = isVidyas ? "#E8C173" : "transparent";
-  const vidyaFg = isVidyas ? "#1E1503" : "#E8DFCE";
-  const vidyaBorder = isVidyas ? "#E8C173" : "rgba(232,193,115,.4)";
-  const kalaBg = isVidyas ? "transparent" : "#E8C173";
-  const kalaFg = isVidyas ? "#E8DFCE" : "#1E1503";
-  const kalaBorder = isVidyas ? "rgba(232,193,115,.4)" : "#E8C173";
-  const showVidyas = () => { setTab("vidyas"); setIndex(0); setPaused(true); setTick((n) => n + 1); };
-  const showKalas = () => { setTab("kalas"); setIndex(0); setPaused(true); setTick((n) => n + 1); };
-  const sylThumbW = `${Math.max(12, sylRatio * 100).toFixed(1)}%`;
-  const sylThumbX = `${(sylP * (100 / Math.max(0.12, sylRatio) - 100)).toFixed(1)}%`;
-  const sylCount = `${current + 1} / ${list.length}`;
-  const sylPrev = () => nudgeSyl(-1);
-  const sylNext = () => nudgeSyl(1);
   const primaryHref = signedIn ? (attempts > 0 ? "/certificates" : "/quiz") : "/register";
   return (
     <div data-page="Home-v5" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip", isolation: "isolate" }}>
@@ -220,55 +156,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section style={{ position: "relative", overflow: "hidden", background: "#070B1E" }}>
-        <img src="/assets/cosmic-spiral.png" alt="" width="924" height="540" loading="lazy" decoding="async" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 38%", opacity: ".5" }} />
-        <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "radial-gradient(80% 60% at 50% 22%, rgba(7,11,30,.62) 0%, rgba(7,11,30,.9) 58%, rgba(4,7,18,.98) 100%)" }}></div>
-        <div aria-hidden="true" style={{ position: "absolute", left: "50%", top: "-18%", width: "720px", height: "720px", transform: "translateX(-50%)", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.16) 0%,rgba(232,193,115,0) 66%)", animation: "v5-glow 11s ease-in-out infinite" }}></div>
-
-        <div data-e="pad section" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "92px 30px 96px" }}>
-          <div data-reveal style={{ maxWidth: "64ch", margin: "0 0 34px" }}>
-            <p style={{ margin: "0 0 12px", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "17px", letterSpacing: ".01em", color: "#E8C173", lineHeight: "1.9" }}>{t.sylKicker}</p>
-            <h2 style={{ margin: "0 0 14px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(27px,3.6vw,42px)", lineHeight: "1.3", color: "#FFF9EC", textWrap: "pretty" }}>{t.sylTitle}</h2>
-            <p style={{ margin: "0", fontSize: "17.5px", lineHeight: "1.9", color: "#E9E4D8" }}>{t.sylLede}</p>
-          </div>
-
-          <div data-reveal role="tablist" style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginBottom: "24px" }}>
-            <button type="button" role="tab" aria-selected={vidyaSelected} onClick={showVidyas} style={{ minHeight: "50px", padding: "13px 26px", border: `1px solid ${vidyaBorder}`, borderRadius: "999px", background: `${vidyaBg}`, color: `${vidyaFg}`, cursor: "pointer", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18px", lineHeight: "1.5", transition: "background .2s ease,color .2s ease,border-color .2s ease" }}>{t.tabVidyas}</button>
-            <button type="button" role="tab" aria-selected={kalaSelected} onClick={showKalas} style={{ minHeight: "50px", padding: "13px 26px", border: `1px solid ${kalaBorder}`, borderRadius: "999px", background: `${kalaBg}`, color: `${kalaFg}`, cursor: "pointer", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18px", lineHeight: "1.5", transition: "background .2s ease,color .2s ease,border-color .2s ease" }}>{t.tabKalas}</button>
-          </div>
-
-          <div data-reveal style={{ position: "relative", overflow: "hidden", borderRadius: "24px", border: "1px solid rgba(232,193,115,.28)", background: "linear-gradient(140deg, rgba(24,34,70,.78) 0%, rgba(8,12,28,.86) 100%)", padding: "30px 32px", marginBottom: "22px", minHeight: "150px", display: "flex", flexDirection: "column", gap: "10px", animation: `${featureAnim} .45s cubic-bezier(.22,.61,.36,1)` }}>
-            <div aria-hidden="true" style={{ position: "absolute", right: "-60px", top: "-60px", width: "260px", height: "260px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%)" }}></div>
-            <span style={{ position: "relative", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "16.5px", letterSpacing: ".01em", color: "#E8C173", lineHeight: "1.9" }}>{feature.group}</span>
-            <span style={{ position: "relative", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(28px,4vw,44px)", lineHeight: "1.22", color: "#FFF9EC" }}>{feature.name}</span>
-            <span style={{ position: "relative", fontSize: "18px", lineHeight: "1.8", color: "#E9E4D8", maxWidth: "52ch" }}>{feature.meaning}</span>
-          </div>
-
-          <div data-e="sylrail" ref={sylRef} onScroll={onSylScroll} style={{ display: "grid", gridAutoFlow: "column", gridTemplateRows: "repeat(2,minmax(0,1fr))", gridAutoColumns: "198px", gap: "10px", overflowX: "auto", scrollSnapType: "x proximity", padding: "2px 2px 16px", overscrollBehaviorX: "contain" }}>
-            {items.map((it, itIndex) => (
-              <button key={itIndex} type="button" onClick={it.select} onMouseEnter={it.select} onFocus={it.select} style={{ scrollSnapAlign: "start", position: "relative", minHeight: "68px", padding: "12px 14px 12px 42px", textAlign: "left", cursor: "pointer", fontFamily: "'Noto Sans Devanagari',sans-serif", fontSize: "15.5px", lineHeight: "1.55", border: `1px solid ${it.border}`, borderRadius: "14px", background: `${it.bg}`, color: `${it.fg}`, transition: "border-color .18s ease,background .18s ease,transform .18s ease" }}>
-              <span aria-hidden="true" style={{ position: "absolute", left: "12px", top: "12px", fontSize: "11.5px", lineHeight: "1.6", color: `${it.numFg}`, fontVariantNumeric: "tabular-nums" }}>{it.n}</span>
-              {it.name}
-            </button>
-            ))}
-          </div>
-
-          <div data-e="sylbar" style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button type="button" onClick={sylPrev} aria-label={t.prevLabel} style={{ width: "48px", height: "48px", border: "1px solid rgba(232,193,115,.4)", borderRadius: "50%", background: "rgba(255,255,255,.05)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .18s ease,border-color .18s ease" }}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E8C173" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" style={{ display: "block" }}><path d="M14.5 5.5 8 12l6.5 6.5"></path></svg>
-              </button>
-              <button type="button" onClick={sylNext} aria-label={t.nextLabel} style={{ width: "48px", height: "48px", border: "1px solid rgba(232,193,115,.4)", borderRadius: "50%", background: "rgba(255,255,255,.05)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background .18s ease,border-color .18s ease" }}>
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E8C173" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" style={{ display: "block" }}><path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg>
-              </button>
-            </div>
-            <div aria-hidden="true" style={{ flex: "1 1 160px", height: "3px", borderRadius: "3px", background: "rgba(255,249,236,.14)", overflow: "hidden" }}>
-              <span style={{ display: "block", height: "100%", borderRadius: "3px", background: "linear-gradient(90deg,rgba(232,193,115,.35),#E8C173)", width: `${sylThumbW}`, transform: `translateX(${sylThumbX})`, transition: "width .2s ease" }}></span>
-            </div>
-            <span style={{ fontSize: "14.5px", lineHeight: "1.7", color: "#DBD5C7", fontVariantNumeric: "tabular-nums" }}>{sylCount}</span>
-          </div>
-        </div>
-      </section>
+      <VidyaKalaTeaser lang={lang} />
 
       <Leadership lang={lang} />
 
