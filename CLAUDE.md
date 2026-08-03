@@ -51,19 +51,34 @@ Every time Devanagari is retyped, conjuncts and matras shift in ways that surviv
 
 ## Auth model — decided, do not redesign
 
-Login is **mobile number only**. No OTP, no PIN, no password, no Google.
+Registration and sign-in are both **SMS OTP on the mobile number**. No PIN, no password, no Google.
 
 - `mobile` is the account identifier: `^[6-9]\d{9}$`, unique index.
-- Login looks up the account and issues a session. There is no credential to verify.
-- Sessions: httpOnly, Secure, SameSite=Lax cookie. Never `localStorage`.
+- `POST /api/otp/send` mints the code, `POST /api/otp/verify` is the only thing that issues a
+  student session. There is no other route to one — a route that hands out a session for a bare
+  mobile number is the hole this closes, not a convenience to be added back.
+- Sessions: httpOnly, Secure, SameSite=Lax cookie. Never `localStorage`. 7 days, so a returning
+  student does not trigger a second SMS.
+- Registration additionally requires the short-lived `skpn_mobile_verified` proof, bound to the one
+  number it was issued for and spent on use.
 
-Because there is no credential, these are mandatory and not optional:
+Mandatory, not optional:
 
-- Login rate-limited per IP, aggressively.
-- Every login attempt written to `authEvents` with mobile, IP, user-agent, timestamp, outcome.
-- No endpoint confirms whether a mobile number is registered, except `POST /api/register/check-mobile`, which is throttled per IP and per session and returns a boolean only.
+- Sends bounded per mobile, per IP, and by a global daily circuit breaker. Every send costs a
+  government trust real money; credit drain is the threat model, not just abuse.
+- Every send and verify written to `authEvents` with mobile, IP, user-agent, timestamp, outcome and
+  the provider's status.
+- The OTP is stored only as `HMAC-SHA256(code, OTP_PEPPER)` and is never returned by any endpoint in
+  any environment. The one exception is `POST /api/admin/otp/issue`, the operator fallback, which is
+  operator/owner only and audit logged on every use.
+- No endpoint confirms whether a mobile number is registered, except `POST /api/register/check-mobile`, which is throttled per IP and per session and returns a boolean only, and `/api/otp/send`, which answers the same question rather than spending a credit on a number that cannot use the code.
 
-Do not add a second factor. Do not propose one. The decision is made.
+**Superseded, 3 August 2026.** This section previously read "login is mobile number only, no OTP,
+do not add a second factor". That decision was made while DLT approval was pending and there was no
+way to send an SMS. DLT is approved (entity Shri Krishna Pathey Nyas, header SKPNYS) and the
+decision is reversed. Do not reinstate the credential-free login path.
+
+Session revocation is unchanged: see below.
 
 Session revocation is a `sessionVersion` integer on the user document, embedded in the cookie payload and compared on every authenticated route including `/api/session`. Sign-out increments it, invalidating every outstanding cookie. Cookie TTL is 7 days.
 
@@ -89,9 +104,12 @@ These exist. Import them. Do not write a second version.
 ```
 lib/db.ts            cached MongoClient
 lib/session.ts       session read/write, ownership helpers
+lib/otp.ts           code generation, hashing, send quotas, MSG91
+lib/mobileProof.ts   the verified-mobile cookie registration requires
 lib/i18n/*           all user-facing strings
 lib/models/*         collections, types, indexes
 components/Site*.tsx SiteHeader, SiteFooter, CtaBox
+components/OtpStep.tsx  the code screen, shared by login and register
 app/globals.css      extracted verbatim, frozen
 ```
 

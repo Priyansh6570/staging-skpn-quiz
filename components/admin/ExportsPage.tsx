@@ -77,7 +77,7 @@ export default function ExportsPage() {
       {error ? <ErrorState message={error} /> : null}
 
       <div className="adm-grid adm-g2" style={{ marginBottom: 14 }}>
-        <Card title="Counts" sub="Aggregates only — no personal data. Safe to circulate.">
+        <Card title="Counts" sub="Aggregates only, no personal data. Safe to circulate.">
           <p style={{ margin: "0 0 14px", fontSize: 13.5, color: "var(--ink-2)" }}>
             District, category, gender, score distribution and daily registrations. No password needed.
           </p>
@@ -98,7 +98,7 @@ export default function ExportsPage() {
       </div>
 
       {secret ? (
-        <Card title="Workbook password — shown once" sub={`${inr(secret.rowCount)} participants${secret.truncated ? " · truncated at the synchronous row limit, see DEFERRED.md" : ""}`}>
+        <Card title="Workbook password, shown once" sub={`${inr(secret.rowCount)} participants${secret.truncated ? " · truncated at the synchronous row limit, see DEFERRED.md" : ""}`}>
           <p className="adm-secret">{secret.password}</p>
           <p style={{ margin: "10px 0 0", fontSize: 12.5, color: "var(--ink-3)" }}>
             Store it now. It is not recoverable, is not in the download URL, and is not in the audit log.

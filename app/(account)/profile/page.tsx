@@ -24,7 +24,7 @@ interface Me {
   attempt: { score: number | null; submittedAt: string | null; timeTakenSeconds: number | null } | null;
 }
 
-const DASH = "—";
+const DASH = "-";
 const mmss = (sec: number) => `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
 
 export default function ProfilePage() {

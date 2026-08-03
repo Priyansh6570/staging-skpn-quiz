@@ -7,38 +7,27 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import DobWheel, { WHEEL_ITEM } from "@/components/DobWheel";
+import OtpStep from "@/components/OtpStep";
 import { useLang, useSession, useShell } from "@/components/AppProviders";
 import { custom, strings, en } from "@/lib/i18n";
 import { CATEGORY_KEYS, GENDER_KEYS } from "@/lib/registration";
-import { codeFromResponse } from "@/lib/errors";
+import { codeFromResponse, errorMessage, type ErrorCode } from "@/lib/errors";
 
-const ITEM = 44;
 const TODAY = Date.now();
 const YEARS = Array.from({ length: 2013 - 1900 + 1 }, (_, i) => 1900 + i);
 const daysInMonth = (m: number, y: number) =>
   [31, (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1];
 
-const wheelStyle = (d: number) => {
-  const a = Math.abs(d);
-  if (a === 0) return { size: "26px", weight: "600", ink: "#14203E", op: "1" };
-  if (a === 1) return { size: "20px", weight: "400", ink: "#161C2E", op: ".9" };
-  if (a === 2) return { size: "18px", weight: "400", ink: "#161C2E", op: ".6" };
-  return { size: "16px", weight: "400", ink: "#161C2E", op: ".38" };
-};
+const wait = (ms: number) => new Promise((done) => setTimeout(done, ms));
 
-const windowRows = (center: number, count: number, labelAt: (i: number) => string, pickAt: (i: number) => void) => {
-  const rows = [];
-  for (let d = -3; d <= 3; d++) {
-    const i = center + d;
-    const inRange = i >= 0 && i < count;
-    rows.push({
-      label: inRange ? labelAt(i) : "",
-      pick: inRange ? () => pickAt(i) : () => {},
-      ...(inRange ? wheelStyle(d) : { size: "16px", weight: "400", ink: "#161C2E", op: "0" }),
-    });
-  }
-  return rows;
-};
+/** Clears the sticky header, so the top of the step lands under it rather than behind it. */
+const HEADER_CLEARANCE = 90;
+
+/** Six rows at most, so the list reads as a list and not as a wall. */
+const PICKER_ROW = 58;
+const PICKER_GAP = 4;
+const PICKER_VISIBLE = 6;
 
 type CategoryKey = (typeof CATEGORY_KEYS)[number];
 
@@ -46,9 +35,10 @@ export default function RegisterPage() {
   const router = useRouter();
   const { lang, toggle: toggleLang } = useLang();
   const { session, refresh } = useSession();
-  const { showError, showMessage } = useShell();
+  const { showMessage } = useShell();
   const t = strings(lang).Register.S;
   const c = custom(lang).register;
+  const cOtp = custom(lang).otp;
   const DISTRICTS = strings(lang).Register.DISTRICTS;
   const LEVELS = strings(lang).Register.LEVELS;
   const MONTHS = strings(lang).Register.MONTHS;
@@ -64,6 +54,7 @@ export default function RegisterPage() {
   });
   const [mobileTouched, setMobileTouched] = useState(false);
   const [mobileTaken, setMobileTaken] = useState(false);
+  const [emailTaken, setEmailTaken] = useState(false);
   const [dob, setDob] = useState({ y: 0, m: 0, d: 0 });
   const [pick, setPick] = useState({ y: 2005, m: 6, d: 15 });
   const [dobOpen, setDobOpen] = useState(false);
@@ -71,11 +62,16 @@ export default function RegisterPage() {
   const [pickerQuery, setPickerQuery] = useState("");
   const [rulesAccepted, setRulesAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  // 0 while the number is still being typed. Bumping it hands the number to the code step, which
+  // does the sending; bumping it again after a "change number" asks for a fresh code.
+  const [sendToken, setSendToken] = useState(0);
+  const [mobileVerified, setMobileVerified] = useState(false);
+  const [checkingMobile, setCheckingMobile] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [pendingStep, setPendingStep] = useState<number | null>(null);
+  const [dobResetKey, setDobResetKey] = useState(0);
   const scrollYRef = useRef(0);
-  const accRef = useRef(0);
-  const dragRef = useRef<{ y: number | null; i: number }>({ y: null, i: 0 });
+  const formRef = useRef<HTMLDivElement>(null);
 
   const set = (k: keyof typeof form, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -112,6 +108,7 @@ export default function RegisterPage() {
 
   const emailProblem = () => {
     const v = form.email.trim();
+    if (emailTaken) return "taken";
     if (!v) return "";
     if (/(gmial\.com|gmail\.con|gmail\.co$|yahoo\.co$)/i.test(v)) return "typo";
     if (!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v)) return "invalid";
@@ -171,27 +168,11 @@ export default function RegisterPage() {
   const mp = mobileProblem();
   const dimPick = daysInMonth(pick.m, pick.y);
   const si = slideIndex % t.slides.length;
-  const ok = canAdvance();
+  const awaitingCode = sendToken > 0;
+  const busy = checkingMobile || submitting || pendingStep !== null;
+  const ok = canAdvance() && !busy;
   const mobileMsg = mobileTouched && mp === "invalid" ? t.mobileInvalid : (mobileTouched && mp === "duplicate" ? t.mobileDuplicate : "");
   const districtRow = DISTRICTS.find((_, i) => en.Register.DISTRICTS[i][0] === form.district);
-
-  const wheelStep = (e: React.WheelEvent, key: "y" | "m" | "d", count: number, toValue: (i: number) => number, current: number) => {
-    accRef.current += e.deltaY;
-    if (Math.abs(accRef.current / 40) < 1) return;
-    const dir = accRef.current > 0 ? 1 : -1;
-    accRef.current = 0;
-    setPick((p) => ({ ...p, [key]: toValue(Math.max(0, Math.min(count - 1, current + dir))) }));
-  };
-  const dragStart = (e: React.TouchEvent | React.MouseEvent, current: number) => {
-    const p = "touches" in e ? e.touches[0] : e;
-    dragRef.current = { y: p.clientY, i: current };
-  };
-  const dragMove = (e: React.TouchEvent | React.MouseEvent, key: "y" | "m" | "d", count: number, toValue: (i: number) => number) => {
-    if (dragRef.current.y == null) return;
-    const p = "touches" in e ? e.touches[0] : e;
-    const delta = Math.round((dragRef.current.y - p.clientY) / ITEM);
-    setPick((prev) => ({ ...prev, [key]: toValue(Math.max(0, Math.min(count - 1, dragRef.current.i + delta))) }));
-  };
 
   const pickerOptions = (() => {
     if (picker === "district") {
@@ -221,40 +202,117 @@ export default function RegisterPage() {
     setPickerQuery("");
   };
 
+  /**
+   * A step is not swapped in under the reader's eyes. The loader marks the change, and the form is
+   * pulled back to its own top afterwards — a four-step form scrolled to the bottom otherwise opens
+   * the next step halfway down it, which reads as nothing having happened.
+   */
+  const scrollFormToTop = () => {
+    const el = formRef.current;
+    if (!el) return;
+    // The reduced-motion rule in globals.css kills CSS transitions but cannot reach a scroll asked
+    // for from script, so this one checks for itself.
+    const smooth = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const top = el.getBoundingClientRect().top + window.scrollY - HEADER_CLEARANCE;
+    window.scrollTo({ top: Math.max(0, top), behavior: smooth ? "smooth" : "auto" });
+  };
+
+  const goToStep = async (n: number) => {
+    setPendingStep(n);
+    await wait(1000);
+    setStep(n);
+    setPendingStep(null);
+    requestAnimationFrame(scrollFormToTop);
+  };
+
+  /**
+   * The code is asked for at step 1, before a single further question. A student who cannot use
+   * this number finds out here rather than after filling in an address, a school and a declaration,
+   * and no credit is spent on a number the duplicate check has already refused.
+   */
+  const onCodeVerified = async () => {
+    setMobileVerified(true);
+    await goToStep(1);
+  };
+
+  const onCodeRejected = (code: ErrorCode) => {
+    setSendToken(0);
+    setMobileTaken(code === "mobile_registered");
+    setMobileTouched(true);
+    if (code !== "mobile_registered") showMessage(errorMessage(lang, code).message);
+  };
+
+  /** Back to the editable field. The next Continue asks for a fresh code, not the old one again. */
+  const changeNumber = () => {
+    setSendToken(0);
+    setMobileVerified(false);
+  };
+
   const submit = async () => {
     setSubmitting(true);
-    const res = await fetch("/api/register", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({
-        mobile: form.mobile,
-        email: form.email.trim(),
-        fullName: form.name.trim(),
-        gender: GENDER_KEYS[t.genders.indexOf(form.gender)] ?? "other",
-        dateOfBirth: `${dob.y}-${String(dob.m).padStart(2, "0")}-${String(dob.d).padStart(2, "0")}`,
-        address: { line: form.address.trim(), cityVillage: form.city.trim(), district: form.district, pincode: form.pin },
-        category: form.category,
-        educationLevel: form.level,
-        institutionName: form.institution.trim(),
-        competitiveExam: form.exam || null,
-        guardianName: needsGuardian ? form.guardianName.trim() : "",
-        rulesAccepted: true,
-        privacyAccepted: true,
-      }),
-    }).catch(() => null);
+    const [res] = await Promise.all([
+      fetch("/api/register", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          mobile: form.mobile,
+          email: form.email.trim(),
+          fullName: form.name.trim(),
+          gender: GENDER_KEYS[t.genders.indexOf(form.gender)] ?? "other",
+          dateOfBirth: `${dob.y}-${String(dob.m).padStart(2, "0")}-${String(dob.d).padStart(2, "0")}`,
+          address: { line: form.address.trim(), cityVillage: form.city.trim(), district: form.district, pincode: form.pin },
+          category: form.category,
+          educationLevel: form.level,
+          institutionName: form.institution.trim(),
+          competitiveExam: form.exam || null,
+          guardianName: needsGuardian ? form.guardianName.trim() : "",
+          rulesAccepted: true,
+          privacyAccepted: true,
+        }),
+      }).catch(() => null),
+      wait(2000),
+    ]);
 
     if (!res || !res.ok) {
+      const code = res ? codeFromResponse(res.status, await res.json().catch(() => null)) : "network";
       setSubmitting(false);
-      showError(res ? codeFromResponse(res.status, await res.json().catch(() => null)) : "network");
+      // Each refusal belongs at the field it is about. Sending someone back to the mobile step
+      // because a different account holds their email address is the same mistake in a new place.
+      if (code === "mobile_registered") {
+        setSendToken(0);
+        setMobileVerified(false);
+        setMobileTaken(true);
+        setMobileTouched(true);
+        void goToStep(0);
+        return;
+      }
+      if (code === "email_taken") {
+        setEmailTaken(true);
+        void goToStep(1);
+        return;
+      }
+      // The proof of ownership outlived neither the form nor the student's patience. There is no
+      // way forward from here but a fresh code, so the number goes back to being unverified.
+      if (code === "verification_expired") {
+        setSendToken(0);
+        setMobileVerified(false);
+        showMessage(errorMessage(lang, code).message);
+        void goToStep(0);
+        return;
+      }
+      showMessage(errorMessage(lang, code).message);
       return;
     }
-    setSubmitted(true);
+
     await refresh();
+    showMessage(t.submitDoneTitle);
     router.push("/quiz/rules");
   };
 
   const steps = t.stepLabels.map((label, i) => ({
     n: String(i + 1), label,
+    state: i === step ? "current" : i < step ? "done" : "todo",
+    done: i < step ? "true" : "false",
     bg: i === step ? "#14203E" : i < step ? "#F4EBD8" : "#FFFFFF",
     fg: i === step ? "#FDF3DF" : i < step ? "#7A5412" : "#161C2E",
     border: i === step ? "#14203E" : "#DCD1BC",
@@ -263,35 +321,61 @@ export default function RegisterPage() {
   }));
   const stepCounter = `${t.stepOf} ${step + 1} ${t.of} 4 · ${t.stepTitles[step]}`;
   const isIdentity = step === 0, isStudent = step === 1, isEducation = step === 2, isDeclare = step === 3;
+  // One loader for both waits. The step change names the step it is opening; the submit names the
+  // work, because that one is a write and takes as long as it takes.
+  const busyLabel = submitting ? t.submitWorkTitle : pendingStep !== null ? t.stepTitles[pendingStep] : "";
   const slide = t.slides[si];
   const slideAnim = slideIndex % 2 === 0 ? "rg-inA" : "rg-inB";
   const dots = t.slides.map((_, n) => ({ w: n === si ? "22px" : "8px", bg: n === si ? "#E8C173" : "rgba(232,193,115,.32)" }));
 
   const email = form.email;
-  const onEmail = (e: React.FormEvent<HTMLInputElement>) => set("email", e.currentTarget.value);
+  const onEmail = (e: React.FormEvent<HTMLInputElement>) => { set("email", e.currentTarget.value); setEmailTaken(false); };
   const emailBorder = ep ? "#A03A2B" : "#DCD1BC";
-  const emailMsg = ep === "typo" ? t.emailTypo : ep === "invalid" ? t.emailInvalid : "";
+  const emailMsg = ep === "typo" ? t.emailTypo : ep === "invalid" ? t.emailInvalid : ep === "taken" ? custom(lang).errors.emailTaken : "";
   const emailMsgDisplay = ep ? "block" : "none";
   const name = form.name;
   const onName = (e: React.FormEvent<HTMLInputElement>) => set("name", e.currentTarget.value);
   const mobile = form.mobile;
   const onMobile = (e: React.FormEvent<HTMLInputElement>) => { set("mobile", e.currentTarget.value.replace(/\D/g, "").slice(0, 10)); setMobileTaken(false); };
-  const onMobileBlur = async () => {
-    setMobileTouched(true);
-    if (!/^[6-9]\d{9}$/.test(form.mobile)) return;
+  /**
+   * Asked at step 1, before a code is ever requested. A number that already has an account cannot
+   * register, and finding that out at the end of a four-step form — after an SMS credit had been
+   * spent on it — was both the wrong moment and the wrong reason.
+   *
+   * Returns whether the number is free. A check that cannot reach the server does not block the
+   * student: the unique index on the account is the real guarantee, and this is the courtesy.
+   */
+  const checkMobileAvailable = async (): Promise<boolean> => {
+    if (!/^[6-9]\d{9}$/.test(form.mobile)) return false;
+    setCheckingMobile(true);
     const res = await fetch("/api/register/check-mobile", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ mobile: form.mobile }),
-    });
-    if (res.ok) setMobileTaken(!(await res.json()).available);
+    }).catch(() => null);
+    setCheckingMobile(false);
+    if (!res || !res.ok) return true;
+    const available = !!(await res.json().catch(() => null))?.available;
+    setMobileTaken(!available);
+    return available;
   };
+
+  // Blur only marks the field as read, it does not ask the server anything. Continue is the next
+  // thing pressed and it runs the check properly; firing a second one here raced the awaited call
+  // and left the form looking as though the button had done nothing.
+  const onMobileBlur = () => setMobileTouched(true);
   const mobileBorder = mobileMsg ? "#A03A2B" : "#DCD1BC";
-  const mobileMsgDisplay = mobileMsg ? "block" : "none";
 
   const dobDisplay = dob.y ? `${dob.d} ${MONTHS[dob.m - 1]} ${dob.y}` : t.dobPlaceholder;
   const dobInk = "#161C2E";
-  const openDob = () => { lockScroll(true); setPick({ y: dob.y || 2005, m: dob.m || 6, d: dob.d || 15 }); setDobOpen(true); };
+  const openDob = () => {
+    lockScroll(true);
+    setPick({ y: dob.y || 2005, m: dob.m || 6, d: dob.d || 15 });
+    // Bumped so each column jumps straight to its value on open instead of animating up from
+    // wherever it was left last time.
+    setDobResetKey((k) => k + 1);
+    setDobOpen(true);
+  };
   const closeDob = () => { lockScroll(false); setDobOpen(false); };
   const confirmDob = () => {
     lockScroll(false);
@@ -303,19 +387,6 @@ export default function RegisterPage() {
     if (age >= 18) setForm((f) => ({ ...f, guardianName: "" }));
   };
   const dobModalDisplay = dobOpen ? "flex" : "none";
-  const blockScroll = (e: React.SyntheticEvent) => { if (e.cancelable) e.preventDefault(); };
-  const onYearWheel = (e: React.WheelEvent) => wheelStep(e, "y", YEARS.length, (i) => YEARS[i], YEARS.indexOf(pick.y));
-  const onMonthWheel = (e: React.WheelEvent) => wheelStep(e, "m", 12, (i) => i + 1, pick.m - 1);
-  const onDayWheel = (e: React.WheelEvent) => wheelStep(e, "d", dimPick, (i) => i + 1, Math.min(pick.d, dimPick) - 1);
-  const onYearDown = (e: React.TouchEvent | React.MouseEvent) => dragStart(e, YEARS.indexOf(pick.y));
-  const onMonthDown = (e: React.TouchEvent | React.MouseEvent) => dragStart(e, pick.m - 1);
-  const onDayDown = (e: React.TouchEvent | React.MouseEvent) => dragStart(e, Math.min(pick.d, dimPick) - 1);
-  const onYearMove = (e: React.TouchEvent | React.MouseEvent) => dragMove(e, "y", YEARS.length, (i) => YEARS[i]);
-  const onMonthMove = (e: React.TouchEvent | React.MouseEvent) => dragMove(e, "m", 12, (i) => i + 1);
-  const onDayMove = (e: React.TouchEvent | React.MouseEvent) => dragMove(e, "d", dimPick, (i) => i + 1);
-  const yearItems = windowRows(YEARS.indexOf(pick.y), YEARS.length, (i) => String(YEARS[i]), (i) => setPick((p) => ({ ...p, y: YEARS[i] })));
-  const monthItems = windowRows(pick.m - 1, 12, (i) => MONTHS[i], (i) => setPick((p) => ({ ...p, m: i + 1 })));
-  const dayItems = windowRows(Math.min(pick.d, dimPick) - 1, dimPick, (i) => String(i + 1), (i) => setPick((p) => ({ ...p, d: i + 1 })));
 
   const genders = t.genders.map((g) => ({
     label: g, on: form.gender === g,
@@ -351,11 +422,6 @@ export default function RegisterPage() {
     select: () => choose(o.value),
   }));
 
-  const submitDisplay = submitting ? "flex" : "none";
-  const spinnerDisplay = submitted ? "none" : "block";
-  const successDisplay = submitted ? "flex" : "none";
-  const submitTitle = submitted ? t.submitDoneTitle : t.submitWorkTitle;
-  const submitBody = submitted ? t.submitDoneBody : t.submitWorkBody;
 
   const address = form.address;
   const onAddress = (e: React.FormEvent<HTMLTextAreaElement>) => set("address", e.currentTarget.value);
@@ -382,30 +448,39 @@ export default function RegisterPage() {
     setRulesAccepted(next);
     setPrivacyAccepted(next);
   };
-  const toggleRules = () => setRulesAccepted((v) => !v);
   const rulesBorder = rulesAccepted ? "#14203E" : "#DCD1BC";
   const rulesBg = rulesAccepted ? "#F7F2E6" : "#FCFAF4";
-  const togglePrivacy = () => setPrivacyAccepted((v) => !v);
-  const privacyBorder = privacyAccepted ? "#14203E" : "#DCD1BC";
-  const privacyBg = privacyAccepted ? "#F7F2E6" : "#FCFAF4";
   const guardianName = form.guardianName;
   const onGuardianName = (e: React.FormEvent<HTMLInputElement>) => set("guardianName", e.currentTarget.value);
 
   const prevDisplay = step === 0 ? "none" : "inline-flex";
-  const prev = () => setStep((p) => Math.max(0, p - 1));
-  const next = () => {
+  const prev = () => { if (step > 0) void goToStep(step - 1); };
+  const next = async () => {
+    if (busy) return;
     const missing = missingFields();
     if (missing.length) {
       showMessage(missing.join(", "));
       return;
     }
+    if (step === 0) {
+      if (mobileVerified) { void goToStep(1); return; }
+      setMobileTouched(true);
+      // Awaited, not fired and forgotten: advancing while the answer is in flight is how a
+      // registered number reached the end of the form in the first place. It also runs before the
+      // code step so that no credit is spent on a number that cannot register.
+      if (!(await checkMobileAvailable())) return;
+      setSendToken((n) => n + 1);
+      return;
+    }
     if (step === 3) { void submit(); return; }
-    setStep((p) => p + 1);
+    void goToStep(step + 1);
   };
   const nextLabel = step === 3 ? t.finish : t.next;
+  // While the code step is open it owns the flow: it carries its own Verify, and a second button
+  // underneath saying "Continue" would be a second thing to press that does the same job.
+  const nextDisplay = step === 0 && awaitingCode && !mobileVerified ? "none" : "inline-flex";
   const nextBg = ok ? "#14203E" : "#EDE6D7";
   const nextFg = ok ? "#FDF3DF" : "#161C2E";
-  const nextEvents = ok ? "auto" : "none";
   const nextCursor = ok ? "pointer" : "not-allowed";
   const signedIn = session.signedIn;
   const hasCerts = session.hasCertificates;
@@ -444,53 +519,83 @@ export default function RegisterPage() {
             </div>
           </aside>
 
-          <div data-e="form" style={{ padding: "36px 34px 40px", background: "#FFFFFF", display: "flex", flexDirection: "column" }}>
+          <div ref={formRef} data-e="form" style={{ padding: "36px 34px 40px", background: "#FFFFFF", display: "flex", flexDirection: "column" }}>
             <h1 style={{ margin: "0 0 20px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(25px,3.2vw,33px)", lineHeight: "1.3", color: "#14203E" }}>{t.title}</h1>
 
-            <ol data-e="steps" style={{ margin: "0 0 8px", padding: "0", listStyle: "none", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px", minWidth: "0" }}>
+            <ol data-e="steps" style={{ margin: "0 0 10px", padding: "0", listStyle: "none", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px", minWidth: "0" }}>
               {steps.map((s, sIndex) => (
                 <li key={sIndex} style={{ display: "flex", alignItems: "center", gap: "10px", flex: "0 1 auto" }}>
-                  <span style={{ width: "32px", height: "32px", flex: "0 0 auto", borderRadius: "50%", background: `${s.bg}`, color: `${s.fg}`, border: `1px solid ${s.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: "600" }}>{s.n}</span>
+                  <span data-e="stepdot" data-state={s.state} style={{ width: "32px", height: "32px", flex: "0 0 auto", borderRadius: "50%", background: `${s.bg}`, color: `${s.fg}`, border: `1px solid ${s.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: "600" }}>{s.state === "done" ? "✓" : s.n}</span>
                   <span data-e="steplabel" style={{ fontSize: "15.5px", lineHeight: "1.6", color: `${s.labelFg}`, whiteSpace: "nowrap" }}>{s.label}</span>
-                  <span aria-hidden="true" style={{ width: "18px", height: "1px", background: "#DCD1BC", display: `${s.sepDisplay}` }}></span>
+                  <span aria-hidden="true" data-e="stepsep" data-done={s.done} style={{ width: "18px", height: "2px", borderRadius: "2px", background: "#DCD1BC", display: `${s.sepDisplay}` }}></span>
                 </li>
               ))}
             </ol>
-            <p style={{ margin: "0 0 26px", fontSize: "15px", lineHeight: "1.7", color: "#161C2E" }}>{stepCounter}</p>
+            <p data-e="stepcounter" style={{ margin: "0 0 28px", paddingBottom: "20px", borderBottom: "1px solid #F0EADD", fontSize: "15px", lineHeight: "1.7", color: "#161C2E" }}>{stepCounter}</p>
 
-            {isIdentity ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
-                <label style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.mobileLabel}</span>
-                  <span style={{ display: "flex", alignItems: "stretch", border: `1px solid ${mobileBorder}`, borderRadius: "14px", background: "#FCFAF4", overflow: "hidden" }}>
-                    <span aria-hidden="true" style={{ flex: "0 0 auto", display: "flex", alignItems: "center", gap: "8px", padding: "0 13px", background: "#F1E9DA", borderRight: "1px solid #E3D9C6" }}>
-                      <svg viewBox="0 0 30 20" width="26" height="18" aria-hidden="true" focusable="false" style={{ display: "block", borderRadius: "3px", boxShadow: "0 0 0 1px rgba(20,32,62,.14)" }}>
-                        <rect width="30" height="20" fill="#FFFFFF"></rect>
-                        <rect width="30" height="6.667" fill="#FF9933"></rect>
-                        <rect y="13.333" width="30" height="6.667" fill="#138808"></rect>
-                        <circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" strokeWidth="0.7"></circle>
-                        <circle cx="15" cy="10" r="0.6" fill="#000080"></circle>
-                      </svg>
-                      <span style={{ fontSize: "16.5px", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }}>+91</span>
-                    </span>
-                    <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={mobile} onInput={onMobile} onBlur={onMobileBlur} placeholder="00000 00000" style={{ flex: "1 1 auto", minWidth: "0", minHeight: "58px", padding: "14px 16px", border: "0", background: "transparent", fontSize: "19px", letterSpacing: ".04em", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }} />
-                  </span>
-                  <span style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B", display: `${mobileMsgDisplay}` }}>{mobileMsg}</span>
-                </label>
-                <p style={{ margin: "0", fontSize: "15.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.mobileHelp}</p>
+            {busyLabel ? (
+              <div role="status" aria-live="polite" data-e="stepbusy" style={{ minHeight: "260px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
+                <span aria-hidden="true" data-e="spinner" style={{ width: "34px", height: "34px", borderRadius: "50%", border: "3px solid rgba(20,32,62,.16)", borderTopColor: "#14203E", animation: "rg-spin 1s linear infinite" }}></span>
+                <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18px", lineHeight: "1.6", color: "#14203E", textAlign: "center" }}>{busyLabel}</span>
               </div>
             ) : null}
 
-            {isStudent ? (
-              <div data-g="two" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "18px" }}>
+            {!busyLabel && isIdentity ? (
+              <div data-e="fields" style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                {awaitingCode && !mobileVerified ? (
+                  <OtpStep
+                    lang={lang}
+                    mobile={form.mobile}
+                    purpose="register"
+                    sendToken={sendToken}
+                    mobileLabel={t.mobileLabel}
+                    onVerified={onCodeVerified}
+                    onRejected={onCodeRejected}
+                    onChangeNumber={changeNumber}
+                  />
+                ) : mobileVerified ? (
+                  <div data-e="verify" style={{ padding: "20px", borderRadius: "16px", border: "1px solid #DCD1BC", background: "#FCFAF4", display: "flex", flexDirection: "column", gap: "14px" }}>
+                    <p role="status" data-e="verifynote" style={{ margin: "0", fontSize: "15.5px", lineHeight: "1.7", color: "#7A5412" }}>{cOtp.verified} +91 {form.mobile}</p>
+                    <button type="button" onClick={changeNumber} style={{ alignSelf: "flex-start", padding: "0", border: "0", background: "transparent", fontSize: "16px", lineHeight: "1.7", color: "#27408B", cursor: "pointer", fontFamily: "inherit" }}>{cOtp.changeNumber}</button>
+                  </div>
+                ) : (
+                  <label data-e="field" data-invalid={mobileMsg ? "true" : "false"} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.mobileLabel}</span>
+                    <span data-e="control" style={{ display: "flex", alignItems: "stretch", border: `1px solid ${mobileBorder}`, borderRadius: "14px", background: "#FCFAF4", overflow: "hidden" }}>
+                      <span aria-hidden="true" style={{ flex: "0 0 auto", display: "flex", alignItems: "center", gap: "8px", padding: "0 13px", background: "#F1E9DA", borderRight: "1px solid #E3D9C6" }}>
+                        <svg viewBox="0 0 30 20" width="26" height="18" aria-hidden="true" focusable="false" style={{ display: "block", borderRadius: "3px", boxShadow: "0 0 0 1px rgba(20,32,62,.14)" }}>
+                          <rect width="30" height="20" fill="#FFFFFF"></rect>
+                          <rect width="30" height="6.667" fill="#FF9933"></rect>
+                          <rect y="13.333" width="30" height="6.667" fill="#138808"></rect>
+                          <circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" strokeWidth="0.7"></circle>
+                          <circle cx="15" cy="10" r="0.6" fill="#000080"></circle>
+                        </svg>
+                        <span style={{ fontSize: "16.5px", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }}>+91</span>
+                      </span>
+                      <input type="tel" inputMode="numeric" autoComplete="tel" maxLength={10} value={mobile} onInput={onMobile} onBlur={onMobileBlur} placeholder="00000 00000" style={{ flex: "1 1 auto", minWidth: "0", minHeight: "58px", padding: "14px 16px", border: "0", background: "transparent", fontSize: "19px", letterSpacing: ".04em", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }} />
+                    </span>
+                    {mobileMsg ? (
+                      <span role="alert" data-e="fieldnote" style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B" }}>
+                        {mobileMsg}
+                        {mp === "duplicate" ? <> <Link href="/login" data-e="fieldlink">{t.signIn}</Link></> : null}
+                      </span>
+                    ) : null}
+                  </label>
+                )}
+                <p data-e="fieldhelp" style={{ margin: "0", fontSize: "15.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.mobileHelp}</p>
+              </div>
+            ) : null}
+
+            {!busyLabel && isStudent ? (
+              <div data-g="two" data-e="fields" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "20px" }}>
                 <label style={{ display: "flex", flexDirection: "column", gap: "7px", gridColumn: "1 / -1" }}>
                   <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.nameLabel}</span>
                   <input type="text" maxLength={100} value={name} onInput={onName} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
                 </label>
-                <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                <label data-e="field" data-invalid={ep ? "true" : "false"} style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.emailLabel} <span style={{ padding: "3px 11px", borderRadius: "999px", background: "#F1E9DA", border: "1px solid #E3D9C6", fontSize: "14.5px", lineHeight: "1.6", color: "#161C2E" }}>{t.optional}</span></span>
                   <input type="email" inputMode="email" autoComplete="email" value={email} onInput={onEmail} placeholder="name@gmail.com" style={{ minHeight: "54px", padding: "14px 16px", border: `1px solid ${emailBorder}`, borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
-                  <span style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B", display: `${emailMsgDisplay}` }}>{emailMsg}</span>
+                  <span role="alert" data-e="fieldnote" style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B", display: `${emailMsgDisplay}` }}>{emailMsg}</span>
                 </label>
                 <div style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
                   <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.dobLabel}</span>
@@ -536,7 +641,7 @@ export default function RegisterPage() {
               </div>
             ) : null}
 
-            {isEducation ? (
+            {!busyLabel && isEducation ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 <fieldset style={{ margin: "0", padding: "0", border: "0", display: "flex", flexDirection: "column", gap: "12px" }}>
                   <legend style={{ padding: "0 0 2px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.categoryLabel}</legend>
@@ -577,7 +682,7 @@ export default function RegisterPage() {
               </div>
             ) : null}
 
-            {isDeclare ? (
+            {!busyLabel && isDeclare ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
                 <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", borderRadius: "16px", border: `1px solid ${rulesBorder}`, background: `${rulesBg}` }}>
                   <input type="checkbox" checked={rulesAccepted && privacyAccepted} onChange={toggleBothConsents} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
@@ -602,7 +707,7 @@ export default function RegisterPage() {
 
             <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", marginTop: "30px", paddingTop: "24px", borderTop: "1px solid #F0EADD" }}>
               <button type="button" onClick={prev} data-e="cta" style={{ minHeight: "54px", padding: "15px 26px", border: "1px solid #DCD1BC", borderRadius: "999px", background: "#FFFFFF", cursor: "pointer", fontSize: "17px", lineHeight: "1.5", color: "#161C2E", alignItems: "center", justifyContent: "center", textAlign: "center", display: `${prevDisplay}` }}>{t.prev}</button>
-              <button type="button" onClick={next} data-e="cta" style={{ minHeight: "56px", padding: "16px 30px", border: "0", borderRadius: "999px", background: `${nextBg}`, color: `${nextFg}`, cursor: `${nextCursor}`, fontSize: "18px", fontWeight: "600", lineHeight: "1.5" }}>{nextLabel}</button>
+              <button type="button" onClick={next} data-e="cta" style={{ minHeight: "56px", padding: "16px 30px", border: "0", borderRadius: "999px", background: `${nextBg}`, color: `${nextFg}`, cursor: `${nextCursor}`, fontSize: "18px", fontWeight: "600", lineHeight: "1.5", alignItems: "center", justifyContent: "center", display: `${nextDisplay}` }}>{nextLabel}</button>
             </div>
 
             <p style={{ margin: "22px 0 0", fontSize: "15.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.haveAccount} <Link href="/login">{t.signIn}</Link></p>
@@ -619,11 +724,14 @@ export default function RegisterPage() {
           <div style={{ display: `${pickerSearchDisplay}`, padding: "14px 18px 4px" }}>
             <input type="search" value={pickerQuery} onInput={onPickerQuery} placeholder={t.searchPlaceholder} style={{ width: "100%", minHeight: "52px", padding: "13px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "16.5px", lineHeight: "1.6", color: "#161C2E" }} />
           </div>
-          <div data-e="pickerlist" style={{ flex: "1 1 auto", overflowY: "auto", padding: "10px 12px 18px", scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}>
+          {/* Six rows at most, and the momentum is the platform's, exactly as on the date wheel: a
+              native overflow column with snapping, so a flick on a handset behaves like every other
+              list on the device rather than like a hand-rolled imitation of one. */}
+          <div data-e="pickerlist" style={{ flex: "0 1 auto", overflowY: "auto", overscrollBehavior: "contain", scrollSnapType: "y proximity", padding: "10px 12px 18px", maxHeight: `${PICKER_VISIBLE * (PICKER_ROW + PICKER_GAP) + 10}px`, scrollBehavior: "smooth", WebkitOverflowScrolling: "touch" }}>
             {pickerItems.map((o, oIndex) => (
-              <button key={oIndex} type="button" onClick={o.select} aria-pressed={o.on} style={{ width: "100%", minHeight: "52px", padding: "13px 16px", marginBottom: "4px", border: "0", borderRadius: "14px", background: `${o.bg}`, color: `${o.fg}`, cursor: "pointer", textAlign: "left", fontSize: "17px", lineHeight: "1.6", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+              <button key={oIndex} type="button" onClick={o.select} aria-pressed={o.on} style={{ width: "100%", minHeight: `${PICKER_ROW}px`, padding: "13px 16px", marginBottom: `${PICKER_GAP}px`, border: "0", borderRadius: "14px", background: `${o.bg}`, color: `${o.fg}`, cursor: "pointer", textAlign: "left", fontSize: "19px", lineHeight: "1.6", scrollSnapAlign: "start", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
                 <span>{o.label}</span>
-                <span aria-hidden="true" style={{ display: `${o.tick}`, fontSize: "17px", lineHeight: "1" }}>✓</span>
+                <span aria-hidden="true" style={{ display: `${o.tick}`, fontSize: "19px", lineHeight: "1" }}>✓</span>
               </button>
             ))}
             <p style={{ margin: "14px 6px", display: `${pickerEmptyDisplay}`, fontSize: "16px", lineHeight: "1.7", color: "#161C2E" }}>{t.noMatch}</p>
@@ -631,45 +739,42 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <div role="status" aria-live="polite" style={{ display: `${submitDisplay}`, position: "fixed", inset: "0", zIndex: "80", background: "rgba(7,11,30,.9)", alignItems: "center", justifyContent: "center", padding: "24px", textAlign: "center" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "22px", maxWidth: "420px" }}>
-          <span style={{ display: `${spinnerDisplay}`, position: "relative", width: "104px", height: "104px" }}>
-            <span aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "50%", border: "3px solid rgba(232,193,115,.22)" }}></span>
-            <span aria-hidden="true" style={{ position: "absolute", inset: "0", borderRadius: "50%", border: "3px solid transparent", borderTopColor: "#E8C173", animation: "rg-spin 1s linear infinite" }}></span>
-            <img src="/uploads/skpn-logo.png" alt="" width="64" height="64" style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%,-50%)", width: "64px", height: "64px", borderRadius: "50%" }} />
-          </span>
-          <span style={{ display: `${successDisplay}`, width: "104px", height: "104px", borderRadius: "50%", background: "#E8C173", alignItems: "center", justifyContent: "center", animation: "rg-pop .5s cubic-bezier(.22,1.2,.36,1)" }}>
-            <svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="#1E1503" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block" }}><path d="M4.5 12.5 9.5 17.5 19.5 7"></path></svg>
-          </span>
-          <p style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(22px,3vw,28px)", lineHeight: "1.4", color: "#FFF9EC" }}>{submitTitle}</p>
-          <p style={{ margin: "0", fontSize: "17px", lineHeight: "1.8", color: "#E9E4D8" }}>{submitBody}</p>
-        </div>
-      </div>
-
-      <div role="dialog" aria-modal="true" aria-label={t.dobModalTitle} onWheel={blockScroll} onTouchMove={blockScroll} style={{ display: `${dobModalDisplay}`, position: "fixed", inset: "0", zIndex: "70", background: "rgba(11,18,38,.55)", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+      <div role="dialog" aria-modal="true" aria-label={t.dobModalTitle} style={{ display: `${dobModalDisplay}`, position: "fixed", inset: "0", zIndex: "70", background: "rgba(11,18,38,.55)", alignItems: "center", justifyContent: "center", padding: "20px" }}>
         <div style={{ width: "100%", maxWidth: "430px", background: "#FFFFFF", borderRadius: "22px", boxShadow: "0 30px 70px rgba(11,18,38,.35)", overflow: "hidden" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", padding: "18px 18px 16px", borderBottom: "1px solid #F0EADD" }}>
             <p style={{ margin: "0", flex: "1 1 auto", textAlign: "center", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "19px", lineHeight: "1.5", letterSpacing: ".02em", color: "#14203E" }}>{t.dobModalTitle}</p>
             <button type="button" onClick={closeDob} aria-label={t.dobCancel} style={{ width: "42px", height: "42px", flex: "0 0 auto", border: "0", borderRadius: "12px", background: "#FCFAF4", cursor: "pointer", fontSize: "20px", lineHeight: "1", color: "#161C2E" }}>×</button>
           </div>
           <div style={{ position: "relative", padding: "14px 12px 4px" }}>
-            <div aria-hidden="true" style={{ position: "absolute", left: "12px", right: "12px", top: "146px", height: "44px", borderRadius: "12px", background: "#F5F1E7", pointerEvents: "none" }}></div>
-            <div style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))" }}>
-              <div onWheel={onYearWheel} onTouchStart={onYearDown} onTouchMove={onYearMove} style={{ height: "308px", overflow: "hidden", position: "relative", touchAction: "none", cursor: "ns-resize" }}>
-                {yearItems.map((y, yIndex) => (
-                  <div key={yIndex} onClick={y.pick} style={{ height: "44px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: `${y.size}`, lineHeight: "1.2", fontWeight: `${y.weight}`, color: `${y.ink}`, opacity: `${y.op}`, fontVariantNumeric: "tabular-nums" }}>{y.label}</div>
-                ))}
-              </div>
-              <div onWheel={onMonthWheel} onTouchStart={onMonthDown} onTouchMove={onMonthMove} style={{ height: "308px", overflow: "hidden", position: "relative", touchAction: "none", cursor: "ns-resize" }}>
-                {monthItems.map((m, mIndex) => (
-                  <div key={mIndex} onClick={m.pick} style={{ height: "44px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: `${m.size}`, lineHeight: "1.2", fontWeight: `${m.weight}`, color: `${m.ink}`, opacity: `${m.op}` }}>{m.label}</div>
-                ))}
-              </div>
-              <div onWheel={onDayWheel} onTouchStart={onDayDown} onTouchMove={onDayMove} style={{ height: "308px", overflow: "hidden", position: "relative", touchAction: "none", cursor: "ns-resize" }}>
-                {dayItems.map((d, dIndex) => (
-                  <div key={dIndex} onClick={d.pick} style={{ height: "44px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", fontSize: `${d.size}`, lineHeight: "1.2", fontWeight: `${d.weight}`, color: `${d.ink}`, opacity: `${d.op}`, fontVariantNumeric: "tabular-nums" }}>{d.label}</div>
-                ))}
-              </div>
+            <div aria-hidden="true" data-e="wheelband" style={{ position: "absolute", left: "12px", right: "12px", top: `${14 + 3 * WHEEL_ITEM}px`, height: `${WHEEL_ITEM}px`, borderRadius: "12px", background: "#F5F1E7", pointerEvents: "none" }}></div>
+            <div aria-hidden="true" data-e="wheelfade" style={{ position: "absolute", inset: "14px 12px 4px", pointerEvents: "none" }}></div>
+            <div data-e="wheels" style={{ position: "relative", display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))" }}>
+              <DobWheel
+                key={`y${dobResetKey}`}
+                label={t.dobYear}
+                count={YEARS.length}
+                index={Math.max(0, YEARS.indexOf(pick.y))}
+                labelAt={(i) => String(YEARS[i])}
+                onChange={(i) => setPick((p) => ({ ...p, y: YEARS[i] }))}
+                tabular
+              />
+              <DobWheel
+                key={`m${dobResetKey}`}
+                label={t.dobMonth}
+                count={12}
+                index={pick.m - 1}
+                labelAt={(i) => MONTHS[i]}
+                onChange={(i) => setPick((p) => ({ ...p, m: i + 1 }))}
+              />
+              <DobWheel
+                key={`d${dobResetKey}`}
+                label={t.dobDay}
+                count={dimPick}
+                index={Math.min(pick.d, dimPick) - 1}
+                labelAt={(i) => String(i + 1)}
+                onChange={(i) => setPick((p) => ({ ...p, d: i + 1 }))}
+                tabular
+              />
             </div>
           </div>
           <div style={{ padding: "8px 18px 20px" }}>

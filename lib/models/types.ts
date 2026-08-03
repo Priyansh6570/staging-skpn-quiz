@@ -147,16 +147,137 @@ export interface Certificate {
   pdfKey?: string;
 }
 
+// --- otp -------------------------------------------------------------------------------------
+
+/**
+ * Bound at send and re-checked at verify, so a code minted to prove ownership of a new number
+ * cannot be turned round and used to sign in to an account that already holds it.
+ */
+export type OtpPurpose = "register" | "login";
+
+/** "admin" rows are the manual fallback: identical to verify, but no SMS was ever sent. */
+export type OtpChannel = "msg91" | "admin";
+
+export interface OtpRequest {
+  _id: ObjectId;
+  /** Unique. One live code per number at a time — a superseded code stops existing, it does not linger. */
+  mobile: string;
+  purpose: OtpPurpose;
+  /** HMAC-SHA256 under OTP_PEPPER, hex. The code itself is never stored, logged or returned. */
+  otpHash: string;
+  /** startedAt + 600s, written server-side. TTL index, so an abandoned code cleans itself up. */
+  expiresAt: Date;
+  attempts: number;
+  consumed: boolean;
+  lastSentAt: Date;
+  sendCount: number;
+  channel: OtpChannel;
+  ip: string;
+  createdAt: Date;
+}
+
+export type DeliveryStatus = "pending" | "delivered" | "failed" | "unknown";
+
+/**
+ * One row per message actually handed to MSG91, keyed by their request_id, created at send and
+ * completed by the delivery webhook. It exists because the send call answers "success" to a request
+ * carrying an invalid auth key — this is the only place a real delivery outcome is recorded.
+ *
+ * It deliberately holds no mobile number. `authEvents` already maps mobile to providerRef, so
+ * support can walk from a student to their message in one hop, and this collection never becomes a
+ * second copy of five lakh minors' phone numbers.
+ */
+export interface SmsDelivery {
+  _id: ObjectId;
+  /** MSG91's request_id. Unique — reports arrive more than once and must be idempotent. */
+  requestId: string;
+  /** UTC "YYYY-MM-DD" of the send, so a day's counts are one indexed group rather than a range scan. */
+  day: string;
+  sentAt: Date;
+  status: DeliveryStatus;
+  /** MSG91's numeric code and text, kept verbatim so an unmapped value is still readable. */
+  providerCode?: string;
+  providerDesc?: string;
+  reportedAt?: Date;
+}
+
+/**
+ * Whatever the last scheduled check of a provider found. One row per key, overwritten each run —
+ * this is current state, not history, and `checkedAt` is what tells the dashboard the poller is
+ * alive without a heartbeat row per run in the audit log.
+ */
+export interface ProviderHealth {
+  _id: ObjectId;
+  /** "msg91_balance" is the only key today. */
+  key: string;
+  ok: boolean;
+  /** Credits, not currency. Can be fractional, so the paise-as-integers rule does not apply. */
+  credits: number;
+  raw: string;
+  detail: string;
+  checkedAt: Date;
+  /** Set while the balance is under the alert threshold, so the crossing is alerted once. */
+  belowThreshold: boolean;
+}
+
+export type OtpCounterScope = "mobile" | "ip" | "global";
+
+/**
+ * Send quotas, kept off the OTP record because that record dies with its code after ten minutes and
+ * an hourly cap has to outlive it. One row per subject per window; the bucket string is the window,
+ * so a new hour is a new row rather than a reset anyone has to run.
+ */
+export interface OtpCounter {
+  _id: ObjectId;
+  scope: OtpCounterScope;
+  /** The mobile, the IP, or "all" for the global breaker. */
+  key: string;
+  /** UTC "YYYY-MM-DDTHH" for an hour window, "YYYY-MM-DD" for a day. */
+  bucket: string;
+  count: number;
+  expiresAt: Date;
+}
+
 // --- authEvents ------------------------------------------------------------------------------
 
-export type AuthOutcome = "success" | "unknown_mobile" | "malformed_mobile" | "rate_limited";
+export type AuthOutcome =
+  | "success"
+  | "unknown_mobile"
+  | "malformed_mobile"
+  | "rate_limited"
+  | "otp_sent"
+  | "otp_send_failed"
+  | "otp_resend_too_soon"
+  | "otp_quota_mobile"
+  | "otp_quota_ip"
+  | "otp_circuit_open"
+  | "otp_already_registered"
+  | "otp_verified"
+  | "otp_wrong_code"
+  | "otp_expired"
+  | "otp_consumed"
+  | "otp_not_found"
+  | "otp_purpose_mismatch"
+  | "otp_attempts_exhausted"
+  | "otp_admin_issued";
+
+export type AuthAction = "login" | "otp_send" | "otp_verify" | "otp_admin_issue";
 
 export interface AuthEvent {
   _id: ObjectId;
   mobile: string;
   ip: string;
   userAgent: string;
+  /** Absent on rows written before OTP landed, every one of which was a sign-in. */
+  action?: AuthAction;
   outcome: AuthOutcome;
+  /** MSG91's HTTP status. Absent when no request was made — a quota refusal never calls out. */
+  providerStatus?: number;
+  /**
+   * MSG91's request_id. Support's only way to ask them what happened to one message when a student
+   * says nothing arrived, which matters because the send call itself cannot tell us.
+   */
+  providerRef?: string;
   at: Date;
 }
 

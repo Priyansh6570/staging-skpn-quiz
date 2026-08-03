@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import OtpStep from "@/components/OtpStep";
 import { useLang, useSession, useShell } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
-import { codeFromResponse } from "@/lib/errors";
+import type { ErrorCode } from "@/lib/errors";
 
 const MOBILE_RE = /^[6-9]\d{9}$/;
 
@@ -15,14 +16,16 @@ export default function LoginPage() {
   const router = useRouter();
   const { lang, toggle: toggleLang } = useLang();
   const { session, refresh } = useSession();
-  const { busy, showError } = useShell();
+  const { showError } = useShell();
   const t = strings(lang).Login.S;
 
   const [mobile, setMobile] = useState("");
   const [touched, setTouched] = useState(false);
   const [slideIndex, setSlideIndex] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
   const [notRegistered, setNotRegistered] = useState(false);
+  // 0 while the number is still being typed. Bumping it hands the number to the code step, which
+  // does the sending; bumping it again after a "change number" asks for a fresh code.
+  const [sendToken, setSendToken] = useState(0);
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -33,33 +36,26 @@ export default function LoginPage() {
   const ok = MOBILE_RE.test(mobile);
   const bad = touched && mobile.length > 0 && !ok;
   const i = slideIndex % t.slides.length;
+  const awaitingCode = sendToken > 0;
 
-  const signIn = async (e: React.MouseEvent) => {
+  // Sign-in no longer ends here. This asks for a code; the session is issued by /api/otp/verify
+  // once the student proves they hold the number, because the number is the whole account.
+  const signIn = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!ok || submitting) return;
-    setSubmitting(true);
+    if (!ok || awaitingCode) return;
     setNotRegistered(false);
-    const res = await busy(
-      fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ mobile }),
-      }).catch(() => null),
-    );
-    setSubmitting(false);
-    if (!res) {
-      showError("network");
-      return;
-    }
-    if (!res.ok) {
-      showError(codeFromResponse(res.status, await res.json().catch(() => null)));
-      return;
-    }
-    const body = await res.json();
-    if (!body.registered) {
-      setNotRegistered(true);
-      return;
-    }
+    setSendToken((n) => n + 1);
+  };
+
+  // An unregistered number is answered without a message being sent, so probing costs the trust
+  // nothing and the student is pointed at the right page immediately.
+  const onRejected = (code: ErrorCode) => {
+    setSendToken(0);
+    if (code === "not_registered") setNotRegistered(true);
+    else showError(code);
+  };
+
+  const onVerified = async () => {
     await refresh();
     router.push("/");
   };
@@ -127,6 +123,18 @@ export default function LoginPage() {
               <p style={{ margin: "0", fontSize: "17px", lineHeight: "1.8", color: "#161C2E" }}>{t.lede}</p>
             </div>
 
+            {awaitingCode ? (
+              <OtpStep
+                lang={lang}
+                mobile={mobile}
+                purpose="login"
+                sendToken={sendToken}
+                mobileLabel={t.mobileLabel}
+                onVerified={onVerified}
+                onRejected={onRejected}
+                onChangeNumber={() => setSendToken(0)}
+              />
+            ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
               <label style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.mobileLabel}</span>
@@ -149,6 +157,7 @@ export default function LoginPage() {
 
               <a href={goHref} onClick={markSignedIn} style={{ minHeight: "58px", padding: "16px 28px", borderRadius: "999px", background: `${goBg}`, color: `${goFg}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "17.5px", fontWeight: "600", lineHeight: "1.5", pointerEvents: `${goEvents}`, textDecoration: "none" }}>{t.continue}</a>
             </div>
+            )}
 
             <p style={{ margin: "auto 0 0", paddingTop: "20px", borderTop: "1px solid #F0EADD", fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>{t.noAccount} <Link href="/register">{t.register}</Link></p>
           </div>

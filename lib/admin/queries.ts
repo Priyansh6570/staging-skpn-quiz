@@ -1,8 +1,12 @@
 import type { Filter } from "mongodb";
-import { adminAuditLog, attempts, authEvents, pageViews, users, visitorDays } from "@/lib/models";
+import {
+  adminAuditLog, attempts, authEvents, otpCounters, pageViews, providerHealth, smsDeliveries,
+  users, visitorDays,
+} from "@/lib/models";
 import type { User } from "@/lib/models/types";
 import { en } from "@/lib/i18n";
 import { cached } from "@/lib/admin/cache";
+import { globalDailyCap } from "@/lib/otp";
 
 export const DISTRICTS: string[] = en.Register.DISTRICTS.map((d) => d[0]);
 const CLOSED = ["submitted", "auto_submitted", "expired"] as const;
@@ -164,6 +168,23 @@ export interface Operations {
   signIn: { success: number; unknownMobile: number; malformed: number; rateLimited: number };
   topSignInIps: { ip: string; attempts: number }[];
   sweeper: { lastRunAt: string | null; runsLast24h: number };
+  sms: {
+    /** Today, UTC, matching the buckets the caps are enforced in. */
+    sentToday: number;
+    deliveredToday: number;
+    failedToday: number;
+    pendingToday: number;
+    sendFailuresToday: number;
+    balance: {
+      /** null when the poller has never run — which is itself the thing to report. */
+      credits: number | null;
+      ok: boolean;
+      detail: string;
+      checkedAt: string | null;
+      belowThreshold: boolean;
+    };
+    circuit: { used: number; cap: number; open: boolean };
+  };
 }
 
 export const operations = () => cached<Operations>("operations", async () => {
@@ -171,10 +192,15 @@ export const operations = () => cached<Operations>("operations", async () => {
   const hourAgo = new Date(now.getTime() - 3_600_000);
   const dayAgo = new Date(now.getTime() - 86_400_000);
 
-  const [attemptsCollection, authCollection, auditCollection] =
-    await Promise.all([attempts(), authEvents(), adminAuditLog()]);
+  const today = day(now);
 
-  const [stuckInProgress, oldest, success, unknownMobile, malformed, rateLimited, topIps, lastSweep, runsLast24h] =
+  const [attemptsCollection, authCollection, auditCollection, deliveryCollection, healthCollection, counterCollection] =
+    await Promise.all([attempts(), authEvents(), adminAuditLog(), smsDeliveries(), providerHealth(), otpCounters()]);
+
+  const [
+    stuckInProgress, oldest, success, unknownMobile, malformed, rateLimited, topIps, lastSweep, runsLast24h,
+    deliveryRows, sendFailuresToday, balanceRow, globalCounter,
+  ] =
     await Promise.all([
       attemptsCollection.countDocuments({ status: "in_progress", expiresAt: { $lt: now } }),
       attemptsCollection.findOne(
@@ -193,7 +219,21 @@ export const operations = () => cached<Operations>("operations", async () => {
       ]).toArray(),
       auditCollection.findOne({ action: "system.sweep" }, { projection: { at: 1 }, sort: { at: -1 } }),
       auditCollection.countDocuments({ action: "system.sweep", at: { $gte: dayAgo } }),
+      deliveryCollection.aggregate<{ _id: string; n: number }>([
+        { $match: { day: today } },
+        { $group: { _id: "$status", n: { $sum: 1 } } },
+      ]).toArray(),
+      // A send MSG91 never accepted has no request_id and so no delivery row. It belongs in the
+      // same picture: it is a message the student did not get either.
+      authCollection.countDocuments({ outcome: "otp_send_failed", at: { $gte: new Date(`${today}T00:00:00.000Z`) } }),
+      healthCollection.findOne({ key: "msg91_balance" }),
+      counterCollection.findOne({ scope: "global", key: "all", bucket: today }),
     ]);
+
+  const byStatus = new Map(deliveryRows.map((r) => [r._id, r.n]));
+  const statusCount = (status: string) => byStatus.get(status) ?? 0;
+  const cap = globalDailyCap();
+  const used = globalCounter?.count ?? 0;
 
   return {
     generatedAt: now.toISOString(),
@@ -202,6 +242,23 @@ export const operations = () => cached<Operations>("operations", async () => {
     signIn: { success, unknownMobile, malformed, rateLimited },
     topSignInIps: topIps.map((r) => ({ ip: r._id, attempts: r.attempts })),
     sweeper: { lastRunAt: iso(lastSweep?.at), runsLast24h },
+    sms: {
+      sentToday: deliveryRows.reduce((total, r) => total + r.n, 0),
+      deliveredToday: statusCount("delivered"),
+      // "unknown" is a report whose status this build could not map, not a delivery. Counted with
+      // the failures so it is visible rather than quietly assumed good.
+      failedToday: statusCount("failed") + statusCount("unknown"),
+      pendingToday: statusCount("pending"),
+      sendFailuresToday,
+      balance: {
+        credits: balanceRow ? balanceRow.credits : null,
+        ok: balanceRow?.ok ?? false,
+        detail: balanceRow?.detail ?? "",
+        checkedAt: iso(balanceRow?.checkedAt),
+        belowThreshold: balanceRow?.belowThreshold ?? false,
+      },
+      circuit: { used, cap, open: used > cap },
+    },
   };
 });
 

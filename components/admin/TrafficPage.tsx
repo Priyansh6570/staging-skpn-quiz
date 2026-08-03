@@ -38,7 +38,7 @@ export default function TrafficPage() {
         }
       >
         {loading ? <Skeleton variant="chart" /> : empty ? (
-          <Empty title="No traffic in this range">Counting began when this build was deployed — try a wider range.</Empty>
+          <Empty title="No traffic in this range">Counting began when this build was deployed. Try a wider range.</Empty>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={data?.days ?? []} margin={{ top: 8, right: 8, bottom: 0, left: -18 }}>

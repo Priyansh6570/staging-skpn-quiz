@@ -3,6 +3,7 @@ import { users } from "@/lib/models";
 import type { User } from "@/lib/models/types";
 import { setSession } from "@/lib/session";
 import { RegistrationInput } from "@/lib/registration";
+import { clearMobileProof, readMobileProof } from "@/lib/mobileProof";
 import { clientIp, fail, json, rateLimit, sameOrigin } from "@/lib/api";
 import { competitionOpen } from "@/lib/competition";
 
@@ -19,6 +20,13 @@ export async function POST(req: Request) {
     return json({ error: "invalid", issues: parsed.error.issues.map((i) => i.path.join(".")) }, { status: 400 });
   }
   const input = parsed.data;
+
+  // The account identifier is the mobile number and there is no credential behind it, so proving
+  // the number reaches the person registering it is the only thing standing between this form and
+  // an account opened in a stranger's name. Bound to the number it was issued for: a proof for one
+  // mobile cannot register another.
+  if ((await readMobileProof()) !== input.mobile) return fail(403, "mobile_not_verified");
+
   const now = new Date();
 
   const document: Omit<User, "_id"> = {
@@ -60,18 +68,28 @@ export async function POST(req: Request) {
     const result = await collection.insertOne(document as User);
     userId = result.insertedId;
   } catch (error) {
-    if (error instanceof MongoServerError && error.code === 11000) return fail(409, "already_registered");
+    // Two unique indexes can raise this, and they are not the same refusal. Answering
+    // "already_registered" for both told a student whose email was on another account that their
+    // mobile number was taken, and sent them back to a step where nothing was wrong.
+    if (error instanceof MongoServerError && error.code === 11000) {
+      const field = Object.keys((error.keyPattern ?? {}) as Record<string, unknown>)[0];
+      return fail(409, field === "email" ? "email_taken" : "already_registered");
+    }
     throw error;
   }
 
-  await setSession({
-    uid: String(userId),
-    name: document.fullName,
-    attemptCount: 0,
-    hasCertificates: false,
-    lang: "hi",
-    sv: 0,
-  });
+  // Spent, so it cannot be replayed into a second account on the same verification.
+  await Promise.all([
+    clearMobileProof(),
+    setSession({
+      uid: String(userId),
+      name: document.fullName,
+      attemptCount: 0,
+      hasCertificates: false,
+      lang: "hi",
+      sv: 0,
+    }),
+  ]);
 
   return json({ ok: true, userId: String(userId) });
 }

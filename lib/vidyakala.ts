@@ -34,16 +34,61 @@ const SOURCE_KEY: Record<string, string> = { "Chhando-jnana": "Abhidhana-kosha" 
 
 const keyOf = (e: RawEntry) => e.key ?? KEY_BY_PAGE[e.bookHeading.printed] ?? null;
 
-export type IndexRow = { key: string; name: string; gloss: string | null; glossIsHindi: boolean; n: number };
+const scopedParas = (key: string): Para[] => {
+  const e = raw.find((x) => keyOf(x) === (SOURCE_KEY[key] ?? key));
+  if (!e) return [];
+  const scope = PAGE_SCOPED[key];
+  return scope ? e.descriptionHi.filter((p) => scope.includes(p.printed)) : e.descriptionHi;
+};
+
+/** Longest preview the drawer can show before the panel starts to scroll on a phone. */
+const PREVIEW_MAX = 300;
+/** U+0964, the sentence terminator the book uses, as an escape: no Devanagari is typed in this repo. */
+const DANDA = "\u0964";
+
+/**
+ * The drawer's preview: a whole opening sentence, never a slice.
+ *
+ * The cut lands on U+0964, the danda the book ends every sentence with — written as an escape
+ * because no Devanagari is typed in this repo. Cutting there means the preview needs no ellipsis
+ * and cannot split a conjunct mid-cluster, which a character count would do roughly one time in
+ * three. An entry whose first sentence runs past the budget with no earlier break gets no preview
+ * at all rather than a mangled one; the drawer then shows name and gloss only.
+ */
+const previewOf = (paras: Para[]): string | null => {
+  const first = paras.find((p) => p.kind === "para")?.text;
+  if (!first) return null;
+  if (first.length <= PREVIEW_MAX) return first;
+  const cut = first.lastIndexOf(DANDA, PREVIEW_MAX);
+  return cut > 80 ? first.slice(0, cut + 1) : null;
+};
+
+export type IndexRow = {
+  key: string;
+  name: string;
+  gloss: string | null;
+  glossIsHindi: boolean;
+  n: number;
+  /** Always Hindi: the book has no English prose, and none is invented. Null where there is none. */
+  preview: string | null;
+};
 export type VidyaGroup = { label: string; rows: IndexRow[] };
 
 const i18nList = (lang: Lang, which: "VIDYAS" | "KALAS") =>
   strings(lang).Home_v5[which] as unknown as (string | null)[][];
 
 const rowOf = (t: (string | null)[], lang: Lang, n: number): IndexRow => {
+  const key = t[2] as string;
   const name = (lang === "hi" ? t[0] : t[2]) ?? t[0] ?? "";
   const gloss = lang === "hi" ? t[1] : (t[3] ?? t[1]);
-  return { key: t[2] as string, name, gloss: gloss ?? null, glossIsHindi: lang === "en" && !t[3], n };
+  return {
+    key,
+    name,
+    gloss: gloss ?? null,
+    glossIsHindi: lang === "en" && !t[3],
+    n,
+    preview: previewOf(scopedParas(key)),
+  };
 };
 
 /**
@@ -84,7 +129,25 @@ export type EntryDetail = {
   pages: number[];
   prev: { key: string; name: string } | null;
   next: { key: string; name: string } | null;
+  /** A window of the entry's own list, current entry included, for the reading rail. */
+  siblings: { key: string; name: string; n: number }[];
 };
+
+/**
+ * The rail shows where the entry sits in its own list, not the whole 64. Seven rows is what fits
+ * the card beside the prose without scrolling; the window slides so the current entry keeps its
+ * neighbours on both sides, and clamps at either end rather than running short.
+ */
+const SIBLING_WINDOW = 7;
+
+function siblingsAround(list: (string | null)[][], pos: number, lang: Lang) {
+  const start = Math.max(0, Math.min(pos - Math.floor(SIBLING_WINDOW / 2), list.length - SIBLING_WINDOW));
+  return list.slice(Math.max(0, start), Math.max(0, start) + SIBLING_WINDOW).map((t, i) => ({
+    key: t[2] as string,
+    name: ((lang === "hi" ? t[0] : t[2]) ?? t[0] ?? "") as string,
+    n: Math.max(0, start) + i + 1,
+  }));
+}
 
 /** Book order across both lists: the 14 vidyas, then the 64 kalas. */
 export function allKeys(): string[] {
@@ -135,6 +198,7 @@ export function entry(key: string, lang: Lang): EntryDetail | null {
     pages: [...new Set(inScope(e.descriptionHi).map((p) => p.printed))].sort((a, b) => a - b),
     prev: i > 0 ? { key: order[i - 1], name: nameOf(order[i - 1]) } : null,
     next: i >= 0 && i < order.length - 1 ? { key: order[i + 1], name: nameOf(order[i + 1]) } : null,
+    siblings: siblingsAround(list, pos, lang),
   };
 }
 

@@ -12,6 +12,7 @@ export type IndexSpec = {
 export const COLLECTIONS = [
   "users", "questions", "attempts", "certificates", "authEvents",
   "admins", "adminAuditLog", "pageViews", "visitorDays",
+  "otpRequests", "otpCounters", "smsDeliveries", "providerHealth",
 ] as const;
 
 export type CollectionName = (typeof COLLECTIONS)[number];
@@ -78,5 +79,29 @@ export const INDEXES: Record<CollectionName, IndexSpec[]> = {
   visitorDays: [
     { name: "day_hash_unique", key: { day: 1, hash: 1 }, unique: true },
     { name: "retention_ttl", key: { at: 1 }, expireAfterSeconds: 365 * 24 * 60 * 60 },
+  ],
+  otpRequests: [
+    // Unique, and load-bearing rather than tidiness: it is what makes one live code per number a
+    // property of the database instead of a property of the send handler remembering to clean up,
+    // and it is what makes the resend gate atomic under two taps at once.
+    { name: "mobile_unique", key: { mobile: 1 }, unique: true },
+    // expireAfterSeconds 0 means "expire at the time in the field", not "expire immediately".
+    { name: "expiry_ttl", key: { expiresAt: 1 }, expireAfterSeconds: 0 },
+  ],
+  otpCounters: [
+    { name: "scope_key_bucket_unique", key: { scope: 1, key: 1, bucket: 1 }, unique: true },
+    { name: "expiry_ttl", key: { expiresAt: 1 }, expireAfterSeconds: 0 },
+  ],
+  smsDeliveries: [
+    // Unique because MSG91 re-posts a report until it gets a 2xx, and a retry must update the row
+    // it already wrote rather than add a second one.
+    { name: "request_id_unique", key: { requestId: 1 }, unique: true },
+    { name: "day_status", key: { day: 1, status: 1 } },
+    // Operational data, not an audit trail: 90 days is long past the competition, and the shorter
+    // the window the less there is to lose.
+    { name: "retention_ttl", key: { sentAt: 1 }, expireAfterSeconds: 90 * 24 * 60 * 60 },
+  ],
+  providerHealth: [
+    { name: "key_unique", key: { key: 1 }, unique: true },
   ],
 };

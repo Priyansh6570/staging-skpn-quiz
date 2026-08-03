@@ -57,14 +57,16 @@ const browser = await chromium.launch();
   check("loader is present and hidden at rest", (await loader.count()) === 1 && (await loader.evaluate((el) => getComputedStyle(el).opacity)) === "0");
   check("loader is a live status region", (await loader.getAttribute("role")) === "status" && !!(await loader.getAttribute("aria-label")));
 
-  // A slow login keeps the shell up for the whole request.
-  await page.route("**/api/auth/login", async (route) => {
+  // Starting the paper is the shell loader's remaining caller — sign-in stopped being one when the
+  // code step moved inline and grew a loader of its own.
+  await page.route("**/api/quiz/attempts", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
     await new Promise((r) => setTimeout(r, 1200));
-    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, registered: false }) });
+    await route.fulfill({ status: 500, contentType: "application/json", body: '{"error":"server"}' });
   });
-  await page.locator('input[type="tel"]').fill("9000000123");
-  await page.waitForTimeout(120);
-  await page.getByRole("link", { name: /साइन इन|Sign in/ }).last().click();
+  await page.goto(`${BASE}/quiz/rules`, { waitUntil: "networkidle" });
+  await page.locator('input[type="checkbox"]').first().check().catch(() => {});
+  await page.locator('button[data-e~="cta"]').last().click();
   await page.waitForTimeout(600);
   const during = Number(await loader.evaluate((el) => getComputedStyle(el).opacity));
   check("loader shows during an async action", during > 0.5, `opacity ${during}`);
@@ -77,11 +79,13 @@ const browser = await chromium.launch();
 // --- toast --------------------------------------------------------------------------------------------
 {
   const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-  await page.route("**/api/auth/login", (route) => route.fulfill({ status: 500, contentType: "application/json", body: '{"error":"server"}' }));
-  await page.goto(`${BASE}/login`, { waitUntil: "networkidle" });
-  await page.locator('input[type="tel"]').fill("9000000123");
-  await page.waitForTimeout(120);
-  await page.getByRole("link", { name: /साइन इन|Sign in/ }).last().click();
+  await page.route("**/api/quiz/attempts", (route) =>
+    route.request().method() === "POST"
+      ? route.fulfill({ status: 500, contentType: "application/json", body: '{"error":"server"}' })
+      : route.continue());
+  await page.goto(`${BASE}/quiz/rules`, { waitUntil: "networkidle" });
+  await page.locator('input[type="checkbox"]').first().check().catch(() => {});
+  await page.locator('button[data-e~="cta"]').last().click();
   await page.waitForTimeout(700);
 
   const stack = page.locator('[data-e~="toaststack"]');

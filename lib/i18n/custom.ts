@@ -38,6 +38,8 @@ export interface CustomStrings {
     saveFailed: string;
     invalidInput: string;
     notRegistered: string;
+    /** TODO(hi) — a different account already holds this email address. */
+    emailTaken: string;
   };
   certificate: {
     retry: string;
@@ -47,6 +49,32 @@ export interface CustomStrings {
   notFound: {
     title: string;
     body: string;
+  };
+  /**
+   * The SMS code step. The design export predates it, so there is no source copy for any of it.
+   * The Devanagari is NOT written: the values are the English text in both locales, for the same
+   * reason as vidyaKala below. This one is worse than that one — it sits in the middle of sign-in
+   * and registration, so until Hindi is supplied every student on a Hindi site meets an English
+   * screen at the one point they cannot skip. Supply it before launch.
+   */
+  otp: {
+    /** TODO(hi) */ title: string;
+    /** TODO(hi) */ codeLabel: string;
+    /** TODO(hi) */ verify: string;
+    /** TODO(hi) */ resend: string;
+    /** TODO(hi) — "{s}" is replaced with the whole seconds remaining. */ resendIn: string;
+    /** TODO(hi) */ changeNumber: string;
+    /** TODO(hi) */ wrongCode: string;
+    /** TODO(hi) */ expired: string;
+    /** TODO(hi) */ exhausted: string;
+    /** TODO(hi) */ sendFailed: string;
+    /** TODO(hi) */ unavailable: string;
+    /** TODO(hi) */ quotaExceeded: string;
+    /** TODO(hi) — the proof of ownership timed out before the form was submitted. */ verificationExpired: string;
+    /** TODO(hi) — status text while the code is being sent. */ sending: string;
+    /** TODO(hi) — status text while the code is being checked. */ verifying: string;
+    /** TODO(hi) — confirmation shown inline once the code is on its way. */ sentTo: string;
+    /** TODO(hi) — followed by the number, once the code for it has been accepted. */ verified: string;
   };
   /**
    * /vidya-kala. The Devanagari for these four is NOT yet written: the values below are the
@@ -67,6 +95,30 @@ export interface CustomStrings {
     bookHeadingLabel: string;
   };
 }
+
+/**
+ * One object, referenced from both tables. Two copies would drift, and the drift would read as a
+ * deliberate translation rather than as the placeholder this is.
+ */
+const OTP_PENDING_HI: CustomStrings["otp"] = {
+  title: "Enter the code",
+  codeLabel: "Six-digit code",
+  verify: "Verify",
+  resend: "Send it again",
+  resendIn: "Send it again in {s}s",
+  changeNumber: "Change number",
+  wrongCode: "That code is not correct.",
+  expired: "That code has expired. Ask for a new one.",
+  exhausted: "Too many incorrect attempts. Ask for a new code.",
+  sendFailed: "The code could not be sent. Please try again in a moment.",
+  unavailable: "Codes cannot be sent at the moment. Please try again later.",
+  quotaExceeded: "Too many codes have been requested for this number. Please try again later.",
+  verificationExpired: "The verification timed out. Please request a new code.",
+  sending: "Sending the code",
+  verifying: "Checking the code",
+  sentTo: "Code sent to",
+  verified: "Verified",
+};
 
 export const customHi: CustomStrings = {
   competitionNoticeBanner: "भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता की तिथि शीघ्र घोषित की जाएगी",
@@ -96,6 +148,7 @@ export const customHi: CustomStrings = {
     saveFailed: "आपका पिछला उत्तर सुरक्षित नहीं हो सका। यह स्वतः पुनः भेजा जाएगा।",
     invalidInput: "कुछ जानकारी अधूरी अथवा अमान्य है। कृपया चिह्नित फ़ील्ड जाँचें।",
     notRegistered: "इस नंबर से कोई पंजीकरण नहीं मिला",
+    emailTaken: "This email address is already registered to another account.",
   },
   certificate: {
     retry: "पुनः प्रयास करें",
@@ -106,6 +159,7 @@ export const customHi: CustomStrings = {
     title: "यह पृष्ठ नहीं मिला",
     body: "संभव है कि पता गलत लिखा गया हो, अथवा यह पृष्ठ स्थानांतरित हो गया हो।",
   },
+  otp: OTP_PENDING_HI,
   vidyaKala: {
     searchLabel: "Search the 64 Kalas",
     browseAll: "विस्तार से देखें",
@@ -144,6 +198,7 @@ export const customEn: CustomStrings = {
     saveFailed: "Your last answer could not be saved. It will be retried automatically.",
     invalidInput: "Some details are missing or not valid. Please check the highlighted fields.",
     notRegistered: "No registration found for this number",
+    emailTaken: "This email address is already registered to another account.",
   },
   certificate: {
     retry: "Try again",
@@ -154,6 +209,7 @@ export const customEn: CustomStrings = {
     title: "This page could not be found",
     body: "The address may be mistyped, or the page may have moved.",
   },
+  otp: OTP_PENDING_HI,
   vidyaKala: {
     searchLabel: "Search the 64 Kalas",
     browseAll: "Browse",

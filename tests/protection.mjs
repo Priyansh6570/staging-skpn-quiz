@@ -1,6 +1,7 @@
 // Asset paths resolve on nested routes, and the content protection behaves on the public site
 // without breaking form fields or the admin password.
 import { chromium } from "@playwright/test";
+import { closeOtp, verifyInPage } from "./otp.mjs";
 
 const BASE = process.env.BASE ?? "http://localhost:4900";
 const results = [];
@@ -23,6 +24,7 @@ const browser = await chromium.launch();
 
   const mobile = `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
   await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+  await verifyInPage(page, mobile);
   await page.evaluate(async (m) => {
     await fetch("/api/register", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({
       mobile: m, email: "", fullName: "Asset Probe", gender: "male", dateOfBirth: "2009-05-14",
@@ -125,6 +127,7 @@ const browser = await chromium.launch();
 }
 
 await browser.close();
+await closeOtp();
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed`);
 process.exit(failed.length ? 1 : 0);

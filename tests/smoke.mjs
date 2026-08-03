@@ -1,7 +1,12 @@
 // End-to-end smoke test against a running dev server.
+import { CODE, closeOtp, plantOtp } from "./otp.mjs";
+
 const BASE = process.env.BASE ?? "http://127.0.0.1:3991";
 const ORIGIN = BASE;
 let cookie = "";
+// The proof of mobile ownership rides separately from the session: registration needs it before
+// there is an account to have a session for.
+let proof = "";
 
 const call = async (path, init = {}) => {
   const res = await fetch(`${BASE}${path}`, {
@@ -9,7 +14,7 @@ const call = async (path, init = {}) => {
     headers: {
       origin: ORIGIN,
       "content-type": "application/json",
-      ...(cookie ? { cookie } : {}),
+      ...([cookie, proof].filter(Boolean).length ? { cookie: [cookie, proof].filter(Boolean).join("; ") } : {}),
       ...init.headers,
     },
     redirect: "manual",
@@ -18,6 +23,7 @@ const call = async (path, init = {}) => {
   for (const c of setCookie) {
     const [pair] = c.split(";");
     if (pair.startsWith("skpn_session=")) cookie = pair;
+    if (pair.startsWith("skpn_mobile_verified=")) proof = pair;
   }
   const text = await res.text();
   let body;
@@ -74,15 +80,38 @@ r = await call("/api/register", {
 });
 check("register rejects unknown keys (mass assignment)", r.status === 400, `status ${r.status}`);
 
-r = await call("/api/register", {
-  method: "POST",
-  body: JSON.stringify({
-    mobile, email: "", fullName: "Smoke Test Student", gender: "male", dateOfBirth: "2009-05-14",
-    address: { line: "12 Test Marg", cityVillage: "Sehore", district: "Sehore", pincode: "466001" },
-    category: "vidyalaya", educationLevel: "Class 10", institutionName: "Test Higher Secondary",
-    competitiveExam: null, isDivyang: false, guardianName: "", rulesAccepted: true, privacyAccepted: true,
-  }),
-});
+const registration = {
+  mobile, email: "", fullName: "Smoke Test Student", gender: "male", dateOfBirth: "2009-05-14",
+  address: { line: "12 Test Marg", cityVillage: "Sehore", district: "Sehore", pincode: "466001" },
+  category: "vidyalaya", educationLevel: "Class 10", institutionName: "Test Higher Secondary",
+  competitiveExam: null, isDivyang: false, guardianName: "", rulesAccepted: true, privacyAccepted: true,
+};
+
+r = await call("/api/register", { method: "POST", body: JSON.stringify(registration) });
+check("register refuses an unverified mobile", r.status === 403 && r.body.error === "mobile_not_verified", `status ${r.status}`);
+
+// --- otp ---------------------------------------------------------------------------------------------
+await plantOtp(mobile, "register");
+
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: "000000", purpose: "register" }) });
+check("otp rejects a wrong code", r.status === 400 && r.body.error === "wrong_code", JSON.stringify(r.body));
+check("...and says how many tries are left", r.body.attemptsRemaining === 4, JSON.stringify(r.body));
+
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: CODE, purpose: "login" }) });
+check("otp refuses a register code used to sign in", r.status === 400 && r.body.error === "otp_purpose_mismatch", JSON.stringify(r.body));
+
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: CODE, purpose: "register" }) });
+check("otp accepts the right code", r.status === 200 && r.body.ok === true, JSON.stringify(r.body));
+check("...and issues no session on its own", (await call("/api/session")).body.signedIn === false);
+check("...and never echoes the code", !JSON.stringify(r.body).includes(CODE), JSON.stringify(r.body));
+
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: CODE, purpose: "register" }) });
+check("a spent code cannot be replayed", r.status === 400 && r.body.error === "otp_consumed", JSON.stringify(r.body));
+
+r = await call("/api/otp/send", { method: "POST", body: JSON.stringify({ mobile: "12345", purpose: "register" }) });
+check("otp send rejects a non-Indian mobile before spending a credit", r.status === 400, `status ${r.status}`);
+
+r = await call("/api/register", { method: "POST", body: JSON.stringify(registration) });
 check("register succeeds", r.status === 200 && r.body.ok === true, JSON.stringify(r.body).slice(0, 100));
 
 r = await call("/api/session");
@@ -171,6 +200,9 @@ check("second attempt refused", r.status === 409, `status ${r.status}`);
   const other = `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
   const saved = cookie;
   cookie = "";
+  proof = "";
+  await plantOtp(other, "register");
+  await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile: other, code: CODE, purpose: "register" }) });
   await call("/api/register", { method: "POST", body: JSON.stringify({
     mobile: other, email: "", fullName: "Resume Probe", gender: "male", dateOfBirth: "2009-05-14",
     address: { line: "12 Test Marg", cityVillage: "Sehore", district: "Sehore", pincode: "466001" },
@@ -199,19 +231,35 @@ cookie = stolen;
 r = await call("/api/session");
 check("sign-out revokes an already-issued cookie", r.body.signedIn === false, JSON.stringify(r.body));
 
+// --- sign-in is the code, not the number ------------------------------------------------------------
 cookie = "";
-r = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ mobile }) });
-check("login succeeds for a known number", r.status === 200 && r.body.ok === true);
-r = await call("/api/session");
-check("login issues a working session", r.body.signedIn === true);
-
-cookie = "";
-const unknown = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ mobile: "9000000001" }) });
-check("login reports an unregistered number", unknown.status === 200 && unknown.body.registered === false, JSON.stringify(unknown.body));
+proof = "";
+r = await call("/api/otp/send", { method: "POST", body: JSON.stringify({ mobile: "9000000001", purpose: "login" }) });
+check("sign-in reports an unregistered number without sending", r.status === 200 && r.body.registered === false, JSON.stringify(r.body));
 check("...and issues no session", (await call("/api/session")).body.signedIn === false);
 
-r = await call("/api/auth/login", { method: "POST", body: JSON.stringify({ mobile }) });
-check("login reports a registered number", r.body.registered === true, JSON.stringify(r.body));
+await plantOtp(mobile, "login");
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: "999999", purpose: "login" }) });
+check("sign-in refuses a wrong code", r.status === 400, `status ${r.status}`);
+check("a wrong code issues no session", (await call("/api/session")).body.signedIn === false);
+
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: CODE, purpose: "login" }) });
+check("sign-in succeeds on the right code", r.status === 200 && r.body.registered === true, JSON.stringify(r.body));
+check("sign-in issues a working session", (await call("/api/session")).body.signedIn === true);
+
+// Five wrong tries kill the code outright rather than leaving it guessable.
+cookie = "";
+await plantOtp(mobile, "login");
+for (let i = 0; i < 4; i++) {
+  await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: "111111", purpose: "login" }) });
+}
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: "111111", purpose: "login" }) });
+check("the fifth wrong try exhausts the code", r.status === 429 && r.body.error === "attempts_exhausted", JSON.stringify(r.body));
+r = await call("/api/otp/verify", { method: "POST", body: JSON.stringify({ mobile, code: CODE, purpose: "login" }) });
+check("...and the correct code no longer works after that", r.status === 400, JSON.stringify(r.body));
+check("...and no session was issued", (await call("/api/session")).body.signedIn === false);
+
+await closeOtp();
 
 const failed = results.filter((r) => !r.pass);
 console.log(`\n${results.length - failed.length}/${results.length} passed`);

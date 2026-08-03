@@ -154,9 +154,9 @@ export default function ParticipantsPage() {
                   {data?.rows.map((r) => (
                     <tr key={r.id}>
                       <td>{r.name}</td>
-                      <td>{r.district || "—"}</td>
-                      <td style={{ textTransform: "capitalize" }}>{r.category || "—"}</td>
-                      <td className="adm-num">{r.score === null ? "—" : r.score}</td>
+                      <td>{r.district || "-"}</td>
+                      <td style={{ textTransform: "capitalize" }}>{r.category || "-"}</td>
+                      <td className="adm-num">{r.score === null ? "-" : r.score}</td>
                       <td>{dateOnly(r.attemptAt)}</td>
                       <td><span className={`adm-pill ${STATUS_PILL[r.status] ?? "adm-pill-mute"}`}>{r.status.replace(/_/g, " ")}</span></td>
                     </tr>

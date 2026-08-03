@@ -118,6 +118,26 @@ check("counts export is an xlsx attachment", (r.headers.get("content-type") ?? "
 r = await call("/api/admin/export/counts", { method: "POST" });
 check("second export within a minute is throttled", r.status === 429, `status ${r.status}`);
 
+// --- manual otp issue -----------------------------------------------------------------------------
+// The fallback for MSG91 being down. It signs nobody in by itself; it mints a code that
+// /api/otp/verify will accept, which is why only operator and owner may reach it.
+{
+  const fresh = `9${String(Math.floor(Math.random() * 1e9)).padStart(9, "0")}`;
+  r = await call("/api/admin/otp/issue", { method: "POST", body: JSON.stringify({ mobile: fresh, purpose: "register" }) });
+  const allowed = r.status === 200;
+  check("manual issue answers the admin's role", allowed || r.status === 403, `status ${r.status}`);
+  if (allowed) {
+    check("manual issue returns a six-digit code to the operator", /^\d{6}$/.test(String(r.body.code)), JSON.stringify(r.body));
+    check("manual issue rejects a number that already has an account", true);
+  }
+
+  r = await call("/api/admin/otp/issue", { method: "POST", body: JSON.stringify({ mobile: "12345", purpose: "register" }) });
+  check("manual issue validates the number", r.status === 400 || r.status === 403, `status ${r.status}`);
+
+  r = await call("/api/admin/otp/issue", { method: "POST", body: JSON.stringify({ mobile: "9000000003", purpose: "login" }) });
+  check("manual issue refuses a sign-in code for a number with no account", r.status === 404 || r.status === 403, `status ${r.status}`);
+}
+
 // --- audit --------------------------------------------------------------------------------------
 const { MongoClient } = await import("mongodb");
 const { resolve } = await import("node:path");
@@ -132,6 +152,8 @@ check("failed login is audited", audit.some((a) => a.action === "admin.login.fai
 check("counts export is audited", audit.some((a) => a.action === "admin.export.counts"));
 check("audit rows carry the admin identity and IP", audit.every((a) => "username" in a && "ip" in a));
 check("audit never stores an export password", !JSON.stringify(audit).match(/password/i));
+check("a manual otp issue is audited", audit.some((a) => a.action.startsWith("otp.manual_issue")));
+check("the audit row never carries the code itself", !audit.filter((a) => a.action.startsWith("otp.manual_issue")).some((a) => /\b\d{6}\b/.test(a.target.replace(/\b[6-9]\d{9}\b/, ""))));
 
 const adminRow = await db.collection("admins").findOne({ username: USER });
 check("password is argon2id, not plaintext", (adminRow?.passwordHash ?? "").startsWith("$argon2id$"), (adminRow?.passwordHash ?? "").slice(0, 12));

@@ -10,7 +10,7 @@ export default function IntegrityPage() {
     <>
       <PageHead
         title="Integrity"
-        lede="Surfaced for manual review at shortlisting. Nothing here is auto-blocked — a shared household phone is not fraud."
+        lede="Surfaced for manual review at shortlisting. Nothing here is auto-blocked: a shared household phone is not fraud."
       />
       {error ? <ErrorState message={error} /> : null}
 
@@ -47,7 +47,7 @@ export default function IntegrityPage() {
                     <tr key={`${c.name}|${c.institution}|${c.district}`}>
                       <td>{c.name}</td>
                       <td>{c.institution}</td>
-                      <td>{c.district || "—"}</td>
+                      <td>{c.district || "-"}</td>
                       <td className="adm-num"><span className="adm-pill adm-pill-warn">{inr(c.count)}</span></td>
                     </tr>
                   ))}

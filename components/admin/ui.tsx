@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 export const inr = (n: number) => new Intl.NumberFormat("en-IN").format(n);
 
 export const dateTime = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "—";
+  iso ? new Date(iso).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "-";
 
 export const dateOnly = (iso: string | null) =>
-  iso ? new Date(iso).toLocaleDateString("en-IN", { dateStyle: "medium" }) : "—";
+  iso ? new Date(iso).toLocaleDateString("en-IN", { dateStyle: "medium" }) : "-";
 
 /** Every admin page loads through this: one endpoint, one cache key, one set of states. */
 export function usePanel<T>(url: string) {

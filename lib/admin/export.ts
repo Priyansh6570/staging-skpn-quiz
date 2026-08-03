@@ -43,12 +43,12 @@ export async function buildCountsSheets(): Promise<Sheet[]> {
     {
       name: "Category Summary",
       header: ["Category", "Registrations"],
-      rows: category.map((c) => [String(c._id ?? "—"), c.count]),
+      rows: category.map((c) => [String(c._id ?? "-"), c.count]),
     },
     {
       name: "Gender Summary",
       header: ["Gender", "Registrations"],
-      rows: gender.map((g) => [String(g._id ?? "—"), g.count]),
+      rows: gender.map((g) => [String(g._id ?? "-"), g.count]),
     },
     {
       name: "Score Distribution",

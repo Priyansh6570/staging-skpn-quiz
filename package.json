@@ -22,7 +22,11 @@
     "quizentry": "node tests/quizentry.mjs",
     "seed-admin": "node scripts/seed-admin.mjs",
     "admin": "node tests/admin.mjs",
-    "protection": "node tests/protection.mjs"
+    "protection": "node tests/protection.mjs",
+    "otpui": "node tests/otpui.mjs",
+    "balance": "node --experimental-strip-types scripts/poll-msg91-balance.mjs",
+    "delivery": "node tests/delivery.mjs",
+    "registerflow": "node tests/registerflow.mjs"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",
