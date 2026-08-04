@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Devanagari:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0a090c; color: #f2eeea; font-family: "Anek Devanagari", system-ui, sans-serif; }
+  a { color: #e8b95c; text-decoration: none; }
+  a:hover { color: #f6d693; }
+  img { display: block; max-width: 100%; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  @keyframes orb { 0%,100% { transform: translate3d(0,0,0) scale(1); opacity: .5; } 50% { transform: translate3d(0,-26px,0) scale(1.12); opacity: .8; } }
+  @keyframes railScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes tileFloat { from { translate: 0 0; } to { translate: 0 -12px; } }
+  [data-rail]:hover [data-track] { animation-play-state: paused; }
+</style>
+</helmet>
+
+<section style="position:relative;background:#0a090c;overflow:hidden;padding:clamp(54px,10vh,118px) 0">
+  <div style="position:absolute;left:-12%;top:-10%;width:70vw;height:70vw;max-width:700px;max-height:700px;border-radius:50%;background:radial-gradient(circle,rgba(232,185,92,.16),transparent 66%);filter:blur(28px);animation:orb 18s ease-in-out infinite;pointer-events:none"></div>
+  <div style="position:absolute;right:-10%;bottom:-14%;width:60vw;height:60vw;max-width:600px;max-height:600px;border-radius:50%;background:radial-gradient(circle,rgba(122,104,232,.18),transparent 66%);filter:blur(32px);animation:orb 24s ease-in-out infinite;pointer-events:none"></div>
+
+  <div style="position:relative;max-width:1320px;margin:0 auto;padding:0 clamp(18px,5vw,60px);display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:clamp(32px,5vw,64px);align-items:center">
+
+    <div>
+      <p style="margin:0 0 clamp(12px,2vh,18px);font-size:clamp(.98rem,4vw,1.2rem);font-weight:400;line-height:1.85;color:#e8b95c;animation:fadeUp .85s .06s both">14 विद्याएँ और 64 कलाएँ प्रेरणा बनीं</p>
+      <h2 style="margin:0;font-size:clamp(2rem,8.6vw,3.5rem);font-weight:600;line-height:1.34;color:#fffdf9;max-width:16em;text-wrap:balance;animation:fadeUp .9s .14s both">पुरातन और आधुनिक युग की शक्ति</h2>
+      <p style="margin:clamp(18px,3vh,28px) 0 0;font-size:clamp(1rem,4vw,1.14rem);font-weight:300;line-height:1.95;color:#a99f92;max-width:28em;animation:fadeUp .9s .28s both">वास्तु विद्या आज स्थापत्य है, धातुवाद धातुकर्म, वृक्षायुर्वेद वनस्पति विज्ञान। आधुनिक व्यवसाय — और उनकी जड़ें एक ही गुरुकुल में।</p>
+      <a href="14 Vidyas 64 Kalas.dc.html" style="display:inline-flex;align-items:center;gap:10px;margin-top:clamp(24px,4vh,36px);color:#e8b95c;font-size:1.06rem;font-weight:600;line-height:1.7;border-bottom:1px solid rgba(232,185,92,.4);padding-bottom:4px;animation:fadeUp .9s .38s both" style-hover="border-color:#e8b95c;gap:16px">व्यवसाय देखें<span>→</span></a>
+    </div>
+
+    <div data-rail style="position:relative;overflow:hidden;padding:14px 0;mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 7%,#000 93%,transparent);animation:fadeUp 1s .3s both">
+      <div data-track style="display:flex;width:max-content;animation:railScroll 34s linear infinite;will-change:transform">
+        <sc-for list="{{ tiles }}" as="t" hint-placeholder-count="6">
+          <a href="14 Vidyas 64 Kalas.dc.html" aria-hidden="{{ t.dupe }}" tabindex="{{ t.tabindex }}" style="width:clamp(200px,58vw,268px);flex:0 0 auto;margin-right:clamp(10px,1.5vw,16px);position:relative;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.09);background:#15141a;transition:border-color .4s,transform .5s;transform:translateY({{ t.offset }});animation:tileFloat 6s ease-in-out infinite alternate;animation-delay:{{ t.delay }}" style-hover="border-color:rgba(232,185,92,.5)">
+            <div style="aspect-ratio:3 / 4;overflow:hidden;min-width:0;width:100%">
+              <img src="{{ t.img }}" alt="{{ t.alt }}" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;object-position:{{ t.pos }};transition:transform 1.4s cubic-bezier(.2,.7,.2,1)" style-hover="transform:scale(1.08)"/>
+            </div>
+            <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(10,9,12,.94) 0%,rgba(10,9,12,.34) 44%,transparent 70%)"></div>
+            <div style="position:absolute;left:16px;right:16px;bottom:14px;pointer-events:none">
+              <div style="font-size:1.2rem;font-weight:600;line-height:1.55;color:#fffdf9">{{ t.hi }}</div>
+              <div style="font-size:.92rem;font-weight:300;line-height:1.75;color:#bfb5a8">{{ t.sk }}</div>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;motion&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const BASE = [
+  { hi: "रंगकर्मी", sk: "नाट्यशास्त्र", img: "uploads/PERFORMANCE%20AND%20ILLUSION.jpg", pos: "34% 38%" },
+  { hi: "सुगंधकार", sk: "गंधयुक्ति", img: "uploads/Perfumery%20%26%20cosmetics.jpg", pos: "40% 45%" },
+  { hi: "भाषाविद्", sk: "व्याकरण", img: "uploads/Literature%20%26%20linguistics.jpg", pos: "48% 42%" }
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    const tiles = [];
+    for (let pass = 0; pass < 2; pass++) {
+      BASE.forEach((t, i) => tiles.push({
+        ...t,
+        alt: "श्री कृष्ण — " + t.sk,
+        dupe: pass === 1 ? "true" : "false",
+        tabindex: pass === 1 ? -1 : 0,
+        offset: i % 2 ? "18px" : "0px",
+        delay: (i * 0.9).toFixed(1) + "s"
+      }));
+    }
+    return { tiles };
+  }
+}
+</script>
+</body>
+</html>

@@ -10,6 +10,7 @@ import CtaBox from "@/components/CtaBox";
 import Leadership from "@/components/Leadership";
 import PageAura from "@/components/PageAura";
 import VidyaKalaTeaser from "@/components/VidyaKalaTeaser";
+import ProfessionsRail from "@/components/ProfessionsRail";
 import { useCompetitionOpen, useLang, useSession } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
 
@@ -159,6 +160,8 @@ export default function HomePage() {
       </section>
 
       <VidyaKalaTeaser lang={lang} />
+
+      <ProfessionsRail lang={lang} />
 
       <Leadership lang={lang} />
 

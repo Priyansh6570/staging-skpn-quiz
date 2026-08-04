@@ -144,6 +144,204 @@
           "src": "/professions/teacher-1074.webp"
         }
       ]
+    },
+    "literature": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/literature-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/literature-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/literature-1074.webp"
+        }
+      ]
+    },
+    "languages": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/languages-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/languages-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/languages-1074.webp"
+        }
+      ]
+    },
+    "textiles": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/textiles-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/textiles-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/textiles-1074.webp"
+        }
+      ]
+    },
+    "jewellery": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/jewellery-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/jewellery-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/jewellery-1074.webp"
+        }
+      ]
+    },
+    "culinary": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/culinary-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/culinary-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/culinary-1074.webp"
+        }
+      ]
+    },
+    "perfumery": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/perfumery-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/perfumery-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/perfumery-1074.webp"
+        }
+      ]
+    },
+    "interior": {
+      "width": 1076,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/interior-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/interior-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/interior-1074.webp"
+        }
+      ]
+    },
+    "sport": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/sport-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/sport-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/sport-1074.webp"
+        }
+      ]
+    },
+    "veterinary": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/veterinary-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/veterinary-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/veterinary-1074.webp"
+        }
+      ]
+    },
+    "vedic": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/vedic-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/vedic-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/vedic-1074.webp"
+        }
+      ]
+    },
+    "performance": {
+      "width": 1075,
+      "height": 716,
+      "sources": [
+        {
+          "width": 480,
+          "src": "/professions/performance-480.webp"
+        },
+        {
+          "width": 768,
+          "src": "/professions/performance-768.webp"
+        },
+        {
+          "width": 1074,
+          "src": "/professions/performance-1074.webp"
+        }
+      ]
     }
   }
 }

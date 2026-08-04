@@ -1,16 +1,22 @@
-// Optimises the eight approved profession illustrations into public/professions/.
+// Optimises the nineteen approved profession illustrations into public/professions/.
 //
 // The artwork is used as it is — no crop, no recolour, no overlay. Each source is re-encoded to
 // WebP at a set of widths for a responsive srcset, and **never above its own width**: sharp is given
 // withoutEnlargement, and any requested width past the source is dropped rather than upscaled.
 //
+// This also guards the mapping in lib/i18n/professions.ts, because it is the one script that has to
+// load it anyway: every entry key must still resolve to a Vidya or a Kala, and all 78 must still be
+// covered. A renamed i18n entry then fails the build rather than shipping a dead link or quietly
+// dropping a whole subject off the page.
+//
 //   node scripts/build-professions.mjs
 
-import { readdirSync, mkdirSync, writeFileSync, statSync } from "node:fs";
+import { mkdirSync, writeFileSync, statSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { PROFESSIONS } from "../lib/i18n/professions.ts";
+import { hi } from "../lib/i18n/hi.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = join(ROOT, "design", "professions");
@@ -20,12 +26,32 @@ const OUT = join(ROOT, "public", "professions");
 const WIDTHS = [480, 768, 1074];
 const QUALITY = 82;
 
-const available = new Set(readdirSync(SRC).filter((f) => /\.(jpe?g|png)$/i.test(f)).map((f) => f.replace(/\.[^.]+$/, "")));
-const missing = PROFESSIONS.map((p) => p.key).filter((k) => !available.has(k));
-if (missing.length) {
-  console.error(`refusing: no artwork for ${missing.join(", ")} in design/professions`);
+const die = (msg) => {
+  console.error(`refusing: ${msg}`);
   process.exit(1);
-}
+};
+
+// Filenames are declared, never slugged: the supplied artwork mixes case, spaces, ampersands and
+// commas, and "PERFORMANCE AND ILLUSION.jpg" has no slug relationship to its key at all.
+const noArt = PROFESSIONS.filter((p) => !existsSync(join(SRC, p.image)));
+if (noArt.length) die(`no artwork in design/professions for ${noArt.map((p) => `${p.key} (${p.image})`).join(", ")}`);
+
+const entryKeys = new Set([...hi.Home_v5.VIDYAS, ...hi.Home_v5.KALAS].map((t) => t[2]));
+const dangling = PROFESSIONS.flatMap((p) => p.entries.filter((e) => !entryKeys.has(e)).map((e) => `${p.key} -> ${e}`));
+if (dangling.length) die(`entry keys that no longer resolve in lib/i18n:\n  ${dangling.join("\n  ")}`);
+
+const slots = PROFESSIONS.flatMap((p) => p.entries);
+const uncovered = [...entryKeys].filter((k) => !slots.includes(k));
+if (uncovered.length) die(`${uncovered.length} of ${entryKeys.size} Vidyas/Kalas are covered by no profession:\n  ${uncovered.join("\n  ")}`);
+
+// Two entries are meant to appear twice and are named here so a third duplicate is a build failure
+// rather than an accident nobody spots. See the header of lib/i18n/professions.ts.
+const EXPECTED_TWICE = new Set(["Vrikshayurveda", "Mani-raga-jnana"]);
+const twice = [...new Set(slots.filter((k, i) => slots.indexOf(k) !== i))];
+const unexpected = twice.filter((k) => !EXPECTED_TWICE.has(k));
+const absent = [...EXPECTED_TWICE].filter((k) => !twice.includes(k));
+if (unexpected.length) die(`entries covered more than once without being declared as such: ${unexpected.join(", ")}`);
+if (absent.length) die(`declared duplicates that no longer appear twice: ${absent.join(", ")}`);
 
 mkdirSync(OUT, { recursive: true });
 
@@ -35,9 +61,8 @@ let outBytes = 0;
 /** What a wide screen actually downloads: the largest variant of each, against its source. */
 let widestBytes = 0;
 
-for (const { key } of PROFESSIONS) {
-  const file = readdirSync(SRC).find((f) => f.replace(/\.[^.]+$/, "") === key);
-  const from = join(SRC, file);
+for (const { key, image } of PROFESSIONS) {
+  const from = join(SRC, image);
   srcBytes += statSync(from).size;
 
   const meta = await sharp(from).metadata();

@@ -12,6 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ["/pratiyogita", 0.9],
     ...(open ? ([["/register", 0.9], ["/rules", 0.8]] as [string, number][]) : []),
     ["/about", 0.7],
+    ["/vyavasaya", 0.7],
     ["/privacy", 0.3],
     ["/terms", 0.3],
   ];

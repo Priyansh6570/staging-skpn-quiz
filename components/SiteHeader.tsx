@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCompetitionOpen } from "@/components/AppProviders";
-import { strings, type Lang } from "@/lib/i18n";
+import { custom, strings, type Lang } from "@/lib/i18n";
 
 /** Below this the bar is always shown, so the top of a page never hides it. */
 const ALWAYS_VISIBLE_ABOVE = 90;
 /** Ignore anything smaller, so a trackpad twitch or rubber-banding cannot flicker the bar. */
 const SCROLL_THRESHOLD = 10;
 
-export type NavKey = "home" | "about" | "pratiyogita" | "rules" | "certificates";
+export type NavKey = "home" | "about" | "pratiyogita" | "rules" | "certificates" | "vidyaKala" | "vyavasaya";
 
 // Order and keys mirror NAV in design/SiteHeader.dc.html; the labels live in lib/i18n and the
 // hrefs are the Next routes from AUDIT.md §1.1 rather than the export's .dc.html filenames.
@@ -22,9 +22,18 @@ const NAV: { key: NavKey; href: string }[] = [
   { key: "certificates", href: "/certificates" },
 ];
 
+/** After "about": the collection sits with the standing content, ahead of the competition items. */
+const COLLECTION_AFTER: NavKey = "about";
+
 type Props = {
   lang: Lang;
   active?: NavKey;
+  /**
+   * Which tab of /vidya-kala the page is showing, so the menu can mark that one rather than both.
+   * Passed by the pages that know it; the header cannot read it itself, because useSearchParams
+   * would opt every page carrying this header out of prerendering.
+   */
+  activeSub?: "vidya" | "kala";
   signedIn?: boolean;
   hasCertificates?: boolean;
   onToggleLang?: () => void;
@@ -33,17 +42,22 @@ type Props = {
 export default function SiteHeader({
   lang,
   active = "home",
+  activeSub,
   signedIn = false,
   hasCertificates = false,
   onToggleLang,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const lastY = useRef(0);
+  const group = useRef<HTMLDivElement>(null);
+  const groupBtn = useRef<HTMLButtonElement>(null);
   const competitionOpen = useCompetitionOpen();
   const s = strings(lang);
   const t = s.SiteHeader.T;
   const m = s.SiteHeader.markup;
+  const nav = custom(lang).nav;
 
   // Hides on the way down, returns on any upward movement. Sliding a nav bar out of view is
   // motion, so under prefers-reduced-motion it simply never hides.
@@ -70,6 +84,41 @@ export default function SiteHeader({
 
   // The drawer is anchored to the bar, so the bar cannot slide away while it is open.
   const barHidden = hidden && !open;
+
+  // The desktop dropdown. Escape returns focus to the trigger, because a reader who dismisses a menu
+  // with the keyboard has to land somewhere they can act from. A pointer press outside closes it,
+  // and so does focus leaving the group — tabbing past the last item is a dismissal too, and without
+  // that the panel stays open behind whatever the reader moves on to.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setMenuOpen(false);
+      groupBtn.current?.focus();
+    };
+    const onPointer = (e: PointerEvent) => {
+      if (!group.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const onFocusIn = (e: FocusEvent) => {
+      if (!group.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("focusin", onFocusIn);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("focusin", onFocusIn);
+    };
+  }, [menuOpen]);
+
+  // Down-arrow opens and steps in, which is what a reader who has met a menu button before expects.
+  const onGroupKey = (e: React.KeyboardEvent) => {
+    if (e.key !== "ArrowDown") return;
+    e.preventDefault();
+    setMenuOpen(true);
+    requestAnimationFrame(() => group.current?.querySelector<HTMLAnchorElement>("[data-e~='navmenulink']")?.focus());
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -100,6 +149,17 @@ export default function SiteHeader({
       drawerFg: i.key === active ? "#FFF9EC" : "#F2EEE4",
     }));
 
+  // Three destinations under one heading. The first two are the two tabs of /vidya-kala, so each
+  // carries its own ?view= and lands on the tab it names — the page reads that parameter rather than
+  // opening on a default. Their labels are the tabs' own, from Home_v5.S, so the item and the tab it
+  // opens can never read differently; only the group and the third are copy of their own.
+  const collection: { id: string; href: string; label: string; current: boolean }[] = [
+    { id: "vidya", href: "/vidya-kala?view=vidya", label: s.Home_v5.S.tabVidyas, current: active === "vidyaKala" && activeSub === "vidya" },
+    { id: "kala", href: "/vidya-kala?view=kala", label: s.Home_v5.S.tabKalas, current: active === "vidyaKala" && activeSub === "kala" },
+    { id: "vyavasaya", href: "/vyavasaya", label: nav.vyavasaya, current: active === "vyavasaya" },
+  ];
+  const collectionActive = active === "vidyaKala" || active === "vyavasaya";
+
   const accountHref = signedIn ? "/profile" : "/login";
   const accountLabel = signedIn ? t.account : t.signIn;
   const hiBg = lang === "hi" ? "#14203E" : "transparent";
@@ -128,7 +188,28 @@ export default function SiteHeader({
     </Link>
     <nav data-e="nav" style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "2px" }}>
       {items.map((item) => (
-        <Link key={item.key} href={item.href} style={{ position: "relative", padding: "10px 13px", borderRadius: "10px", fontSize: "16px", lineHeight: "1.7", color: item.color, fontWeight: item.weight, whiteSpace: "nowrap", textDecoration: "none", transition: "background .16s ease" }}>{item.label}<span aria-hidden="true" style={{ position: "absolute", left: "13px", right: "13px", bottom: "5px", height: "2px", borderRadius: "2px", background: item.underline }}></span></Link>
+        <span key={item.key} style={{ display: "contents" }}>
+        <Link href={item.href} style={{ position: "relative", padding: "10px 13px", borderRadius: "10px", fontSize: "16px", lineHeight: "1.7", color: item.color, fontWeight: item.weight, whiteSpace: "nowrap", textDecoration: "none", transition: "background .16s ease" }}>{item.label}<span aria-hidden="true" style={{ position: "absolute", left: "13px", right: "13px", bottom: "5px", height: "2px", borderRadius: "2px", background: item.underline }}></span></Link>
+        {item.key === COLLECTION_AFTER ? (
+        <div ref={group} data-e="navgroup" style={{ position: "relative" }}>
+          <button ref={groupBtn} type="button" data-e="navgroupbtn" aria-expanded={menuOpen} aria-haspopup="true" aria-controls="skpn-navmenu" onClick={() => setMenuOpen((v) => !v)} onKeyDown={onGroupKey} style={{ position: "relative", display: "flex", alignItems: "center", gap: "6px", padding: "10px 13px", borderRadius: "10px", border: "0", background: "transparent", fontFamily: "inherit", fontSize: "16px", lineHeight: "1.7", color: collectionActive ? "#14203E" : "#333C50", fontWeight: collectionActive ? "600" : "400", whiteSpace: "nowrap", cursor: "pointer" }}>
+            {nav.group}
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" style={{ display: "block", transform: menuOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform .18s ease" }}><path d="m6 9.5 6 6 6-6" /></svg>
+            <span aria-hidden="true" style={{ position: "absolute", left: "13px", right: "13px", bottom: "5px", height: "2px", borderRadius: "2px", background: collectionActive ? "#E8C173" : "transparent" }}></span>
+          </button>
+          <ul id="skpn-navmenu" data-e="navmenu" hidden={!menuOpen}>
+            {collection.map((i) => (
+              <li key={i.id}>
+                <Link href={i.href} data-e="navmenulink" aria-current={i.current ? "page" : undefined} onClick={() => setMenuOpen(false)}>
+                  <span data-e="navmenumark" aria-hidden="true"></span>
+                  <span data-e="navmenutext">{i.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+        ) : null}
+        </span>
       ))}
     </nav>
     <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "9px", flex: "0 0 auto" }}>
@@ -159,7 +240,14 @@ export default function SiteHeader({
 
     <nav style={{ flex: "1 1 auto", overflow: "auto", padding: "12px 14px", display: "flex", flexDirection: "column", gap: "2px" }}>
       {items.map((item) => (
-        <Link key={item.key} href={item.href} style={{ padding: "15px 14px", minHeight: "54px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", borderRadius: "14px", background: item.drawerBg, fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18.5px", color: item.drawerFg, textDecoration: "none" }}>{item.label}<span aria-hidden="true" style={{ fontFamily: "'Noto Sans Devanagari',sans-serif", fontSize: "16px", color: "#E8C173" }}>{m.text3}</span></Link>
+        <Link key={item.key} href={item.href} onClick={() => setOpen(false)} style={{ padding: "15px 14px", minHeight: "54px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", borderRadius: "14px", background: item.drawerBg, fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18.5px", color: item.drawerFg, textDecoration: "none" }}>{item.label}<span aria-hidden="true" style={{ fontFamily: "'Noto Sans Devanagari',sans-serif", fontSize: "16px", color: "#E8C173" }}>{m.text3}</span></Link>
+      ))}
+
+      {/* The same two routes the desktop bar groups into a dropdown. A drawer is already a vertical
+          list with room, so they are listed under a heading rather than folded behind another tap. */}
+      <span data-e="drawergroup" lang={lang}>{nav.group}</span>
+      {collection.map((i) => (
+        <Link key={i.id} href={i.href} onClick={() => setOpen(false)} aria-current={i.current ? "page" : undefined} style={{ padding: "15px 14px", minHeight: "54px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", borderRadius: "14px", background: i.current ? "rgba(232,193,115,.14)" : "transparent", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18.5px", color: i.current ? "#FFF9EC" : "#F2EEE4", textDecoration: "none" }}>{i.label}<span aria-hidden="true" style={{ fontFamily: "'Noto Sans Devanagari',sans-serif", fontSize: "16px", color: "#E8C173" }}>{m.text3}</span></Link>
       ))}
     </nav>
 

@@ -45,7 +45,6 @@ export default function VidyaKalaTeaser({ lang }: { lang: Lang }) {
       <div data-e="pad section" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "88px 30px 92px" }}>
         <div data-e="vkteaserwrap">
           <div data-e="vkteasercopy" data-reveal>
-            <p data-e="vkkicker" style={{ margin: "0 0 16px", fontFamily: serif, fontSize: "17px", color: "#C79A46", lineHeight: "1.9" }}>{s.sylKicker}</p>
             <h2 style={{ margin: "0 0 18px", fontFamily: serif, fontWeight: 600, fontSize: "clamp(30px,4.4vw,50px)", lineHeight: "1.22", color: "#FFF9EC", textWrap: "balance" }}>{c.vidyaKala.countLine}</h2>
             <p style={{ margin: 0, fontSize: "17.5px", lineHeight: "1.95", color: "#D8D3C7" }}>{s.sylLede}</p>
 

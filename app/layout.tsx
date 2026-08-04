@@ -87,8 +87,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             tree hydrating altogether, which silently makes every page on the site inert. */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        {/* Anek Devanagari is the professions export's own face and is used by nothing else — the
+            home rail and /vyavasaya. Only the four weights that export actually sets are requested;
+            its <helmet> also asked for 700, which no element in either file uses. */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&family=Anek+Devanagari:wght@300;400;500;600&display=swap"
           rel="stylesheet"
         />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />

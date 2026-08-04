@@ -18,6 +18,40 @@ const OUT = join(ROOT, "app", "globals.css");
 // Rendered inside other pages, so their rules can never carry a [data-page] prefix.
 const COMPONENTS = new Set(["SiteHeader", "SiteFooter", "CtaBox", "Leadership"]);
 
+// The professions export arrived in its own folder rather than beside the others, and it is a
+// second design system: dark ground, gold links, its own face. Three things follow, and all three
+// are selector-level only — not one declaration below is altered.
+//
+//   1. Nothing in it may be hoisted to the shared block. Its `body`, `a`, `img` and `::selection`
+//      rules are identical across its two files, which is exactly the test the hoist uses, so
+//      without this the site would go dark and every link on it would turn gold.
+//   2. Its `html` and `body` rules move onto the page root — the element carrying data-page. There
+//      is one <body> and it is light. This is what the older pages already do by hand, as an inline
+//      style on the wrapper (see app/(marketing)/page.tsx).
+//   3. Its keyframes are namespaced. @keyframes cannot be scoped, and these two files both declare
+//      `fadeUp` and `orb` with *different* values — 22px against 24px, -26px against -30px — so
+//      concatenated one silently overwrites the other. Every other file in the export namespaces its
+//      own (v5-, ab-, rg-); this applies the same convention to the two that did not.
+const EXPORT_DIR = join(DESIGN, "profession section claude design files");
+const SLUG = {
+  "14 Vidyas 64 Kalas.dc.html": "Vyavasaya",
+  "Home Section - 14 Vidyas.dc.html": "Vyavasaya-Section",
+};
+// The professions page's own authored rules. Only what an inline style cannot express, which here is
+// one thing: the number plate on each card sits in a pill that centres its *line box*, and Anek
+// Devanagari's baseline is not at the middle of that box — measured by rendering the real pill at 6x
+// and scanning for ink, the digits ride 2.75px above centre, or .2096em. The correction goes on an
+// inner block so the pill itself does not move, and in em so it holds at any size.
+const VYAVASAYA_CSS = `
+[data-page="Vyavasaya"] [data-e~="vynum"] { display: block; transform: translateY(.21em); }
+`;
+const KEYFRAME_PREFIX = {
+  "14 Vidyas 64 Kalas.dc.html": "vy-",
+  "Home Section - 14 Vidyas.dc.html": "vs-",
+};
+const SCOPED_EXPORT = new Set(Object.keys(SLUG));
+const ROOT_SELECTORS = new Set(["html", "body"]);
+
 // The one place the seven per-page reduced-motion blocks are unified. Text is copied from the
 // Home v5 / Rules variant, which is the superset of the two that exist in the export.
 const REDUCED_MOTION_BODY = " animation: none !important; transition: none !important; ";
@@ -64,6 +98,62 @@ const REGISTER_FORM_CSS = `
 [data-page="Register"] [data-e~="wheel"]::-webkit-scrollbar { width: 0; height: 0; }
 [data-page="Register"] [data-e~="wheelfade"] { background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 24%, rgba(255,255,255,0) 76%, #FFFFFF 100%); }
 [data-page="Register"] [data-e~="resend"]:disabled { cursor: default; }
+`;
+
+// components/SiteHeader.tsx — the collection dropdown and its drawer counterpart. No design source:
+// the export's header has five flat items and no menu. Unprefixed, because SiteHeader renders inside
+// every page.
+//
+// The panel is a plain `hidden` toggle rather than a transition, so a reader with motion off gets it
+// instantly and nothing depends on an animation having run. Colours are the header's own — #14203E
+// ink, #E8DFCE rule, #E8C173 gold — so this adds a control, not a palette.
+const NAV_MENU_CSS = `
+[data-e~="navgroupbtn"] { transition: background .16s ease, color .16s ease; }
+[data-e~="navgroupbtn"]:hover { background: rgba(232,193,115,.18); color: #14203E; }
+/* The panel is the bar's own material, not a white card floating over it: the same translucent
+   #FBF7F0 ground, the same 14px blur, the same #E8DFCE rule. The gold hairline along the top ties it
+   to the active underline in the bar directly above, so the two read as one surface. */
+[data-e~="navmenu"] {
+  position: absolute; top: calc(100% + 6px); right: 0; z-index: 5;
+  min-width: 216px; margin: 0; padding: 5px; list-style: none; overflow: hidden;
+  background: rgba(251,247,240,.97); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid #E8DFCE; border-top: 2px solid #E8C173; border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(20,32,62,.05), 0 10px 28px rgba(20,32,62,.14), 0 22px 60px rgba(20,32,62,.10);
+}
+[data-e~="navmenu"][hidden] { display: none; }
+/* Scoped to the menu rather than written as a bare token, and that is load-bearing rather than
+   tidiness. SiteHeader renders *inside* each page's wrapper, so a page that scopes its own anchor
+   colour reaches into it: [data-page="Vyavasaya"] a is (0,1,1) and beat a lone attribute selector at
+   (0,1,0), which painted these links #e8b95c — gold on white, about 1.9:1, unreadable. Qualifying by
+   the menu makes them (0,2,0), above any single page scope, and the link exists nowhere else. */
+[data-e~="navmenu"] [data-e~="navmenulink"] {
+  display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px;
+  font-size: 15.5px; line-height: 1.7; color: #333C50; text-decoration: none; white-space: nowrap;
+  transition: background .16s ease, color .16s ease;
+}
+/* The marker carries the state rather than a background swap alone: it is the bar's gold underline
+   turned on its side, so hovering an item and standing on a page use one vocabulary at two weights. */
+[data-e~="navmenu"] [data-e~="navmenumark"] {
+  flex: 0 0 auto; width: 2px; height: 15px; border-radius: 2px;
+  background: transparent; transition: background .16s ease;
+}
+[data-e~="navmenu"] [data-e~="navmenulink"]:hover { background: rgba(232,193,115,.18); color: #14203E; }
+[data-e~="navmenu"] [data-e~="navmenulink"]:hover [data-e~="navmenumark"] { background: rgba(138,96,21,.55); }
+[data-e~="navmenu"] [data-e~="navmenulink"][aria-current="page"] { background: rgba(232,193,115,.26); color: #14203E; font-weight: 600; }
+[data-e~="navmenu"] [data-e~="navmenulink"][aria-current="page"] [data-e~="navmenumark"] { background: #E8C173; }
+/* The global ring is 3px offset 2px, which inside a 5px-padded panel is clipped by the rounded
+   corners. Inset and tightened so the focused item is unmistakable and still inside its own box. */
+[data-e~="navmenu"] [data-e~="navmenulink"]:focus-visible {
+  outline: 2px solid #27408B; outline-offset: -2px; background: rgba(232,193,115,.18); color: #14203E;
+}
+/* The drawer's heading over the same three routes. Latin at this size, so the tracking cannot reach
+   a Devanagari cluster — it is the one place in the drawer that is a label rather than a
+   destination. The Hindi heading carries no tracking for exactly that reason. */
+[data-e~="drawergroup"] {
+  display: block; margin: 14px 14px 4px; font-size: 12.5px;
+  color: rgba(255,249,236,.55); line-height: 1.8;
+}
+[data-e~="drawergroup"]:lang(en) { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
 `;
 
 // components/OtpStep.tsx and components/OtpBoxes.tsx — the code screen, inline on both the sign-in
@@ -341,6 +431,13 @@ const VIDYAKALA_CSS = `
   box-shadow: 0 8px 26px rgba(232,193,115,.28);
 }
 [data-e~="vktab"]:focus-visible { outline: 2px solid #E8C173; outline-offset: 3px; }
+/* The label sat high in the pill. align-items:center centres the *line box*, and the baseline is not
+   at its middle: 'Noto Serif Devanagari' declares 15px of ascent against 4px of descent at 17px, so
+   the baseline lands below centre and the ink rides above it. Measured by rendering the real pill at
+   6x and scanning for ink, the glyphs sit 4.33px high — .2549em, which is why this is the same .25em
+   the CTA label already carries in this font. It rides on the label alone, in em so it holds at any
+   size; padding would move the pill instead of the text inside it. */
+[data-e~="vktablabel"] { display: block; transform: translateY(.25em); }
 
 [data-e~="vksearch"] {
   position: relative; display: flex; align-items: center; flex: 1 1 320px; max-width: 470px;
@@ -434,59 +531,6 @@ const VIDYAKALA_CSS = `
   [data-e~="vkcardname"] { font-size: 18px; }
 }
 
-/* ================= the drawer ================= */
-
-@keyframes vk-scrim-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes vk-drawer-in { from { transform: translate3d(100%,0,0); } to { transform: translate3d(0,0,0); } }
-
-[data-e~="vkscrim"] {
-  position: fixed; inset: 0; z-index: 80; border: 0; padding: 0; cursor: pointer;
-  background: rgba(3,6,16,.62); -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
-  animation: vk-scrim-in .2s ease both;
-}
-[data-e~="vkdrawer"] {
-  position: fixed; z-index: 81; top: 0; right: 0; bottom: 0; width: min(620px, 100%);
-  display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain;
-  padding: 30px 40px 40px; background: #0A0F22; border-left: 1px solid rgba(255,249,236,.08);
-  box-shadow: -30px 0 70px rgba(0,0,0,.5);
-  animation: vk-drawer-in .26s cubic-bezier(.22,.61,.36,1) both;
-}
-[data-e~="vkdrawerclose"] {
-  position: absolute; top: 24px; right: 30px; width: 44px; height: 44px; padding: 0;
-  display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
-  border-radius: 50%; border: 1px solid rgba(255,249,236,.14); background: rgba(255,249,236,.05);
-  color: #F4EFE2; transition: background .2s ease, border-color .2s ease;
-}
-[data-e~="vkdrawerclose"]:hover { background: rgba(255,249,236,.11); border-color: rgba(255,249,236,.3); }
-[data-e~="vkdrawerclose"]:focus-visible { outline: 2px solid #E8C173; outline-offset: 3px; }
-[data-e~="vkdeyebrow"] { margin: 0 0 26px; font-size: 13.5px; line-height: 1.7; color: #C79A46; max-width: 60%; }
-/* Digits only. */
-[data-e~="vkdnum"] {
-  display: block; margin: 0 0 6px; font-family: 'Noto Serif Devanagari', serif; font-weight: 600;
-  font-size: 46px; line-height: 1; color: #FFF9EC; opacity: .3; font-variant-numeric: tabular-nums; letter-spacing: .02em;
-}
-[data-e~="vkdname"] { margin: 0; font-family: 'Noto Serif Devanagari', serif; font-weight: 600; font-size: clamp(30px,5vw,42px); line-height: 1.24; color: #FFF9EC; }
-[data-e~="vkdgloss"] { margin: 14px 0 0; font-size: 16.5px; line-height: 1.8; color: #C79A46; }
-[data-e~="vkdrule"] { margin: 28px 0; border: 0; border-top: 1px solid rgba(232,193,115,.28); }
-[data-e~="vkdprose"] { margin: 0 0 30px; max-width: 42ch; font-size: 17px; line-height: 1.95; color: #D6D2C8; }
-[data-e~="vkdcta"] {
-  display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
-  min-height: 54px; padding: 15px 30px; border-radius: 999px; text-decoration: none;
-  font-family: 'Noto Serif Devanagari', serif; font-size: 17.5px; line-height: 1.5;
-  background: linear-gradient(140deg, #F0CE86 0%, #D9A94F 100%); color: #241703;
-  box-shadow: 0 12px 34px rgba(232,193,115,.22); transition: transform .2s ease, box-shadow .2s ease;
-}
-[data-e~="vkdcta"]:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(232,193,115,.3); }
-[data-e~="vkdcta"]:focus-visible { outline: 2px solid #E8C173; outline-offset: 3px; }
-
-@media (max-width: 700px) {
-  /* Full screen on a phone. A 620px panel over a 390px viewport is a modal pretending to be a
-     drawer; at this width the panel is the screen, and the close button is inside thumb reach. */
-  [data-e~="vkdrawer"] { width: 100%; border-left: 0; padding: 26px 22px 40px; }
-  [data-e~="vkdrawerclose"] { top: 18px; right: 18px; }
-  [data-e~="vkdeyebrow"] { margin-bottom: 22px; }
-}
-
 /* ================= /vidya-kala/[key]: the reading surface ================= */
 
 [data-e~="vkhero"] { position: relative; overflow: hidden; background: #070B1E; }
@@ -498,17 +542,22 @@ const VIDYAKALA_CSS = `
 }
 [data-e~="vkheroname"] { margin: 0; font-family: 'Noto Serif Devanagari', serif; font-weight: 600; font-size: clamp(34px,5.6vw,60px); line-height: 1.16; color: #FFF9EC; text-wrap: balance; }
 [data-e~="vkherogloss"] { margin: 20px 0 0; max-width: 52ch; font-size: 17px; line-height: 1.85; color: #C79A46; }
-/* The entry's plate, closing the dark band. The plates are painted panels of wildly different
-   proportions — 2.16:1 for most, 1.4:1 for a few — so the box is given the ratio and the image
-   covers it, rather than the band jumping height from one entry to the next. The inset ring and
-   the fade into the band below stop it reading as a photograph dropped onto the page. */
+/* The entry's plate, closing the dark band.
+   It used to be forced into a 21/9 box at the full width of the column and covered. Both halves of
+   that were wrong. The plates are small — 646 to 1168px wide, most of them about 755 — so stretching
+   one across a 1160px column scaled it 1.5x and it arrived visibly soft. And 21/9 is not the artwork:
+   the common plate is 2.15:1 and a few are 1.4:1, so object-fit:cover was cropping the sides off
+   every one of them, worst on a phone where the box was 16/9.
+   So: no forced ratio and no crop — the plate keeps its own proportions — and no upscaling, because
+   the element carries its own native width as a max-width inline (the widths differ per plate, so it
+   cannot live here). Under that width it still scales down to fit a phone, which is sharp. Centred,
+   so a plate narrower than the column reads as a placed panel rather than a short measure. */
 [data-e~="vkplate"] {
-  display: block; width: 100%; height: auto; margin: 34px 0 0;
-  aspect-ratio: 21 / 9; object-fit: cover; object-position: 50% 42%;
+  display: block; width: 100%; height: auto; margin: 34px auto 0;
   border-radius: 20px; box-shadow: inset 0 0 0 1px rgba(232,193,115,.22), 0 24px 60px rgba(0,0,0,.42);
 }
 @media (max-width: 640px) {
-  [data-e~="vkplate"] { aspect-ratio: 16 / 9; margin-top: 26px; border-radius: 16px; }
+  [data-e~="vkplate"] { margin-top: 26px; border-radius: 16px; }
 }
 
 [data-e~="vkbody"] { background: #F1ECE1; color: #1B2233; }
@@ -579,101 +628,11 @@ const VIDYAKALA_CSS = `
 }
 `;
 
-// components/ProfessionBridge.tsx — the professions section at the foot of /vidya-kala. No design
-// source: the export never had it. Written mobile-first, so the base rules are the phone layout and
-// the wider grids are additive rather than a desktop design being undone at every breakpoint.
-//
-// #2F456E, #A02B2D and #48887B are the approved palette. They carry the three states this section
-// has — resting, open, and the link rail inside an open card — rather than being sprinkled for
-// decoration.
-//
-// Every transition here is motion the reduced-motion block at the end of globals.css switches off;
-// nothing depends on a transition having run, so the section works with animation disabled. The
-// image reveal is a height/opacity change on a panel that is `hidden` when shut, so a reader with
-// motion off gets the same content instantly.
-const PROFESSIONS_CSS = `
-[data-e~="profsection"] { background: #F1ECE1; border-top: 1px solid #E2D9C6; padding: 54px 0 76px; }
-[data-e~="profsection"] [data-e~="pad"] { max-width: 1220px; margin: 0 auto; padding: 0 18px; }
-[data-e~="proftitle"] {
-  margin: 0 0 12px; font-family: 'Noto Serif Devanagari', serif; font-weight: 600;
-  font-size: clamp(24px, 5.4vw, 34px); line-height: 1.32; color: #2F456E; text-wrap: balance;
-}
-[data-e~="proflede"] {
-  margin: 0 0 30px; max-width: 60ch; font-size: clamp(16px, 3.6vw, 18px); line-height: 1.85;
-  color: #46505F; text-wrap: pretty;
-}
+const slug = (file) => SLUG[file] ?? file.replace(/\.dc\.html$/, "").replace(/\s+/g, "-");
 
-[data-e~="profgrid"] { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; grid-template-columns: minmax(0, 1fr); }
-[data-e~="profcell"] { min-width: 0; }
-
-[data-e~="profcard"] {
-  display: block; width: 100%; padding: 0; border: 1px solid #E2D9C6; border-radius: 20px;
-  background: #FFFDF7; overflow: hidden; cursor: pointer; text-align: left; font: inherit; color: inherit;
-  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
-  box-shadow: 0 2px 4px rgba(47,69,110,.05), 0 14px 30px rgba(47,69,110,.07);
-}
-[data-e~="profcard"]:hover { border-color: #2F456E; box-shadow: 0 4px 8px rgba(47,69,110,.09), 0 20px 44px rgba(47,69,110,.14); }
-[data-e~="profcard"]:focus-visible { outline: 3px solid #2F456E; outline-offset: 3px; }
-[data-e~="profimg"] { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; background: #EDE6D7; }
-[data-e~="profcap"] {
-  display: flex; align-items: center; gap: 12px; padding: 15px 18px;
-  border-top: 1px solid #EFE7D6; background: #FFFDF7;
-}
-[data-e~="proflabel"] {
-  flex: 1 1 auto; min-width: 0; font-family: 'Noto Serif Devanagari', serif; font-weight: 600;
-  font-size: clamp(17px, 4vw, 19px); line-height: 1.45; color: #2F456E;
-}
-/* The count is the promise: how many entries open underneath. */
-[data-e~="profcount"] {
-  flex: 0 0 auto; min-width: 34px; height: 26px; padding: 0 9px; border-radius: 999px;
-  background: #EAF0F6; color: #2F456E; display: inline-flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;
-  transition: background .18s ease, color .18s ease;
-}
-[data-e~="profcell"][data-open="true"] [data-e~="profcard"] { border-color: #A02B2D; box-shadow: 0 4px 10px rgba(160,43,45,.10), 0 22px 48px rgba(160,43,45,.16); }
-[data-e~="profcell"][data-open="true"] [data-e~="profcount"] { background: #A02B2D; color: #FFF6F2; }
-[data-e~="profcell"][data-open="true"] [data-e~="proflabel"] { color: #A02B2D; }
-
-/* The payoff. It sits directly under the plate that opened it, at the plate's own width. */
-[data-e~="profpanel"] { margin: 12px 0 4px; }
-[data-e~="profpanel"][hidden] { display: none; }
-[data-e~="proflinks"] { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
-[data-e~="proflink"] {
-  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 6px 14px;
-  padding: 14px 16px; border-radius: 16px; background: #FFFDF7; border: 1px solid #E2D9C6;
-  border-left: 3px solid #48887B; text-decoration: none; color: inherit;
-  transition: background .16s ease, border-color .16s ease, transform .16s ease;
-}
-[data-e~="proflink"]:hover { background: #F4F8F6; border-left-color: #A02B2D; transform: translateX(2px); }
-[data-e~="proflink"]:focus-visible { outline: 3px solid #48887B; outline-offset: 2px; }
-[data-e~="profnum"] { font-size: 12.5px; font-weight: 600; letter-spacing: .06em; color: #48887B; font-variant-numeric: tabular-nums; }
-[data-e~="profname"] { font-family: 'Noto Serif Devanagari', serif; font-weight: 600; font-size: 18px; line-height: 1.5; color: #2F456E; }
-[data-e~="profgo"] { color: #48887B; font-size: 16px; }
-/* The gloss is the book's own, and it earns a line of its own rather than being clipped. */
-[data-e~="profgloss"] { grid-column: 2 / 3; font-size: 15px; line-height: 1.7; color: #4E5665; text-wrap: pretty; }
-
-@media (min-width: 720px) {
-  [data-e~="profsection"] [data-e~="pad"] { padding: 0 30px; }
-  [data-e~="profgrid"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-  [data-e~="proflinks"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  /* An open card takes the full row so its links are never a squeezed column beside the picture. */
-  [data-e~="profcell"][data-open="true"] { grid-column: 1 / -1; }
-}
-@media (min-width: 1100px) {
-  [data-e~="profsection"] { padding: 72px 0 96px; }
-  [data-e~="profgrid"] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
-  /* Open, the plate and its links sit side by side. Stacked, a full-row 3:2 illustration is over
-     700px tall and pushes every link below the fold — and the links are the point of the section,
-     not the picture. Side by side the plate still reads at scale and the payoff is visible with it. */
-  [data-e~="profcell"][data-open="true"] {
-    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: start;
-  }
-  [data-e~="profcell"][data-open="true"] [data-e~="profpanel"] { margin: 0; }
-  [data-e~="profcell"][data-open="true"] [data-e~="proflinks"] { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-}
-`;
-
-const slug = (file) => file.replace(/\.dc\.html$/, "").replace(/\s+/g, "-");
+/** One page-scoped selector, shared by the emitter and the verification pass so they cannot drift. */
+const scoped = (selector, page, file) =>
+  SCOPED_EXPORT.has(file) && ROOT_SELECTORS.has(selector) ? `[data-page="${page}"]` : `[data-page="${page}"] ${selector}`;
 
 // --- parse ------------------------------------------------------------------------------------
 
@@ -708,8 +667,12 @@ function parseRules(css, file) {
   return rules;
 }
 
-const files = readdirSync(DESIGN).filter((f) => f.endsWith(".dc.html")).sort();
-const sources = new Map(files.map((f) => [f, readFileSync(join(DESIGN, f), "utf8")]));
+const dirOf = new Map();
+for (const dir of [DESIGN, EXPORT_DIR]) {
+  for (const f of readdirSync(dir).filter((f) => f.endsWith(".dc.html"))) dirOf.set(f, dir);
+}
+const files = [...dirOf.keys()].sort();
+const sources = new Map(files.map((f) => [f, readFileSync(join(dirOf.get(f), f), "utf8")]));
 
 const all = [];
 for (const [file, src] of sources) {
@@ -717,10 +680,23 @@ for (const [file, src] of sources) {
   if (block) all.push(...parseRules(block[1], file));
 }
 
+for (const r of all) {
+  const p = KEYFRAME_PREFIX[r.file];
+  if (p) r.selector = r.selector.replace(/^@keyframes\s+/, `@keyframes ${p}`);
+}
+
 // --- classify ---------------------------------------------------------------------------------
 
 const norm = (s) => s.replace(/\s+/g, " ").trim();
-const keyOf = (r) => `${r.context ?? ""}||${norm(r.selector)}`;
+
+// The professions export's rules are keyed per file, so they never land in a group with anybody
+// else's. Without this they do not merely fail to hoist — they *break* the hoist for the rules they
+// collide with: this export declares `a` and `::selection` with its own values, which makes the
+// group's body set ambiguous, and the site-wide `a { color: #27408B }` that had been shared for ten
+// pages falls out of the shared block and is re-emitted as ten [data-page] copies. That is a
+// specificity change, not a cosmetic one — [data-page="VidyaKala"] a outranks [data-e~="vkback"],
+// which plain `a` did not, and the back link changes colour on a page nobody touched.
+const keyOf = (r) => `${SCOPED_EXPORT.has(r.file) ? `${slug(r.file)}::` : ""}${r.context ?? ""}||${norm(r.selector)}`;
 
 const byKey = new Map();
 for (const r of all) {
@@ -764,9 +740,9 @@ function splitSelectors(list) {
   return out.filter(Boolean);
 }
 
-const prefix = (selectorList, page) =>
+const prefix = (selectorList, page, file) =>
   splitSelectors(selectorList)
-    .map((s) => `[data-page="${page}"] ${s}`)
+    .map((s) => scoped(s, page, file))
     .join(", ");
 
 // --- emit -------------------------------------------------------------------------------------
@@ -790,7 +766,7 @@ function renderGroup(rules, page) {
       }
     }
     const indent = "  ".repeat(r.context ? r.context.split(" && ").length : 0);
-    const selector = r.atRule || !page ? r.selector : prefix(r.selector, page);
+    const selector = r.atRule || !page ? r.selector : prefix(r.selector, page, r.file);
     lines.push(`${indent}${selector} {${r.body}}`);
   }
   close();
@@ -853,8 +829,11 @@ out += `${renderGroup(parseRules(BOARD_CSS, "LeadershipBoard"), null)}\n`;
 out += `\n/* ---------- vidya-kala pages (no design source) ---------- */\n`;
 out += `${renderGroup(parseRules(VIDYAKALA_CSS, "VidyaKala"), null)}\n`;
 
-out += `\n/* ---------- professions section on /vidya-kala (no design source) ---------- */\n`;
-out += `${renderGroup(parseRules(PROFESSIONS_CSS, "ProfessionBridge"), null)}\n`;
+out += `\n/* ---------- professions page, authored additions ---------- */\n`;
+out += `${renderGroup(parseRules(VYAVASAYA_CSS, "VyavasayaExtra"), null)}\n`;
+
+out += `\n/* ---------- header collection menu (no design source) ---------- */\n`;
+out += `${renderGroup(parseRules(NAV_MENU_CSS, "SiteHeaderMenu"), null)}\n`;
 
 out += `\n/* ---------- register form states (no design source) ---------- */\n`;
 out += `${renderGroup(parseRules(REGISTER_FORM_CSS, "RegisterForm"), null)}\n`;
@@ -875,7 +854,7 @@ for (const r of all) {
   if (isReducedMotion(r)) continue;
   for (const s of r.atRule ? [r.selector] : splitSelectors(r.selector)) {
     const page = COMPONENTS.has(slug(r.file)) || sharedKeys.has(keyOf(r)) || r.atRule ? null : slug(r.file);
-    wanted.set(`${r.context ?? ""}||${page ? `[data-page="${page}"] ` : ""}${norm(s)}`, norm(r.body));
+    wanted.set(`${r.context ?? ""}||${page ? scoped(norm(s), page, r.file) : norm(s)}`, norm(r.body));
   }
 }
 const got = new Map();

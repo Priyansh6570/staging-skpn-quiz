@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
+import VidyaKalaBackLink from "@/components/VidyaKalaBackLink";
 import SiteFooter from "@/components/SiteFooter";
 import { useLang, useSession } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
@@ -91,13 +92,17 @@ export default function VidyaKalaEntry({ entry: hiEntry, entryEn }: { entry: Ent
   return (
     <div data-page="VidyaKalaEntry" style={{ background: "#F1ECE1", color: "#1B2233", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip", isolation: "isolate" }}>
       {long ? <div data-e="vkprogress" aria-hidden="true"><span style={{ transform: `scaleX(${progress})` }}></span></div> : null}
-      <SiteHeader lang={lang} active="home" onToggleLang={toggleLang} signedIn={session.signedIn} hasCertificates={session.hasCertificates} />
+      <SiteHeader lang={lang} active="vidyaKala" activeSub={entry.section === "vidya" ? "vidya" : "kala"} onToggleLang={toggleLang} signedIn={session.signedIn} hasCertificates={session.hasCertificates} />
 
       <article>
         <header data-e="vkhero">
           <div aria-hidden="true" style={{ position: "absolute", left: "50%", top: "-30%", width: "760px", height: "760px", transform: "translateX(-50%)", borderRadius: "50%", background: "radial-gradient(circle,rgba(47,69,110,.4) 0%,rgba(47,69,110,0) 66%)" }}></div>
           <div data-e="pad" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "40px 30px 58px" }}>
-            <Link href={listHref} data-e="vkback">{`← ${listLabel}`}</Link>
+            {/* The fallback is the list link, which is the default answer anyway — so the static
+                HTML carries a working back link and only the ?from= case waits for hydration. */}
+            <Suspense fallback={<Link href={listHref} data-e="vkback">{`← ${listLabel}`}</Link>}>
+              <VidyaKalaBackLink listHref={listHref} listLabel={listLabel} backLabel={c.vidyaKala.back} />
+            </Suspense>
 
             <div data-e="vkheroline" style={{ marginTop: "30px" }}>
               {n ? <span data-e="vkheronum" aria-hidden="true">{String(n).padStart(2, "0")}</span> : null}
@@ -134,7 +139,10 @@ export default function VidyaKalaEntry({ entry: hiEntry, entryEn }: { entry: Ent
                 alt=""
                 width={entry.plate.width}
                 height={entry.plate.height}
-                sizes="(max-width: 640px) 100vw, (max-width: 1220px) 92vw, 1160px"
+                // Never wider than the file itself. The plates run 646–1168px and the column is
+                // 1160px, so without this most of them were being scaled up by half again.
+                style={{ maxWidth: `${entry.plate.width}px` }}
+                sizes={`(max-width: ${entry.plate.width}px) 100vw, ${entry.plate.width}px`}
                 priority
               />
             ) : null}

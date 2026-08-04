@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import VidyaKalaIndex from "@/components/VidyaKalaIndex";
 import { hi } from "@/lib/i18n";
-import { kalaIndex, professionCards, vidyaGroups } from "@/lib/vidyakala";
+import { kalaIndex, vidyaGroups } from "@/lib/vidyakala";
 
 // Static. lib/vidyakala.ts pulls in the whole 400KB book file, so the read happens here and only the
 // index rows — name and gloss, both languages already resolved — cross into the client component.
@@ -24,8 +24,6 @@ export default function VidyaKalaPage() {
       kalas={kalaIndex("hi")}
       vidyasEn={vidyaGroups("en")}
       kalasEn={kalaIndex("en")}
-      professions={professionCards("hi")}
-      professionsEn={professionCards("en")}
     />
     </Suspense>
   );

@@ -1,46 +1,83 @@
 /**
- * The eight professions the trust approved, and the Vidyas and Kalas each one shares a domain with.
+ * The nineteen professions the trust approved, and the Vidyas and Kalas each one shares a domain
+ * with.
  *
  * **The framing is domain correspondence and nothing more.** These entries belong to the same field
  * of study as the modern subject beside them. Nothing here says, or may be written to imply, that
  * one came first or produced the other — no priority claim, in either language, anywhere in this
- * section.
+ * section or on the page built from it.
  *
- * `entries` are keys in Home_v5.VIDYAS and Home_v5.KALAS. Every one was checked against those two
- * lists before being written here; `npm run professions` refuses to build if any stops resolving, so
- * a renamed entry fails at the build rather than rendering a dead link.
+ * `entries` are keys in Home_v5.VIDYAS and Home_v5.KALAS, and they are the only form the mapping is
+ * written in. The trust supplied it as Devanagari names, about a quarter of which differ from the
+ * book's own spelling — वास्तु विद्या for वास्तुविद्या, संपाठ्य for सम्पाठ्यम्, मेषकुक्कुट विधि for the full
+ * मेषकुक्कुट लावकयुद्ध विधि. Storing those would put a second set of Devanagari names in the repo to
+ * drift against lib/i18n; storing the key means the rendered name is always the book's, resolved at
+ * build time. Every key below was matched to the supplied name mechanically, not by eye, and
+ * `npm run professions` refuses to build if any stops resolving.
  *
- * The keys live here once rather than under `hi` and `en` separately: they are structure, not copy,
- * and a second copy is what drifts.
+ * All 78 entries are covered across these nineteen, in 80 slots. The two entries that appear twice
+ * are deliberate, and both are compounds the trust reads as two subjects:
+ *   - `Vrikshayurveda` — वृक्षायुर्वेद योग, under `doctor` and `botanical`.
+ *   - `Mani-raga-jnana` — मणिरागाकर ज्ञान, मणिराग (gem colour) under `lab` and आकर (mines) under
+ *     `space`. Both render under the entry's own name; the split is editorial, not a second entry.
+ *
+ * The trust's mapping also carried केश मार्जन under `perfumery`. No entry of that name exists — the
+ * book reads केशमर्दन, inside उत्सादन-संवाहन-केशमर्दन कुशलता, which is already `doctor`'s `Utsadana`.
+ * The trust confirmed on 5 August 2026 that the slot name was wrong and dropped it.
  */
 export interface Profession {
-  /** Also the artwork's filename in design/professions and public/professions. */
   key: string;
+  /** Explicit, not slugged: the supplied artwork filenames are inconsistent in case and spacing. */
+  image: string;
   entries: string[];
 }
 
 export const PROFESSIONS: Profession[] = [
-  { key: "space", entries: ["Jyotisha", "Yantra-matrika"] },
-  { key: "engineer", entries: ["Vastu-vidya", "Takshana", "Takshakarma", "Yantra-matrika"] },
-  { key: "doctor", entries: ["Vrikshayurveda", "Utsadana", "Vyayamiki"] },
-  { key: "lab", entries: ["Dhatu-vada", "Rupya-ratna-pariksha", "Mani-raga-jnana"] },
-  { key: "botanical", entries: ["Vrikshayurveda", "Malya-grathana", "Pushpastarana"] },
-  { key: "painter", entries: ["Alekhya", "Chitra-yoga", "Manibhumika-karma"] },
-  { key: "musician", entries: ["Geet", "Vadya", "Nritya", "Vina-damaruka"] },
-  { key: "teacher", entries: ["Vyakarana", "Nirukta", "Nyaya", "Dharana-matrika"] },
+  { key: "space", image: "space.jpg", entries: ["Jyotisha", "Yantra-matrika", "Mani-raga-jnana", "Nimitta-jnana"] },
+  { key: "engineer", image: "engineer.jpg", entries: ["Vastu-vidya", "Takshana", "Takshakarma"] },
+  { key: "doctor", image: "doctor.jpg", entries: ["Vrikshayurveda", "Utsadana", "Vyayamiki"] },
+  { key: "lab", image: "lab.jpg", entries: ["Dhatu-vada", "Rupya-ratna-pariksha", "Mani-raga-jnana"] },
+  { key: "botanical", image: "botanical.jpg", entries: ["Vrikshayurveda", "Malya-grathana", "Pushpastarana"] },
+  { key: "painter", image: "painter.jpg", entries: ["Alekhya", "Chitra-yoga", "Manibhumika-karma"] },
+  { key: "musician", image: "musician.jpg", entries: ["Geet", "Vadya", "Nritya", "Vina-damaruka"] },
+  { key: "teacher", image: "teacher.jpg", entries: ["Vyakarana", "Nirukta", "Nyaya", "Dharana-matrika"] },
+  {
+    key: "literature",
+    image: "Literature & linguistics.jpg",
+    entries: ["Pustaka-vachana", "Natika-akhyayika", "Kavya-samasya-purana", "Pratimala", "Prahelika", "Durvachaka-yoga", "Abhidhana-kosha", "Chhando-jnana", "Manasi-kavya-kriya", "Chhanda"],
+  },
+  { key: "languages", image: "Languages & translation.jpg", entries: ["Mlechchhita-kala", "Desha-bhasha-jnana", "Akshara-mushtika", "Sampathya"] },
+  {
+    key: "textiles",
+    image: "Textiles & fashion.jpg",
+    entries: ["Suchi-vana-karma", "Sutra-krida", "Nepathya-yoga", "Dashana-vasana-raga", "Vastra-gopana", "Pattika-vetra-vana"],
+  },
+  { key: "jewellery", image: "Jewellery & gemcraft.jpg", entries: ["Bhushana-yojana", "Karnapatra-bhanga", "Shekharaka-yojana"] },
+  { key: "culinary", image: "Culinary arts & nutrition.jpg", entries: ["Vichitra-bhakshya", "Panaka-rasa-yojana"] },
+  { key: "perfumery", image: "Perfumery & cosmetics.jpg", entries: ["Gandha-yukti", "Visheshakachchhedya", "Tandula-kusuma"] },
+  { key: "interior", image: "Interior & event design.jpg", entries: ["Shayana-rachana", "Pushpa-shakatika", "Udaka-vadya"] },
+  { key: "sport", image: "Sport, games & recreation.jpg", entries: ["Udaka-ghata", "Balakridanaka", "Akarsha-krida", "Dyuta-vishesha"] },
+  { key: "veterinary", image: "Veterinary & animal science.jpg", entries: ["Mesha-kukkuta-vidhi", "Shuka-sarika-pralapana", "Vaijayiki-vidya"] },
+  {
+    key: "vedic",
+    image: "Vedic scholarship & philosophy.jpg",
+    entries: ["Rigveda", "Yajurveda", "Samaveda", "Atharvaveda", "Shiksha", "Kalpa", "Dharmashastra", "Purana", "Mimamsa", "Vainayiki-vidya", "Kriya-vikalpa"],
+  },
+  { key: "performance", image: "PERFORMANCE AND ILLUSION.jpg", entries: ["Aindrajala", "Kauchumara-yoga", "Hasta-laghava", "Chhalitaka-yoga"] },
 ];
 
 /**
  * Supplied by the trust with the artwork, in both languages, and copied in verbatim.
  *
- * One name in the supplied mapping has no entry to point at: `space` was given a third, आकरज्ञान,
- * and no Vidya or Kala carries that name. The only entry containing आकर in the sense of a source or
- * mine is मणिरागाकर ज्ञान (`Mani-raga-jnana`), which the same mapping already assigns to `lab`, and
- * the only other आकर is आकर्षक्रीड़ा (`Akarsha-krida`), which is a game with magnets. It is left out
- * rather than guessed at. See HANDOFF.md.
+ * `eyebrow` and `headline` are the professions page's own masthead and the home section's opening,
+ * supplied on 5 August 2026. They replace the headings the design mockup carried, which were
+ * improvised and are not used anywhere. `title` and `subtitle` are the older pair, still the heading
+ * over the grid itself and the lede on the home section.
  */
 export const professionCopy = {
   hi: {
+    eyebrow: "14 विद्याएँ और 64 कलाएँ प्रेरणा बनीं",
+    headline: "पुरातन और आधुनिक युग की शक्ति",
     title: "ये कलाएँ आज कहाँ हैं",
     subtitle: "चौदह विद्याएँ और चौंसठ कलाएँ आज के विषयों और व्यवसायों में इसी रूप में जीवित हैं",
     labels: {
@@ -52,9 +89,22 @@ export const professionCopy = {
       painter: "चित्रकला एवं डिज़ाइन",
       musician: "संगीत एवं नृत्य",
       teacher: "शिक्षा एवं शोध",
+      literature: "साहित्य एवं भाषाविज्ञान",
+      languages: "भाषा एवं अनुवाद",
+      textiles: "वस्त्र एवं परिधान",
+      jewellery: "आभूषण एवं रत्नकला",
+      culinary: "पाककला एवं पोषण",
+      perfumery: "सुगंध एवं सौंदर्य",
+      interior: "सज्जा एवं आयोजन",
+      sport: "खेल एवं मनोरंजन",
+      veterinary: "पशु चिकित्सा एवं विज्ञान",
+      vedic: "वैदिक अध्ययन एवं दर्शन",
+      performance: "मंचकला एवं इंद्रजाल",
     },
   },
   en: {
+    eyebrow: "The 14 Vidyas and 64 Kalas became an inspiration",
+    headline: "A strength for both the ancient and the modern age",
     title: "Where these arts live today",
     subtitle: "The fourteen Vidyas and sixty-four Kalas survive in today's subjects and professions",
     labels: {
@@ -66,6 +116,17 @@ export const professionCopy = {
       painter: "Art & design",
       musician: "Music & dance",
       teacher: "Education & research",
+      literature: "Literature & linguistics",
+      languages: "Languages & translation",
+      textiles: "Textiles & fashion",
+      jewellery: "Jewellery & gemcraft",
+      culinary: "Culinary arts & nutrition",
+      perfumery: "Perfumery & cosmetics",
+      interior: "Interior & event design",
+      sport: "Sport, games & recreation",
+      veterinary: "Veterinary & animal science",
+      vedic: "Vedic scholarship & philosophy",
+      performance: "Performance & illusion",
     },
   },
 } as const;

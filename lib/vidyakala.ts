@@ -1,7 +1,6 @@
 import book from "@/vidya-kala.json";
 import plateBook from "@/vk-plates.json";
 import { hi as hiStrings, type Lang, strings } from "@/lib/i18n";
-import { PROFESSIONS, professionCopy } from "@/lib/i18n/professions";
 
 // Server-only. The JSON is ~400KB; nothing here may be imported by a client component.
 // Callers pass the narrow shapes below across the boundary instead.
@@ -58,43 +57,12 @@ const SOURCE_KEY: Record<string, string> = { "Chhando-jnana": "Abhidhana-kosha" 
 
 const keyOf = (e: RawEntry) => e.key ?? KEY_BY_PAGE[e.bookHeading.printed] ?? null;
 
-const scopedContent = (key: string): Block[] => {
-  const e = raw.find((x) => keyOf(x) === (SOURCE_KEY[key] ?? key));
-  if (!e) return [];
-  const scope = PAGE_SCOPED[key];
-  return scope ? e.content.filter((p) => scope.includes(p.printed)) : e.content;
-};
-
-/** Longest preview the drawer can show before the panel starts to scroll on a phone. */
-const PREVIEW_MAX = 300;
-/** U+0964, the sentence terminator the book uses, as an escape: no Devanagari is typed in this repo. */
-const DANDA = "\u0964";
-
-/**
- * The drawer's preview: a whole opening sentence, never a slice.
- *
- * The cut lands on U+0964, the danda the book ends every sentence with — written as an escape
- * because no Devanagari is typed in this repo. Cutting there means the preview needs no ellipsis
- * and cannot split a conjunct mid-cluster, which a character count would do roughly one time in
- * three. An entry whose first sentence runs past the budget with no earlier break gets no preview
- * at all rather than a mangled one; the drawer then shows name and gloss only.
- */
-const previewOf = (blocks: Block[]): string | null => {
-  const first = blocks.find((p) => p.kind === "para")?.text;
-  if (!first) return null;
-  if (first.length <= PREVIEW_MAX) return first;
-  const cut = first.lastIndexOf(DANDA, PREVIEW_MAX);
-  return cut > 80 ? first.slice(0, cut + 1) : null;
-};
-
 export type IndexRow = {
   key: string;
   name: string;
   gloss: string | null;
   glossIsHindi: boolean;
   n: number;
-  /** Always Hindi: the book has no English prose, and none is invented. Null where there is none. */
-  preview: string | null;
 };
 export type VidyaGroup = { label: string; rows: IndexRow[] };
 
@@ -111,50 +79,8 @@ const rowOf = (t: (string | null)[], lang: Lang, n: number): IndexRow => {
     gloss: gloss ?? null,
     glossIsHindi: lang === "en" && !t[3],
     n,
-    preview: previewOf(scopedContent(key)),
   };
 };
-
-export type ProfessionEntry = { key: string; name: string; gloss: string | null; glossIsHindi: boolean; n: number; section: "vidya" | "kala" };
-export type ProfessionCard = { key: string; label: string; entries: ProfessionEntry[] };
-
-/**
- * The professions section's data, resolved server-side: for each profession, the Vidyas and Kalas it
- * shares a domain with, carrying each entry's own name and its gloss from the book.
- *
- * The gloss is the point. A student who taps "चिकित्सा" is not shown a list of words — they are shown
- * that वृक्षायुर्वेद योग is "पेड़-पौधों की चिकित्सा", and the link takes them to what the book says.
- *
- * Throws on a key that no longer resolves. The section is a set of promises about what the reader
- * will find; a silently dropped link is worse than a failed build.
- */
-export function professionCards(lang: Lang): ProfessionCard[] {
-  const vidyas = i18nList(lang, "VIDYAS");
-  const kalas = i18nList(lang, "KALAS");
-  // Built field by field rather than through rowOf: this needs a name and a gloss, and rowOf also
-  // computes the drawer preview, which walks the entry's whole content for a string nothing here
-  // renders.
-  const entryOf = (t: (string | null)[], n: number, section: "vidya" | "kala"): ProfessionEntry => ({
-    key: t[2] as string,
-    name: ((lang === "hi" ? t[0] : t[2]) ?? t[0] ?? "") as string,
-    gloss: (lang === "hi" ? t[1] : (t[3] ?? t[1])) ?? null,
-    glossIsHindi: lang === "en" && !t[3],
-    n,
-    section,
-  });
-  const find = (key: string): ProfessionEntry => {
-    const vi = vidyas.findIndex((t) => t[2] === key);
-    if (vi >= 0) return entryOf(vidyas[vi], vi + 1, "vidya");
-    const ki = kalas.findIndex((t) => t[2] === key);
-    if (ki >= 0) return entryOf(kalas[ki], ki + 1, "kala");
-    throw new Error(`professions: no Vidya or Kala with key "${key}" — see lib/i18n/professions.ts`);
-  };
-  return PROFESSIONS.map(({ key, entries }) => ({
-    key,
-    label: professionCopy[lang].labels[key as keyof (typeof professionCopy)["hi"]["labels"]],
-    entries: entries.map(find),
-  }));
-}
 
 /**
  * Vidyas grouped 4/6/4. The label comes from groupHi on the book entry, written there once by a

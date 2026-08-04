@@ -90,6 +90,27 @@ export interface CustomStrings {
     countLine: string;
     /** TODO(hi): shown where an entry has no English description and the Hindi is displayed. */
     hindiOnly: string;
+    /**
+     * The entry page's back link when the reader arrived from /vyavasaya. Supplied by the client on
+     * 5 August 2026: "वापस जाएं". Arrivals from the index keep the list's own name instead, so this
+     * is the generic wording used only where naming the destination would say nothing useful.
+     */
+    back: string;
+  };
+  /**
+   * The collection dropdown, grouped under one nav item rather than added as three more top-level
+   * ones. Supplied by the client on 5 August 2026.
+   *
+   * Only two labels live here. The other two entries in the menu are the two tabs of /vidya-kala,
+   * and the client's wording for them — "14 विद्याएँ" and "64 कलाएँ" — is byte-identical to
+   * Home_v5.S.tabVidyas and tabKalas, which the tabs themselves already render. Those are read
+   * straight from there rather than copied: a second copy of a Devanagari string is a second thing
+   * to keep in step, and a nav item that disagreed with the tab it lands on would be worse than
+   * either wording alone.
+   */
+  nav: {
+    group: string;
+    vyavasaya: string;
   };
 }
 
@@ -184,6 +205,11 @@ export const customHi: CustomStrings = {
     browseAll: "विस्तार से देखें",
     countLine: "14 विद्याएँ और 64 कलाएँ",
     hindiOnly: "Hindi only",
+    back: "वापस जाएं",
+  },
+  nav: {
+    group: "ज्ञान परंपरा",
+    vyavasaya: "आधुनिक युग",
   },
 };
 
@@ -233,5 +259,10 @@ export const customEn: CustomStrings = {
     browseAll: "Browse",
     countLine: "14 Vidyas and 64 Kalas",
     hindiOnly: "Hindi only",
+    back: "Back",
+  },
+  nav: {
+    group: "Knowledge Tradition",
+    vyavasaya: "The Modern Age",
   },
 };
