@@ -90,8 +90,9 @@ export default function LoginPage() {
         <div data-e="split" style={{ display: "grid", gridTemplateColumns: "minmax(0,.92fr) minmax(0,1.08fr)", borderRadius: "26px", overflow: "hidden", boxShadow: "0 2px 6px rgba(20,32,62,.06),0 22px 52px rgba(20,32,62,.14)", alignItems: "stretch" }}>
 
           <aside data-e="aside" style={{ position: "relative", overflow: "hidden", background: "#070B1E", minHeight: "500px", padding: "36px 34px", display: "flex", flexDirection: "column", gap: "24px" }}>
-            <img src="/assets/cosmic-halo.png" alt="" width="924" height="540" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 40%", opacity: ".5" }} />
-            <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(170deg, rgba(7,11,30,.5) 0%, rgba(7,11,30,.87) 54%, rgba(5,8,22,.97) 100%)" }}></div>
+            {/* Same artwork, framing and scrim as the registration aside, kept in step with it. */}
+            <img src="/assets/newbg.jpg" alt="" width="1791" height="1007" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "40% 35%", opacity: ".62" }} />
+            <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(170deg, rgba(7,11,30,.46) 0%, rgba(7,11,30,.80) 54%, rgba(5,8,22,.94) 100%)" }}></div>
             <div aria-hidden="true" style={{ position: "absolute", right: "-14%", top: "-12%", width: "320px", height: "320px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%)", animation: "lg-glow 9s ease-in-out infinite" }}></div>
 
             <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "12px" }}>

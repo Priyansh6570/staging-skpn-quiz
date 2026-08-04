@@ -52,18 +52,17 @@ export interface CustomStrings {
   };
   /**
    * The SMS code step. The design export predates it, so there is no source copy for any of it.
-   * The Devanagari is NOT written: the values are the English text in both locales, for the same
-   * reason as vidyaKala below. This one is worse than that one — it sits in the middle of sign-in
-   * and registration, so until Hindi is supplied every student on a Hindi site meets an English
-   * screen at the one point they cannot skip. Supply it before launch.
+   * Six of these were supplied by the client on 4 August 2026 and are Devanagari; the rest are
+   * still the English text in both locales, for the same reason as vidyaKala below. Every one of
+   * those sits in the middle of sign-in and registration, at the one point a student cannot skip.
    */
   otp: {
-    /** TODO(hi) */ title: string;
-    /** TODO(hi) */ codeLabel: string;
-    /** TODO(hi) */ verify: string;
-    /** TODO(hi) */ resend: string;
+    title: string;
+    codeLabel: string;
+    verify: string;
+    resend: string;
     /** TODO(hi) — "{s}" is replaced with the whole seconds remaining. */ resendIn: string;
-    /** TODO(hi) */ changeNumber: string;
+    changeNumber: string;
     /** TODO(hi) */ wrongCode: string;
     /** TODO(hi) */ expired: string;
     /** TODO(hi) */ exhausted: string;
@@ -73,11 +72,11 @@ export interface CustomStrings {
     /** TODO(hi) — the proof of ownership timed out before the form was submitted. */ verificationExpired: string;
     /** TODO(hi) — status text while the code is being sent. */ sending: string;
     /** TODO(hi) — status text while the code is being checked. */ verifying: string;
-    /** TODO(hi) — confirmation shown inline once the code is on its way. */ sentTo: string;
+    /** followed by the number, once the code is on its way. */ sentTo: string;
     /** TODO(hi) — followed by the number, once the code for it has been accepted. */ verified: string;
   };
   /**
-   * /vidya-kala. The Devanagari for these four is NOT yet written: the values below are the
+   * /vidya-kala. The Devanagari for two of these is NOT yet written: the values below are the
    * English text in both locales, deliberately, because no Hindi source exists for them and
    * inventing Devanagari for a government page is not something this build will do. Every other
    * label on those pages is reused from lib/i18n. Supply Hindi here before launch.
@@ -91,16 +90,10 @@ export interface CustomStrings {
     countLine: string;
     /** TODO(hi): shown where an entry has no English description and the Hindi is displayed. */
     hindiOnly: string;
-    /** TODO(hi): label for the book heading shown as scholarly detail. */
-    bookHeadingLabel: string;
   };
 }
 
-/**
- * One object, referenced from both tables. Two copies would drift, and the drift would read as a
- * deliberate translation rather than as the placeholder this is.
- */
-const OTP_PENDING_HI: CustomStrings["otp"] = {
+const OTP_EN: CustomStrings["otp"] = {
   title: "Enter the code",
   codeLabel: "Six-digit code",
   verify: "Verify",
@@ -118,6 +111,32 @@ const OTP_PENDING_HI: CustomStrings["otp"] = {
   verifying: "Checking the code",
   sentTo: "Code sent to",
   verified: "Verified",
+};
+
+/**
+ * Six supplied by the client on 4 August 2026 and copied in verbatim. The remaining eleven still
+ * have no Hindi, and they read from OTP_EN rather than repeating its text: one English string in
+ * one place, so a Hindi value replaces it here and nowhere else, and there is no second copy to
+ * drift out of step while it waits.
+ */
+const OTP_HI: CustomStrings["otp"] = {
+  title: "कोड दर्ज करें",
+  codeLabel: "छह अंकों का कोड",
+  verify: "सत्यापित करें",
+  resend: "पुनः भेजें",
+  changeNumber: "नंबर बदलें",
+  sentTo: "कोड भेजा गया",
+  resendIn: OTP_EN.resendIn,
+  wrongCode: OTP_EN.wrongCode,
+  expired: OTP_EN.expired,
+  exhausted: OTP_EN.exhausted,
+  sendFailed: OTP_EN.sendFailed,
+  unavailable: OTP_EN.unavailable,
+  quotaExceeded: OTP_EN.quotaExceeded,
+  verificationExpired: OTP_EN.verificationExpired,
+  sending: OTP_EN.sending,
+  verifying: OTP_EN.verifying,
+  verified: OTP_EN.verified,
 };
 
 export const customHi: CustomStrings = {
@@ -159,13 +178,12 @@ export const customHi: CustomStrings = {
     title: "यह पृष्ठ नहीं मिला",
     body: "संभव है कि पता गलत लिखा गया हो, अथवा यह पृष्ठ स्थानांतरित हो गया हो।",
   },
-  otp: OTP_PENDING_HI,
+  otp: OTP_HI,
   vidyaKala: {
     searchLabel: "Search the 64 Kalas",
     browseAll: "विस्तार से देखें",
     countLine: "14 विद्याएँ और 64 कलाएँ",
     hindiOnly: "Hindi only",
-    bookHeadingLabel: "Book heading",
   },
 };
 
@@ -209,12 +227,11 @@ export const customEn: CustomStrings = {
     title: "This page could not be found",
     body: "The address may be mistyped, or the page may have moved.",
   },
-  otp: OTP_PENDING_HI,
+  otp: OTP_EN,
   vidyaKala: {
     searchLabel: "Search the 64 Kalas",
     browseAll: "Browse",
     countLine: "14 Vidyas and 64 Kalas",
     hindiOnly: "Hindi only",
-    bookHeadingLabel: "Book heading",
   },
 };

@@ -7,25 +7,26 @@ import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import { useLang, useSession } from "@/components/AppProviders";
-import { strings, en as enStrings } from "@/lib/i18n";
+import { custom, strings, en as enStrings } from "@/lib/i18n";
+import { EXAM_KEYS } from "@/lib/registration";
 
+/** Mirrors `profileDetail` in lib/serialize.ts, field for field. No score, no raw duration. */
 interface Me {
-  fullName: string;
+  displayName: string;
   mobile: string;
   email: string | null;
   gender: "male" | "female" | "other";
   dateOfBirth: string | null;
-  address: { line: string; cityVillage: string; district: string; state: string; pincode: string };
+  address: { line: string; cityVillage: string; district: string; pincode: string };
   category: "vidyalaya" | "mahavidyalaya";
   educationLevel: string;
   institutionName: string;
   competitiveExam: string | null;
   isDivyang: boolean;
-  attempt: { score: number | null; submittedAt: string | null; timeTakenSeconds: number | null } | null;
+  attempt: { submittedAt: string | null; durationLabel: string | null } | null;
 }
 
 const DASH = "-";
-const mmss = (sec: number) => `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -59,18 +60,24 @@ export default function ProfilePage() {
   const levelIndex = me ? enStrings.Register.LEVELS[me.category].indexOf(me.educationLevel) : -1;
   const levelLabel = me && levelIndex >= 0 ? strings(lang).Register.LEVELS[me.category][levelIndex] : DASH;
   const genderLabel = me ? strings(lang).Register.S.genders[["male", "female", "other"].indexOf(me.gender)] ?? DASH : DASH;
+  // Stored as the English key, read back as the label, exactly like district and level above.
+  const examIndex = me?.competitiveExam ? EXAM_KEYS.indexOf(me.competitiveExam) : -1;
+  const examLabel = examIndex >= 0
+    ? [...custom(lang).pratiyogita.examNames, strings(lang).Register.S.examOther, strings(lang).Register.S.examNone][examIndex]
+    : me?.competitiveExam || inline[0];
   const dobLabel = me?.dateOfBirth
     ? (() => { const d = new Date(me.dateOfBirth); return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`; })()
     : DASH;
 
-  const name = me?.fullName ?? session.name ?? DASH;
+  const name = me?.displayName ?? session.displayName ?? DASH;
   const attemptDate = me?.attempt?.submittedAt
     ? (() => { const d = new Date(me.attempt!.submittedAt!); return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`; })()
     : DASH;
   const attemptClock = me?.attempt?.submittedAt
     ? (() => { const d = new Date(me.attempt!.submittedAt!); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; })()
     : DASH;
-  const attemptTaken = me?.attempt?.timeTakenSeconds != null ? mmss(me.attempt.timeTakenSeconds) : DASH;
+  // Formatted server-side. The raw second count is not sent: see lib/serialize.ts.
+  const attemptTaken = me?.attempt?.durationLabel ?? DASH;
 
   const student = { fullName: name, district: districtLabel };
   const initials = name.trim().charAt(0);
@@ -79,6 +86,17 @@ export default function ProfilePage() {
     { label: s.stats[0], value: attemptDate },
     { label: s.stats[1], value: attemptTaken },
   ];
+  /**
+   * The one condition the participation card turns on. `me.attempt` is a submitted paper and
+   * nothing else — see app/api/me/route.ts. Having an account is not completion, and neither is
+   * having opened a paper; the green "competition completed" panel used to render for every
+   * student who reached this page, including one who had only just registered.
+   *
+   * `null` while /api/me is in flight, so neither state is shown before the answer arrives: a
+   * student who has finished must not be told to start, and one who has not must not be
+   * congratulated, even for a frame.
+   */
+  const completed = me === null ? null : me.attempt !== null;
   const attempts = me?.attempt
     ? [{ date: `${attemptDate}, ${attemptClock}`, time: `${inline[2]}${attemptTaken}`, status: inline[3] }]
     : [];
@@ -104,7 +122,7 @@ export default function ProfilePage() {
       { k: k.category, v: categoryLabel },
       { k: k.level, v: levelLabel },
       { k: k.institution, v: me?.institutionName ?? DASH },
-      { k: k.exam, v: me?.competitiveExam || inline[0] },
+      { k: k.exam, v: examLabel },
       { k: k.divyang, v: me?.isDivyang ? s.divyangYes : s.divyangNo },
     ] },
   ];
@@ -132,7 +150,7 @@ export default function ProfilePage() {
 
         <div data-e="card" style={{ padding: "28px 30px", background: "#FFFFFF", borderRadius: "20px", boxShadow: "0 2px 4px rgba(20,32,62,.05),0 14px 32px rgba(20,32,62,.06)", marginBottom: "20px" }}>
           <h2 style={{ margin: "0 0 18px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "21px", lineHeight: "1.4", color: "#14203E" }}>{t.participation}</h2>
-          <div data-e="attempt" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "16px", marginBottom: "24px" }}>
+          <div data-e="attempt" style={{ display: completed ? "grid" : "none", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "16px", marginBottom: "24px" }}>
             {stats.map((s, sIndex) => (
               <div key={sIndex} style={{ padding: "18px 20px", borderRadius: "16px", background: "#F6F0E4", display: "flex", flexDirection: "column", gap: "4px" }}>
                 <span style={{ fontSize: "15px", lineHeight: "1.6", color: "#161C2E" }}>{s.label}</span>
@@ -150,13 +168,24 @@ export default function ProfilePage() {
               </li>
             ))}
           </ul>
-          <div style={{ margin: "20px 0 0", padding: "18px 20px", borderRadius: "14px", background: "#EAF3ED", border: "1px solid #CFE3D6", display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: "9px", padding: "8px 16px", borderRadius: "999px", background: "#2E6B4B", color: "#F2FBF5", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "16.5px", lineHeight: "1.5" }}>
-              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F2FBF5" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block" }}><path d="M4.5 12.5 9.5 17.5 19.5 7"></path></svg>
-              {t.status}
-            </span>
-            <span style={{ fontSize: "16px", lineHeight: "1.8", color: "#161C2E" }}>{t.bestNote}</span>
-          </div>
+          {completed === true ? (
+            <div data-e="donepanel" style={{ margin: "20px 0 0", padding: "18px 20px", borderRadius: "14px", background: "#EAF3ED", border: "1px solid #CFE3D6", display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: "9px", padding: "8px 16px", borderRadius: "999px", background: "#2E6B4B", color: "#F2FBF5", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "16.5px", lineHeight: "1.5" }}>
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="#F2FBF5" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block" }}><path d="M4.5 12.5 9.5 17.5 19.5 7"></path></svg>
+                {t.status}
+              </span>
+              <span style={{ fontSize: "16px", lineHeight: "1.8", color: "#161C2E" }}>{t.bestNote}</span>
+            </div>
+          ) : null}
+
+          {/* Not yet sat. The invite, in the page's own approved copy — Profile.S.startQuiz was
+              already written for this state and had never been rendered. */}
+          {completed === false ? (
+            <div data-e="startpanel" style={{ margin: "20px 0 0", padding: "18px 20px", borderRadius: "14px", background: "#F6F0E4", border: "1px solid #E3D9C6", display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "16px", lineHeight: "1.8", color: "#161C2E" }}>{t.bestNote}</span>
+              <Link href="/quiz" data-e="cta" style={{ marginLeft: "auto", display: "inline-flex", alignItems: "center", justifyContent: "center", minHeight: "48px", padding: "12px 24px", borderRadius: "999px", background: "#14203E", color: "#FDF3DF", fontSize: "16.5px", fontWeight: "600", lineHeight: "1.5" }}>{t.startQuiz}</Link>
+            </div>
+          ) : null}
         </div>
 
         <div data-g="two" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "20px", alignItems: "start" }}>

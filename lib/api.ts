@@ -46,7 +46,15 @@ setInterval(() => {
   for (const [key, bucket] of buckets) if (bucket.resetAt <= now) buckets.delete(key);
 }, 60_000).unref?.();
 
+/**
+ * The only thing a client is told about a failure is a code this codebase chose.
+ *
+ * A SessionError carries one; anything else is logged server-side and answered with a bare 500.
+ * It used to rethrow, which in development renders the stack — and a driver error rethrown here
+ * would put Mongo's own message, index names and all, into a response body.
+ */
 export function errorResponse(error: unknown): NextResponse {
   if (error instanceof SessionError) return fail(error.status, error.message);
-  throw error;
+  console.error("unhandled route error", error);
+  return fail(500, "server_error");
 }

@@ -6,9 +6,10 @@ import { useSearchParams } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import VidyaKalaDrawer from "@/components/VidyaKalaDrawer";
+import ProfessionBridge from "@/components/ProfessionBridge";
 import { useLang, useSession } from "@/components/AppProviders";
 import { custom, strings } from "@/lib/i18n";
-import type { IndexRow, VidyaGroup } from "@/lib/vidyakala";
+import type { IndexRow, ProfessionCard, VidyaGroup } from "@/lib/vidyakala";
 
 // Devanagari typed into a search box does not reliably match the book's bytes: the data carries both
 // nukta and bare forms of the same letter (क्रीडा / क्रीड़ा), and IME output is not always NFC. Folding
@@ -17,9 +18,12 @@ const fold = (s: string) =>
   s.normalize("NFC").replace(/़/g, "").replace(/[​-‍]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
 
 type View = "vidya" | "kala";
-type Props = { vidyas: VidyaGroup[]; kalas: IndexRow[]; vidyasEn: VidyaGroup[]; kalasEn: IndexRow[] };
+type Props = {
+  vidyas: VidyaGroup[]; kalas: IndexRow[]; vidyasEn: VidyaGroup[]; kalasEn: IndexRow[];
+  professions: ProfessionCard[]; professionsEn: ProfessionCard[];
+};
 
-export default function VidyaKalaIndex({ vidyas, kalas, vidyasEn, kalasEn }: Props) {
+export default function VidyaKalaIndex({ vidyas, kalas, vidyasEn, kalasEn, professions, professionsEn }: Props) {
   const { lang, toggle: toggleLang } = useLang();
   const { session } = useSession();
   const s = strings(lang).Home_v5.S;
@@ -63,7 +67,7 @@ export default function VidyaKalaIndex({ vidyas, kalas, vidyasEn, kalasEn }: Pro
 
   return (
     <div data-page="VidyaKala" style={{ background: "#070B1E", color: "#F2EEE4", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip", isolation: "isolate" }}>
-      <SiteHeader lang={lang} active="home" onToggleLang={toggleLang} signedIn={session.signedIn} hasCertificates={session.hasCertificates || session.attemptCount > 0} />
+      <SiteHeader lang={lang} active="home" onToggleLang={toggleLang} signedIn={session.signedIn} hasCertificates={session.hasCertificates} />
 
       <section style={{ position: "relative", overflow: "hidden" }}>
         <div aria-hidden="true" style={{ position: "absolute", left: "50%", top: "-26%", width: "820px", height: "820px", transform: "translateX(-50%)", borderRadius: "50%", background: "radial-gradient(circle,rgba(47,69,110,.4) 0%,rgba(47,69,110,0) 68%)" }}></div>
@@ -141,6 +145,11 @@ export default function VidyaKalaIndex({ vidyas, kalas, vidyasEn, kalasEn }: Pro
           {!shown.length ? <p data-e="vkempty">{q} · 0 / {rows.length}</p> : null}
         </section>
       )}
+
+      {/* Below the tabbed index rather than between the tabs and their content: the list is what
+          this page is for, and eight large plates wedged above it would bury the thing the reader
+          came to browse. */}
+      <ProfessionBridge cards={professions} cardsEn={professionsEn} />
 
       <SiteFooter lang={lang} />
 

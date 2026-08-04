@@ -336,6 +336,16 @@ button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offs
 [data-e~="vkcta"][data-vkc="primary"]:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(232,193,115,.32); }
 [data-e~="vkcta"][data-vkc="ghost"] { border: 1px solid rgba(255,249,236,.30); color: #FFF9EC; }
 [data-e~="vkcta"][data-vkc="ghost"]:hover { background: rgba(255,249,236,.07); border-color: rgba(255,249,236,.52); }
+/* The label rode high in the pill while the chevron sat dead centre.
+   'Noto Serif Devanagari' declares a descent of 11px at 17.5px, for conjuncts and matras that most
+   labels never reach; the ink descent of these two is 2px in Hindi and 1px in Latin. The baseline is
+   therefore set low in the line box and the ink centre lands about 5px above the box centre —
+   measured at 390 and 1440, both languages. Flex centring can only see the line box, so no amount of
+   align-items or line-height moves it: a symmetric line-height keeps the same ink offset, and
+   padding would carry the chevron with it.
+   The correction rides on the label alone, in em so it holds at any size. text-box-trim would do
+   this properly and is not available to the handsets this platform has to run on. */
+[data-e~="vkctalabel"] { display: block; transform: translateY(.25em); }
 [data-e~="vkcta"]:focus-visible { outline: 2px solid #E8C173; outline-offset: 3px; }
 /* The rows stay inside their own grid column. They used to be set to calc(100% + 14vw) so the strip
    would read as continuing past the section — but the section clips its overflow, so on a wide
@@ -563,6 +573,18 @@ button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offs
 }
 [data-e~="vkheroname"] { margin: 0; font-family: 'Noto Serif Devanagari', serif; font-weight: 600; font-size: clamp(34px,5.6vw,60px); line-height: 1.16; color: #FFF9EC; text-wrap: balance; }
 [data-e~="vkherogloss"] { margin: 20px 0 0; max-width: 52ch; font-size: 17px; line-height: 1.85; color: #C79A46; }
+/* The entry's plate, closing the dark band. The plates are painted panels of wildly different
+   proportions — 2.16:1 for most, 1.4:1 for a few — so the box is given the ratio and the image
+   covers it, rather than the band jumping height from one entry to the next. The inset ring and
+   the fade into the band below stop it reading as a photograph dropped onto the page. */
+[data-e~="vkplate"] {
+  display: block; width: 100%; height: auto; margin: 34px 0 0;
+  aspect-ratio: 21 / 9; object-fit: cover; object-position: 50% 42%;
+  border-radius: 20px; box-shadow: inset 0 0 0 1px rgba(232,193,115,.22), 0 24px 60px rgba(0,0,0,.42);
+}
+@media (max-width: 640px) {
+  [data-e~="vkplate"] { aspect-ratio: 16 / 9; margin-top: 26px; border-radius: 16px; }
+}
 [data-e~="vkbody"] { background: #F1ECE1; color: #1B2233; }
 [data-e~="vkread"] { display: grid; gap: 56px; grid-template-columns: minmax(0,1fr) 340px; align-items: start; }
 /* The opening paragraph is set larger than the rest. It is the only typographic hierarchy the
@@ -625,22 +647,116 @@ button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offs
   [data-e~="vkheroline"] { gap: 14px; }
 }
 
+/* ---------- professions section on /vidya-kala (no design source) ---------- */
+[data-e~="profsection"] { background: #F1ECE1; border-top: 1px solid #E2D9C6; padding: 54px 0 76px; }
+[data-e~="profsection"] [data-e~="pad"] { max-width: 1220px; margin: 0 auto; padding: 0 18px; }
+[data-e~="proftitle"] {
+  margin: 0 0 12px; font-family: 'Noto Serif Devanagari', serif; font-weight: 600;
+  font-size: clamp(24px, 5.4vw, 34px); line-height: 1.32; color: #2F456E; text-wrap: balance;
+}
+[data-e~="proflede"] {
+  margin: 0 0 30px; max-width: 60ch; font-size: clamp(16px, 3.6vw, 18px); line-height: 1.85;
+  color: #46505F; text-wrap: pretty;
+}
+[data-e~="profgrid"] { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; grid-template-columns: minmax(0, 1fr); }
+[data-e~="profcell"] { min-width: 0; }
+[data-e~="profcard"] {
+  display: block; width: 100%; padding: 0; border: 1px solid #E2D9C6; border-radius: 20px;
+  background: #FFFDF7; overflow: hidden; cursor: pointer; text-align: left; font: inherit; color: inherit;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+  box-shadow: 0 2px 4px rgba(47,69,110,.05), 0 14px 30px rgba(47,69,110,.07);
+}
+[data-e~="profcard"]:hover { border-color: #2F456E; box-shadow: 0 4px 8px rgba(47,69,110,.09), 0 20px 44px rgba(47,69,110,.14); }
+[data-e~="profcard"]:focus-visible { outline: 3px solid #2F456E; outline-offset: 3px; }
+[data-e~="profimg"] { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; background: #EDE6D7; }
+[data-e~="profcap"] {
+  display: flex; align-items: center; gap: 12px; padding: 15px 18px;
+  border-top: 1px solid #EFE7D6; background: #FFFDF7;
+}
+[data-e~="proflabel"] {
+  flex: 1 1 auto; min-width: 0; font-family: 'Noto Serif Devanagari', serif; font-weight: 600;
+  font-size: clamp(17px, 4vw, 19px); line-height: 1.45; color: #2F456E;
+}
+/* The count is the promise: how many entries open underneath. */
+[data-e~="profcount"] {
+  flex: 0 0 auto; min-width: 34px; height: 26px; padding: 0 9px; border-radius: 999px;
+  background: #EAF0F6; color: #2F456E; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums;
+  transition: background .18s ease, color .18s ease;
+}
+[data-e~="profcell"][data-open="true"] [data-e~="profcard"] { border-color: #A02B2D; box-shadow: 0 4px 10px rgba(160,43,45,.10), 0 22px 48px rgba(160,43,45,.16); }
+[data-e~="profcell"][data-open="true"] [data-e~="profcount"] { background: #A02B2D; color: #FFF6F2; }
+[data-e~="profcell"][data-open="true"] [data-e~="proflabel"] { color: #A02B2D; }
+/* The payoff. It sits directly under the plate that opened it, at the plate's own width. */
+[data-e~="profpanel"] { margin: 12px 0 4px; }
+[data-e~="profpanel"][hidden] { display: none; }
+[data-e~="proflinks"] { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+[data-e~="proflink"] {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: baseline; gap: 6px 14px;
+  padding: 14px 16px; border-radius: 16px; background: #FFFDF7; border: 1px solid #E2D9C6;
+  border-left: 3px solid #48887B; text-decoration: none; color: inherit;
+  transition: background .16s ease, border-color .16s ease, transform .16s ease;
+}
+[data-e~="proflink"]:hover { background: #F4F8F6; border-left-color: #A02B2D; transform: translateX(2px); }
+[data-e~="proflink"]:focus-visible { outline: 3px solid #48887B; outline-offset: 2px; }
+[data-e~="profnum"] { font-size: 12.5px; font-weight: 600; letter-spacing: .06em; color: #48887B; font-variant-numeric: tabular-nums; }
+[data-e~="profname"] { font-family: 'Noto Serif Devanagari', serif; font-weight: 600; font-size: 18px; line-height: 1.5; color: #2F456E; }
+[data-e~="profgo"] { color: #48887B; font-size: 16px; }
+/* The gloss is the book's own, and it earns a line of its own rather than being clipped. */
+[data-e~="profgloss"] { grid-column: 2 / 3; font-size: 15px; line-height: 1.7; color: #4E5665; text-wrap: pretty; }
+@media (min-width: 720px) {
+  [data-e~="profsection"] [data-e~="pad"] { padding: 0 30px; }
+  [data-e~="profgrid"] { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  [data-e~="proflinks"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* An open card takes the full row so its links are never a squeezed column beside the picture. */
+  [data-e~="profcell"][data-open="true"] { grid-column: 1 / -1; }
+}
+@media (min-width: 1100px) {
+  [data-e~="profsection"] { padding: 72px 0 96px; }
+  [data-e~="profgrid"] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+  /* Open, the plate and its links sit side by side. Stacked, a full-row 3:2 illustration is over
+     700px tall and pushes every link below the fold — and the links are the point of the section,
+     not the picture. Side by side the plate still reads at scale and the payoff is visible with it. */
+  [data-e~="profcell"][data-open="true"] {
+    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: start;
+  }
+  [data-e~="profcell"][data-open="true"] [data-e~="profpanel"] { margin: 0; }
+  [data-e~="profcell"][data-open="true"] [data-e~="proflinks"] { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+}
+
 /* ---------- register form states (no design source) ---------- */
 [data-page="Register"] [data-e~="field"] input,
+[data-page="Register"] [data-e~="field"] textarea,
 [data-page="Register"] [data-e~="field"] button,
 [data-page="Register"] [data-e~="control"] { transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease; }
+/* !important throughout the state rules. Every control in this form carries its resting border and
+   background as an inline style, and an inline declaration outranks any selector here however
+   specific — without it these rules are inert, which is what they had quietly been. The export's own
+   responsive rules override inline styles the same way. */
 [data-page="Register"] [data-e~="control"]:focus-within,
 [data-page="Register"] [data-e~="field"] > input:focus,
-[data-page="Register"] [data-e~="field"] > button:focus { border-color: #14203E; box-shadow: 0 0 0 3px rgba(20,32,62,.10); }
+[data-page="Register"] [data-e~="field"] > textarea:focus,
+[data-page="Register"] [data-e~="field"] > button:focus { border-color: #14203E !important; box-shadow: 0 0 0 3px rgba(20,32,62,.10) !important; }
 [data-page="Register"] [data-e~="field"][data-invalid="true"] [data-e~="control"],
-[data-page="Register"] [data-e~="field"][data-invalid="true"] > input { border-color: #A03A2B; background: #FDF6F3; }
-[data-page="Register"] [data-e~="field"][data-invalid="true"] [data-e~="control"]:focus-within { box-shadow: 0 0 0 3px rgba(160,58,43,.12); }
-[data-page="Register"] [data-e~="field"] input:disabled { color: #7A6B4E; cursor: not-allowed; }
-[data-page="Register"] [data-e~="control"]:has(input:disabled) { background: #F4F1EA; }
+[data-page="Register"] [data-e~="field"][data-invalid="true"] > input,
+[data-page="Register"] [data-e~="field"][data-invalid="true"] > textarea,
+[data-page="Register"] [data-e~="field"][data-invalid="true"] > button { border-color: #A03A2B !important; background: #FDF6F3 !important; }
+[data-page="Register"] [data-e~="field"][data-invalid="true"] [data-e~="control"]:focus-within,
+[data-page="Register"] [data-e~="field"][data-invalid="true"] > input:focus,
+[data-page="Register"] [data-e~="field"][data-invalid="true"] > textarea:focus,
+[data-page="Register"] [data-e~="field"][data-invalid="true"] > button:focus { box-shadow: 0 0 0 3px rgba(160,58,43,.12) !important; }
+/* A row of choice buttons has no single box to redden, so its label carries the refusal. */
+[data-page="Register"] fieldset[data-e~="field"][data-invalid="true"] > [data-e~="fieldlabel"] { color: #A03A2B !important; }
+[data-page="Register"] [data-e~="consent"][data-invalid="true"] { border-color: #A03A2B !important; background: #FDF6F3 !important; }
+[data-page="Register"] [data-e~="field"] input:disabled { color: #7A6B4E !important; cursor: not-allowed; }
+[data-page="Register"] [data-e~="control"]:has(input:disabled) { background: #F4F1EA !important; }
 [data-page="Register"] [data-e~="fieldlink"] { color: #27408B; }
-[data-page="Register"] [data-e~="stepsep"][data-done="true"] { background: #E8C173; }
+/* Groups are ruled apart, not merely spaced apart: at ten fields in one grid the spacing stopped
+   reading as a division and the address questions arrived without warning. */
+[data-page="Register"] [data-e~="fieldgroup"] + [data-e~="fieldgroup"] { padding-top: 26px; border-top: 1px solid #EFE5D3; }
+[data-page="Register"] [data-e~="stepsep"][data-done="true"] { background: #E8C173 !important; }
 [data-page="Register"] [data-e~="stepdot"] { transition: background-color .2s ease, color .2s ease, border-color .2s ease; }
-[data-page="Register"] [data-e~="stepdot"][data-state="current"] { box-shadow: 0 0 0 4px rgba(20,32,62,.10); }
+[data-page="Register"] [data-e~="stepdot"][data-state="current"] { box-shadow: 0 0 0 4px rgba(20,32,62,.10) !important; }
 [data-page="Register"] [data-e~="wheel"] { scrollbar-width: none; -ms-overflow-style: none; }
 [data-page="Register"] [data-e~="wheel"]::-webkit-scrollbar { width: 0; height: 0; }
 [data-page="Register"] [data-e~="wheelfade"] { background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 24%, rgba(255,255,255,0) 76%, #FFFFFF 100%); }
@@ -648,14 +764,15 @@ button:focus-visible, a:focus-visible { outline: 3px solid #27408B; outline-offs
 
 /* ---------- OTP code step (no design source) ---------- */
 [data-e~="otpbox"] { transition: border-color .16s ease, box-shadow .16s ease; }
-[data-e~="otpbox"]:focus { outline: 0; border-color: #14203E; box-shadow: 0 0 0 3px rgba(20,32,62,.10); }
-[data-e~="otpbox"]:disabled { color: #7A6B4E; background: #F4F1EA; cursor: not-allowed; }
-[data-e~="verify"] [data-e~="control"]:has(input:disabled) { background: #F2ECE0; }
+[data-e~="otpbox"]:focus { outline: 0; border-color: #14203E !important; box-shadow: 0 0 0 3px rgba(20,32,62,.10); }
+[data-e~="otpbox"]:disabled { color: #7A6B4E !important; background: #F4F1EA !important; cursor: not-allowed; }
+[data-e~="verify"] [data-e~="control"]:has(input:disabled) { background: #F2ECE0 !important; }
 [data-e~="verify"] [data-e~="resend"]:disabled { cursor: default; }
-/* Six boxes across a 320px phone leaves each one narrower than a fingertip at the resting size. */
+/* Six boxes across a 320px phone leaves each one narrower than a fingertip at the resting size.
+   !important because the box carries its resting geometry inline and inline outranks a selector. */
 @media (max-width: 420px) {
-  [data-e~="otpboxes"] { gap: 6px; }
-  [data-e~="otpbox"] { min-height: 52px; padding: 12px 2px; border-radius: 12px; font-size: 21px; }
+  [data-e~="otpboxes"] { gap: 6px !important; }
+  [data-e~="otpbox"] { min-height: 52px !important; padding: 12px 2px !important; border-radius: 12px !important; font-size: 21px !important; }
 }
 
 /* ---------- reduced motion, last so it wins ---------- */

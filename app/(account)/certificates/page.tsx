@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Loader from "@/components/Loader";
@@ -10,13 +10,67 @@ import { custom, strings } from "@/lib/i18n";
 const CERTIFICATE_SRC = "/uploads/cert.jpeg";
 const FILE_NAME = "Medhavi Chhatravritti Pratiyogita Pramaan Patra.pdf";
 
-// The on-screen overlay's geometry, as fractions of the certificate rather than container query
-// units, so the exported file and the preview place the name identically.
-const NAME_TOP = 0.49;          // top: 49%
-const NAME_SIZE = 0.042;        // font-size: 4.2cqw, and the container is the image width
-const NAME_LINE_HEIGHT = 1.55;
-const NAME_SIDE_INSET = 0.12;   // left/right: 12%
+/**
+ * Where the name goes, measured off the artwork itself rather than eyeballed.
+ *
+ * The template carries a "श्री / सुश्री" line with a dotted rule beneath it. Scanning cert.jpeg's
+ * pixels along y = 356 of 601 separates the two: from x = 256 to 301 the dark runs are irregular and
+ * widely spaced — the baseline strokes of the label itself — and from x = 308 the pitch becomes a
+ * regular 2.7px all the way to x = 584. That periodic stretch is the rule.
+ *
+ * **The rule is not centred on the page.** Its midpoint is x = 446 of 840, pushed right by the label
+ * beside it, so the name centres on the rule rather than on the certificate. The name used to be
+ * drawn at 49% of the height — above the rule, over the artwork — at a size that assumed most of the
+ * page's width.
+ *
+ * Everything here is a fraction of the certificate's own dimensions, so replacing the asset with a
+ * larger scan needs no new numbers, and the preview and the exported file cannot drift apart.
+ */
+const CERT_W = 840;
+const CERT_H = 601;
+const CERT_ASPECT = CERT_W / CERT_H;
+const NAME_RULE_Y = 356 / CERT_H;
+/** A little inside the first and last dot, so a full-width name does not butt against the ends. */
+const NAME_RULE_LEFT = 314 / CERT_W;
+const NAME_RULE_RIGHT = 578 / CERT_W;
+const NAME_RULE_WIDTH = NAME_RULE_RIGHT - NAME_RULE_LEFT;
+/** Resting size, and the floor a long name may shrink to. Fractions of the image width. */
+const NAME_SIZE = 0.030;
+const NAME_MIN_SIZE = 0.013;
+/** The name sits on the rule rather than through it. A fraction of the font size. */
+const NAME_BASELINE_LIFT = 0.12;
 const NAME_COLOUR = "#8C1A20";
+
+const nameFont = (px: number) => `600 ${px}px "Noto Serif Devanagari", serif`;
+
+/**
+ * The fitted size and top edge for a name, both as fractions of the certificate.
+ *
+ * Text width is linear in font size, so one measurement at a reference size gives the exact fit —
+ * no shrink loop. A name wider than the rule comes down until it fits; the overlay used to keep its
+ * size and truncate with an ellipsis, and a shortened name on a certificate is worse than a smaller
+ * one (AUDIT.md §6.6).
+ *
+ * The top edge is derived from the font's own ascent and descent rather than a tuned offset: with
+ * line-height 1 the baseline sits `(1 - (asc + desc)) / 2 + asc` down the box, and the box is
+ * placed so that baseline lands on the rule.
+ */
+const REF_PX = 100;
+function fitName(name: string): { size: number; top: number } {
+  const fallback = { size: NAME_SIZE, top: NAME_RULE_Y - 0.9 * NAME_SIZE * CERT_ASPECT };
+  if (typeof document === "undefined" || !name) return fallback;
+  const ctx = document.createElement("canvas").getContext("2d");
+  if (!ctx) return fallback;
+  ctx.font = nameFont(REF_PX);
+  if ("letterSpacing" in ctx) ctx.letterSpacing = `${REF_PX * 0.01}px`;
+  const metrics = ctx.measureText(name);
+  const widthAtRef = metrics.width || 1;
+  const size = Math.max(NAME_MIN_SIZE, Math.min(NAME_SIZE, (NAME_RULE_WIDTH * REF_PX) / widthAtRef));
+  const asc = metrics.fontBoundingBoxAscent / REF_PX;
+  const desc = metrics.fontBoundingBoxDescent / REF_PX;
+  const baselineInBox = (1 - (asc + desc)) / 2 + asc;
+  return { size, top: NAME_RULE_Y - (baselineInBox + NAME_BASELINE_LIFT) * size * CERT_ASPECT };
+}
 
 const A4_LANDSCAPE = { width: 297, height: 210 }; // mm
 const DOWNLOAD_LOCK_MS = 5000;
@@ -31,7 +85,7 @@ async function composite(studentName: string, src: string): Promise<HTMLCanvasEl
   // Devanagari then silently falls back to a Latin one.
   await Promise.all([
     image.decode(),
-    document.fonts.load('600 64px "Noto Sans Devanagari"'),
+    document.fonts.load(nameFont(64)),
     document.fonts.ready,
   ]);
 
@@ -42,27 +96,19 @@ async function composite(studentName: string, src: string): Promise<HTMLCanvasEl
   if (!ctx) throw new Error("no 2d context");
   ctx.drawImage(image, 0, 0);
 
-  const base = canvas.width * NAME_SIZE;
-  let size = base;
-  const maxWidth = canvas.width * (1 - NAME_SIDE_INSET * 2);
+  // The same fit the preview uses, so the file a student downloads is the frame they were shown.
+  const size = fitName(studentName).size * canvas.width;
   ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
+  ctx.textBaseline = "alphabetic";
   ctx.fillStyle = NAME_COLOUR;
+  ctx.font = nameFont(size);
   if ("letterSpacing" in ctx) ctx.letterSpacing = `${size * 0.01}px`;
 
-  // The overlay truncates with an ellipsis; on a certificate a shortened name is worse than a
-  // slightly smaller one, so a long name shrinks to fit instead (AUDIT.md §6.6).
-  ctx.font = `600 ${size}px "Noto Sans Devanagari", sans-serif`;
-  while (ctx.measureText(studentName).width > maxWidth && size > base * 0.5) {
-    size -= 1;
-    ctx.font = `600 ${size}px "Noto Sans Devanagari", sans-serif`;
-  }
-
+  // Centred on the rule, which is centred on the page, and sitting just above it.
   ctx.fillText(
     studentName,
-    canvas.width / 2,
-    canvas.height * NAME_TOP + (size * NAME_LINE_HEIGHT) / 2,
-    maxWidth,
+    canvas.width * (NAME_RULE_LEFT + NAME_RULE_WIDTH / 2),
+    canvas.height * NAME_RULE_Y - size * NAME_BASELINE_LIFT,
   );
   return canvas;
 }
@@ -80,9 +126,11 @@ export default function CertificatesPage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/me", { cache: "no-store" })
+    // The certificate endpoint, not the profile: this page needs a name to print and was being
+    // served the whole student record to get it.
+    fetch("/api/me/certificate", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => { if (!cancelled && data) setName(data.fullName); });
+      .then((data) => { if (!cancelled && data) setName(data.displayName); });
     return () => { cancelled = true; };
   }, []);
 
@@ -120,7 +168,9 @@ export default function CertificatesPage() {
 
   // Always the signed-in student. Never a query parameter — a name that can be typed into the URL
   // is a certificate generator for any name at all.
-  const studentName = name || session.name || "";
+  const studentName = name || session.displayName || "";
+  // One fit, read by the preview below and by composite() on download.
+  const nameFit = useMemo(() => fitName(studentName), [studentName]);
   const fileName = FILE_NAME;
   const signedIn = session.signedIn;
   const hasCerts = session.hasCertificates;
@@ -163,11 +213,14 @@ export default function CertificatesPage() {
         <h1 style={{ margin: "0 0 26px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(25px,3.6vw,34px)", lineHeight: "1.3", color: "#14203E" }}>{t.title}</h1>
 
         <div data-e="card" style={{ padding: "26px", background: "#FFFFFF", borderRadius: "22px", boxShadow: "0 2px 4px rgba(20,32,62,.05),0 16px 34px rgba(20,32,62,.07)" }}>
-          <div data-e="certframe" style={{ containerType: "inline-size", position: "relative", overflow: "hidden", borderRadius: "14px", aspectRatio: "1600/1131", background: "#FFFDF7" }}>
+          {/* The frame carries the certificate's own aspect ratio. It used to declare 1600/1131
+              against an 840x601 image, so objectFit:contain letterboxed it and every percentage
+              below addressed the frame rather than the artwork. */}
+          <div data-e="certframe" style={{ containerType: "inline-size", position: "relative", overflow: "hidden", borderRadius: "14px", aspectRatio: `${CERT_W}/${CERT_H}`, background: "#FFFDF7" }}>
             {imageState === "ready" ? (
               <>
                 <img src={CERTIFICATE_SRC} alt={t.certAlt} style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
-                <p style={{ position: "absolute", left: "12%", right: "12%", top: "49%", margin: "0", textAlign: "center", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "4.2cqw", lineHeight: "1.55", letterSpacing: ".01em", color: "#8C1A20", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{studentName}</p>
+                <p style={{ position: "absolute", left: `${NAME_RULE_LEFT * 100}%`, right: `${(1 - NAME_RULE_RIGHT) * 100}%`, top: `${nameFit.top * 100}%`, margin: "0", textAlign: "center", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: `${nameFit.size * 100}cqw`, lineHeight: "1", letterSpacing: ".01em", color: NAME_COLOUR, whiteSpace: "nowrap" }}>{studentName}</p>
               </>
             ) : null}
 

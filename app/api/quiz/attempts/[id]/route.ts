@@ -28,6 +28,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const questions = await replayPaper(attempt.served);
 
+  // Named fields only. The finished-attempt branch used to spread in score and timeTakenSeconds;
+  // nothing read them — the client redirects to /certificates the moment status is not in_progress
+  // — so they were a leak with no reader. `status` is all this route owes about a closed paper.
   return json({
     attemptId: String(attempt._id),
     status: attempt.status,
@@ -41,8 +44,5 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     serverNow: new Date().toISOString(),
     startedAt: attempt.startedAt.toISOString(),
     expiresAt: attempt.expiresAt.toISOString(),
-    ...(attempt.status !== "in_progress"
-      ? { score: attempt.score, submittedAt: attempt.submittedAt?.toISOString(), timeTakenSeconds: attempt.timeTakenSeconds }
-      : {}),
   });
 }

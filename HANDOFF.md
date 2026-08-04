@@ -26,23 +26,30 @@ date check.
 Verified after the change: all six routes serve rather than redirect, `/api/register/check-mobile`
 answers `{"available":true}`, and the sitemap lists `/register` and `/rules`.
 
-## 2. The date copy is NOT changed — see COPY_NEEDED.md
+## 2. The date is changed — 5 August 2026
 
-The competition now opens **5 August 2026**. The site still says 29 July in six places.
+Applied 4 August 2026 from client-supplied copy. Six keys in each of `lib/i18n/hi.ts` and `en.ts`,
+and the four design exports that feed them. Guru Purnima no longer appears anywhere in either.
+Two open questions about the framing are in `COPY_NEEDED.md` part 1 — the hero line lost its "से
+प्रारंभ" tail, and the first timeline row still names the Guru Parv against the new date.
 
-This is not an oversight. The date is welded to "Guru Purnima" in the approved copy, and Guru
-Purnima 2026 *is* 29 July — the scheme launches on Guru Purnima per the government order, the
-competition opens separately on 5 August. Changing the number alone would make the sentence false,
-and rewriting the framing is the Nyas's call, not the build's. The six keys, with their current
-Hindi and English, are laid out in `COPY_NEEDED.md`.
+**`lib/i18n/hi.ts` and `en.ts` are generated but are no longer reproducible from a bare
+`npm run i18n`.** The vidya-kala work hand-edited the `VIDYAS`/`KALAS` tables in them, and
+`scripts/vk-fill-canonical.mjs` now reads `hi.ts` as the canonical source for those names. Re-running
+extraction wipes that work — it was tried during this change and reverted. The date keys were
+therefore edited in place, and the same edits were made to the design exports and to
+`scripts/i18n-transforms.mjs` so a future extraction reproduces them rather than reverting them.
+Before anyone runs `npm run i18n` again, the vidya-kala content has to be folded back into the
+exports or into the transform. Until then, treat those two files as hand-maintained.
+
+`scripts/i18n-transforms.mjs` no longer builds the hero range out of `heroDate` — it opens on
+`dates[0].when` and closes on `dates[1]`. It used to lift the festival name off `heroDate`, which
+would now date the range to the wrong day.
 
 `scripts/baseline.mjs:59` pins the Playwright clock to `2026-07-29T00:00:00Z`. **Leave it.** It is
 there to freeze carousels and marquees so screenshots hash identically run to run; it carries no
 meaning about the competition, and moving it would shift every carousel and invalidate all of
 `tests/baseline/`.
-
-When the approved strings land, they also have to go into three `.dc.html` design exports or the
-baseline comparison will fail. Line numbers are in `COPY_NEEDED.md`.
 
 ---
 
@@ -274,20 +281,51 @@ hand-edited into `app/globals.css` — that file is generated and says so at the
 written directly into it is lost at the next `npm run css`. Every colour is one the Register export
 already uses, so this adds states rather than a palette.
 
+### Authored CSS states were inert until 4 August 2026
+
+`REGISTER_FORM_CSS` and `OTP_CSS` in `scripts/build-css.mjs` had no `!important`, and **every control
+on this form carries its resting border and background as an inline style.** An inline declaration
+outranks any selector in a stylesheet however specific, so the focus ring, the invalid treatment, the
+completed-step separator and the sub-420px sizing of the six code boxes were all being written and
+all being ignored. The two error states that did work — the mobile field and the email field — worked
+because the page computes their border colour in JavaScript and sets it inline.
+
+Those rules now carry `!important`, the same way the export's own responsive rules and `BOARD_CSS`
+do, and for the same reason. The transitions deliberately do **not**, so the reduced-motion block at
+the end of `globals.css` still wins over them.
+
+If you add a state rule to this page, either give it `!important` or take the resting value out of
+the inline style. Writing it plainly and assuming it applies is the trap.
+
 ### This diverges from tests/baseline
 
-CLAUDE.md's definition of done for a page is a pixel match against `tests/baseline/`. Changing the
-form's visual design necessarily breaks that for Register, and it was asked for explicitly. **The
-Register baselines need regenerating and re-approving** — `npm run baseline` — and until that is
-done a baseline run will report Register as failing. No other page is affected.
+CLAUDE.md's definition of done for a page is a pixel match against `tests/baseline/`. Three pages now
+diverge, each because a change was asked for explicitly: **Register** (field grouping, step track,
+focus and error states), **Login** and **Register** again (the aside artwork is no longer at .46
+opacity under a heavy scrim), and **Rules** (the acceptance card is light and the instructions list
+above the checkbox is gone). None of that lives in the `.dc.html` exports, so no regeneration can
+reconcile it — the baselines are a record of the approved design, and the client has moved it.
+
+**`npm run baseline` was run on 4 August 2026 and the result was reverted.** All 39 images changed,
+including nine pages whose exports had not been touched at all, which means the committed baselines
+were produced in a different rendering environment (browser build, font rasterisation) than this
+machine. Regenerating here would swap a known-good reference for an unverified one and mix two
+environments in one set. Regenerate on whatever produced the originals, or re-approve the whole set
+deliberately — not as a side effect of a copy change.
 
 ### Language
 
-Audited. Everything with a design source renders from `lib/i18n` in the navbar's language, verified
-in both — the duplicate-number refusal was checked rendering in Devanagari under a Hindi navbar. The
-only English-on-a-Hindi-site strings left in the flow are the `custom.otp.*` placeholders and
-`custom.errors.emailTaken`, all listed in `COPY_NEEDED.md`. `pratiyogita.examNames` is identical in
-both tables on purpose — NEET, JEE, CLAT, CAT are proper nouns.
+Audited again on 4 August 2026, screenshotting the whole of registration and sign-in in both
+languages. Everything with a design source renders from `lib/i18n` in the navbar's language. What is
+left in English on a Hindi site is exactly: eleven `custom.otp.*` strings and
+`custom.errors.emailTaken`, all in `COPY_NEEDED.md`. Nothing else in either flow is hard-coded
+English. `pratiyogita.examNames` is identical in both tables on purpose — NEET, JEE, CLAT, CAT are
+proper nouns; `name@gmail.com` and the digit placeholders are the same in both for the same reason.
+
+The suites used to assert on the English OTP labels, which broke the moment Hindi landed. They now
+match bilingually (`/^(सत्यापित करें|Verify)$/`), which is the convention the rest of the suite
+already used, and the resend control is located by `[data-e~="resend"]` rather than by its label,
+because its label is one of the eleven still waiting for Hindi.
 
 ---
 
@@ -305,13 +343,314 @@ it or the baseline comparison fails. Reported, not fixed.
 
 Comments and one server-side `console.warn` still contain em dashes; none of that reaches a reader.
 
+## 5b. Vidya-kala entries render in the book's order — 4 August 2026
+
+`vidya-kala.json` stored prose and shlokas in two parallel arrays keyed only by printed page, so the
+sequence *within* a page was never represented. `VidyaKalaEntry.tsx` grouped by page and emitted all
+the prose then all the verse, which put **182 of the 192 shlokas in the wrong place** — detached
+from the sentence that introduces them, which in this book is usually the line directly above.
+
+**The order was not recoverable from what was stored.** No element carried an index, an ordinal or
+any positional field; every one of the 89 shloka-bearing pages also carries prose; the batch files
+the merge was assembled from no longer exist; and a colon/dash handoff heuristic matched on only 38
+of 89 page-slices. It was re-read from the page images in `split/` instead — sequence only, no text
+re-transcribed.
+
+- `entries[].content` is the new ordered array: `para`, `subhead`, `deflist-item`, `quote`,
+  `connector`, `shloka`, interleaved as printed. **This is what the site reads.**
+- `descriptionHi` and `shloka` are still in the JSON as the provenance `content` was assembled from.
+  Nothing reads them. Do not add a second reader.
+- `vk-order.json` holds the re-read sequence as positions only (`d0`, `s0`, …, per page).
+  `scripts/vk-order.mjs` rebuilds `content` from it and **asserts** every source text is still
+  byte-identical, none lost, none duplicated, and that page order never runs backwards.
+  `node scripts/vk-order.mjs verify` re-runs those assertions without writing; it should always say
+  `701 blocks across 77 entries`.
+- Re-run `apply` after any edit to `vidya-kala.json`'s two source arrays, or `content` goes stale.
+
+Three entries carry `key: null` (book headings with no canonical match). `slices()` groups on the
+entry's **index**, not its key — grouping on the key hands all three every one of the others' blocks.
+
+On printed 239 (`Akarsha-krida`) the phrase `पाशक क्रीड़ा ।` was stored both inline in the prose and
+as a standalone shloka, so it rendered twice. The book sets it in red mid-sentence: emphasis inside
+the paragraph, not a verse. The standalone copy was dropped on the client's instruction. **191
+shlokas, 700 blocks.**
+
+### Book-internal references are stripped
+
+Seven cross-references that only mean anything inside the printed book were removed from the prose,
+each as an exact substring deletion with the surrounding punctuation left closing the sentence
+properly. Nothing was rephrased and no Devanagari was typed.
+
+| Where | Cut | Why |
+| --- | --- | --- |
+| `Yajurveda` p42 | `इसका प्रमाण इसी पुस्तक में … आगे किया गया है।` | forward pointer into this book |
+| `Yajurveda` p42 | `, यह पूर्व में कहा जा चुका है` | back-reference to an earlier section |
+| `Kalpa` p80 | `, जो इस ग्रंथ में यथास्थान संसूचित किए जायेंगे` | forward pointer into this book |
+| `Kalpa` p81 | `शेष अंग यथास्थान सूचित किए जाएँगे।` | forward pointer into this book |
+| `Karnapatra-bhanga` p141 | `, जिसे पूर्वोक्त सोलहवीं कला के श्लोकों में देखा जा सकता है` | cross-reference to this book's 16th kala |
+| `Takshakarma` p185 | ` ( 36 )` | this book's own section number |
+| `Vrikshayurveda` p201 | `इस सबंध में … वर्णन पूर्व में किया जा चुका है।` | back-reference to the Vastu-vidya section |
+
+**Deliberately kept**, because they are content rather than navigation: every scripture citation
+(`( ऋग्वेद 1/32/1 )`, `भाग.पु. 11/23/45–58`, `द्रष्टव्य` pointing at a sukta of the Atharvaveda),
+every bracketed gloss (`शिक्षा ( उच्चारण विज्ञान )`), and `उपरोक्त तीनों वेद मंत्र` on p65, which
+points at the three shlokas immediately above it — those are still immediately above it in
+`content`, so it reads correctly on the site.
+
+### One plate per entry
+
+`design/image` holds 78 commissioned illustrations named `  (1).png` … `  (78).png`, numbered in
+book order. There are exactly 78 entries — 14 vidyas then 64 kalas — and the mapping is **1:1**:
+plate 3 is captioned SAMAVEDA and Samaveda is the third vidya; plate 15 is Krishna with the gopis
+and Geet is the first kala; plate 78 is club-swinging and Vyayamiki is the last. They are not the
+book's own figures.
+
+`node scripts/vk-plates.mjs` re-encodes them into `public/vk/<key>.webp` and writes `vk-plates.json`.
+**42.8MB of PNG became 4.2MB of WebP, 90% smaller**, at native size — the only resize is a 1200px
+cap on the handful above it, and sharp is passed `withoutEnlargement`, so nothing is upscaled.
+The script refuses to run if the plate count and the entry count ever stop matching, because the
+mapping is positional and means nothing once they diverge.
+
+Because the mapping is 1:1, **there is no second plate to place inline** in any entry. Each renders
+once, in the entry header, with `alt=""` — it illustrates the heading directly above it, and there
+is no approved caption for any of the 78 in either language.
+
+## 5c. Two lists, one flag — both collapsed, 4 August 2026
+
+Two bugs with the same shape: a value that had two sources of truth, and a state that had none.
+
+### The exam enum validated against a different list than the form offered
+
+`lib/registration.ts` built `EXAM_KEYS` from `en.Register.EXAMS`, the design export's 34-entry list.
+Item 13 narrowed the *form* to four exams without narrowing the enum, and the export has "NEET UG",
+"NEET PG", "JEE Main" and "JEE Advanced" but no bare "NEET" or "JEE". So two of the four options the
+form offered were refused at submit with `{"error":"invalid","issues":["competitiveExam"]}`.
+
+Worse than reported: the form also sent the **display label** for Other and None, so on a Hindi
+navbar `अन्य` and `कोई नहीं` were refused too. Four of the six selectable options were broken in
+Hindi, two in English. District and level already did this correctly — English key as the value,
+localised string as the label — and the exam picker simply had not been converted.
+
+`EXAM_KEYS` now derives from `customEn.pratiyogita.examNames`, the same array the form renders, and
+the picker sends the key. `en.Register.EXAMS` is no longer read by validation.
+
+**`npm run smoke` registers one student per option** — all six plus `null` — and asserts the stored
+value comes back unchanged, plus one case proving the enum still refuses a value the form does not
+offer, so widening it to `z.string()` cannot silently un-cover the rest.
+
+### "Competition completed" rendered for everyone
+
+The green completion panel on `/profile` was inside no conditional at all. Every student who reached
+the page was told they had finished, including one who had registered minutes earlier. `/api/me`
+also returned the newest attempt row **without filtering on status**, so a paper merely opened read
+as a completed one.
+
+This is the third time this exact conflation has been found. `app/quiz/page.tsx` carries a comment
+about the first ("it used to render 'your attempt is already recorded' unconditionally"), and
+`lib/errors.ts` about the second (409 meaning both "number already registered" and "already sat").
+
+**`SAT_STATUSES` in `lib/models/types.ts` is now the single definition** of "has taken the
+competition": `submitted`, `auto_submitted`, `expired`. `expired` belongs in it because
+`scripts/sweep-attempts.mjs` scores those rows and increments `attemptCount` — filtering it out
+would have let a swept student be invited to start a paper the gate then refuses. Read the set;
+do not test statuses inline.
+
+Audited, all four readers:
+
+| Reader | Derives completion from | Verdict |
+| --- | --- | --- |
+| `/profile` | `me.attempt`, now `SAT_STATUSES` only | **fixed** — panel was unconditional |
+| `/api/me` | attempt row, now `SAT_STATUSES` only | **fixed** — was any row |
+| registration | `lib/errors.ts` code dispatch | already correct |
+| quiz entry gate | `status === "in_progress"` → resume, else 409 | already correct |
+| certificates nav | `session.hasCertificates` (+ `attemptCount > 0` on Home and vidya-kala) | already correct — both move only on submit or sweep |
+
+A student with no sat paper now gets the invite, using `Profile.S.startQuiz`
+("प्रतियोगिता प्रारंभ करें" / "Start the quiz") — approved copy that had been written for this state
+and never rendered. While `/api/me` is in flight neither panel shows, so nobody is briefly
+congratulated or briefly told to start.
+
+## 5d. Responses are whitelists — 4 August 2026
+
+`lib/serialize.ts` is the only place a student-facing field is named. Every route builds its body
+from a serialiser there, key by key. **No spread of a document, no `delete`, no projection standing
+in for a contract.** Reviewing what a student can see means reading one file.
+
+**`score` is in none of them and must not be added.** Selection is by district merit list and
+committee lottery and the results are published by the Nyas; a score in the network tab pre-empts
+that, and scores correlated across attempts are a path to inferring the answer key.
+
+What was leaking, all of it visible in the network tab on an ordinary page load:
+
+| Route | Was returning |
+| --- | --- |
+| `/api/me` | the whole user document, plus the whole attempt including `score`, on every profile load — and the certificate page called it just to read a name |
+| `/api/certificates` | joined each row back to its attempt to attach `score`, which nothing rendered |
+| `/api/quiz/attempts/[id]` | spread `score` and `timeTakenSeconds` in for a finished attempt — the client redirects away and never read them |
+| `/api/quiz/attempts/[id]/submit` | `score`, `answered`, `timeTakenSeconds`, on all three code paths |
+| `/api/register` | `userId` — the Mongo `_id` — and, on a 400, every failing field path |
+| `/api/session` | `attemptCount` and `initial`, neither of which the client needed |
+
+Consumers now: `/api/me` is the profile's alone, `/api/me/certificate` is the certificate page's,
+`/api/session` carries `signedIn`, `displayName`, `hasCertificates`, `lang`. The quiz screen's
+"answered" and "time taken" are computed from its own state, which is where they came from; the
+profile is given a formatted `durationLabel` rather than a second count.
+
+`attemptCount` left the session because `hasCertificates` says the same thing — a certificate is
+issued for every paper sat, including one swept at expiry — and one flag cannot drift from itself.
+
+Mongo `_id` is not an identifier a student is given. A certificate is addressed by the
+`certificateNumber` printed on it. **The one ObjectId still crossing the boundary is an attempt's**,
+because it is the URL the student is already on and every read is ownership-checked; giving attempts
+an opaque public id needs a field, a unique index and a backfill, so it is a migration to schedule
+rather than a serialiser change.
+
+`errorResponse` no longer rethrows. An unrecognised error is logged server-side and answered with a
+bare 500 `server_error`; rethrowing rendered a stack in development, and a driver error would have
+put Mongo's own message and index names into a body.
+
+### The Server-to-Client trap
+
+Props handed from a Server Component to a Client Component are serialised into the RSC flight
+payload and ship inline in the HTML, so **a document passed across that boundary is as public as an
+API response**. Audited: the root layout passes only `competitionOpen`, `/quiz/attempt/[id]` passes
+the id from its own URL, `/quiz` passes a phase string, and the vidya-kala pages pass book content.
+No user document crosses it. Do not start.
+
+Verified rather than assumed — every server-rendered page fetched as a signed-in student who had
+sat a paper, and the raw HTML scanned for `score`, `correctOptionId`, `answered`,
+`timeTakenSeconds`, `sessionVersion`, `_id` and the student's own email. Eight pages, all clean.
+
+### The guard
+
+`npm run smoke` walks one student — registered, mid-paper, then finished — and greps **fifteen**
+response bodies for those four keys, for the bare word "score" in any casing, for `"_id"`, and for a
+400 that names a field. It scans the serialised body rather than checking named fields, so a
+serialiser that starts spreading a document fails there.
+
+## 5e. The certificate name is placed off the artwork — 4 August 2026
+
+The name was drawn at 49% of the height, above the template's dotted rule and over the artwork, at a
+size derived from the page width rather than the rule's.
+
+**Where the rule actually is, measured from cert.jpeg's pixels rather than eyeballed.** Scanning
+along y = 356 of 601 separates the label from the rule: x = 256–301 carries irregular, widely spaced
+dark runs — the baseline strokes of "श्री / सुश्री" — and from x = 308 the pitch becomes a regular
+2.7px through to x = 584. That periodic stretch is the rule.
+
+**The rule is not centred on the page.** Its midpoint is x = 446 of 840, pushed right by the label
+beside it. Centring the name on the certificate instead of on the rule is what put it over "सुश्री"
+on the first attempt at this fix.
+
+Everything in the block at the top of `app/(account)/certificates/page.tsx` is a fraction of the
+certificate's own dimensions, so a larger scan of the same artwork needs no new numbers.
+
+`fitName()` returns the size and top edge, and **both the preview and the exported file read it**.
+They used to disagree twice over: the preview truncated a long name with an ellipsis while the export
+shrank it, and the preview drew in Noto **Sans** while the export used Noto Sans too but the frame
+declared `aspect-ratio: 1600/1131` against an 840x601 image — so `object-fit: contain` letterboxed
+the artwork and every percentage addressed the frame rather than the image. Both are fixed.
+
+Text width is linear in font size, so one measurement at a reference size gives the exact fit; there
+is no shrink loop. Verified at native scale: `राम कुमार` and `Ram Kumar` sit at the resting 25.2px,
+a 36-character Devanagari name comes down to 23.7px, a 44-character one to 17.5px, and a
+40-character Latin one to 11.5px — all inside the 264px rule, all with the baseline 1.4–3.0px above
+it.
+
+## 5f. Two alignment fixes with a shared cause
+
+**The quiz's "उत्तर हटाएँ" sat against the left edge of its button.** It is the only one of the three
+nav buttons with a `display` that toggles — `"none"` / `"inline-flex"` — and a flex container with no
+`justify-content` lays its child out from `flex-start`. `पिछला` and `अगला` were fine only because,
+being `inline-block`, they got the button element's own centring. All three now carry the same
+`inline-flex` + `align-items` + `justify-content`, measured at 0.00px offset each.
+
+**The home page's Browse label rode ~5px high while its chevron sat dead centre.** Not padding, and
+not fixable with `line-height`: `Noto Serif Devanagari` declares a descent of 11px at 17.5px for
+conjuncts most labels never reach, while the ink descent of these two is 2px in Hindi and 1px in
+Latin. The baseline is therefore set low in the line box, and the ink centre lands above the box
+centre. **Flex centring can only see the line box, never the ink**, so `align-items` cannot reach it,
+a symmetric `line-height` preserves the same offset exactly, and padding would carry the chevron with
+it. The correction rides on the label alone (`[data-e~="vkctalabel"]`), in `em` so it holds at any
+size. Measured after: 0.13px in Hindi, 0.88px in Latin, identical at 390, 768, 1280 and 1440.
+
+`text-box-trim` would do this properly and is not available on the handsets this platform targets.
+If another Devanagari label ever looks high in a pill, this is the cause.
+
+## 5g. The professions section — 4 August 2026
+
+At the foot of `/vidya-kala`: eight approved illustrations, each a doorway into the Vidyas and Kalas
+that share its domain. `components/ProfessionBridge.tsx`.
+
+**The framing is domain correspondence and nothing else.** These entries belong to the same field of
+study as the modern subject beside them. Nothing in the section says, or may be written to imply,
+that one came first or produced the other. The title and subtitle are the trust's own words, copied
+verbatim; no prose was written for this section in either language.
+
+### One mapping name has no entry, and is left out
+
+The supplied mapping gives `space` three names: ज्योतिष, यंत्रमात्रिका and **आकरज्ञान**. The first two
+resolve. **आकरज्ञान does not exist as a Vidya or a Kala.** The only entry carrying आकर in the sense of
+a source or a mine is मणिरागाकर ज्ञान (`Mani-raga-jnana`), which the same mapping already assigns to
+`lab` as मणिरागज्ञान; the only other आकर is आकर्षक्रीड़ा (`Akarsha-krida`), a game with magnets.
+
+It is **omitted rather than guessed at**, so `space` currently shows two entries. Supply the intended
+name and it is one line in `lib/i18n/professions.ts`.
+
+Seven names differ from the book's own spelling and were matched on the romanised key, which is this
+codebase's canonical identifier. Worth confirming, though each is unambiguous:
+
+| Supplied | Book heading | Key |
+| --- | --- | --- |
+| यंत्रमात्रिका | यन्त्रमातृका | `Yantra-matrika` |
+| धारणमात्रिका | धारणमातृका | `Dharana-matrika` |
+| वृक्षायुर्वेद | वृक्षायुर्वेद योग | `Vrikshayurveda` |
+| उत्सादन | उत्सादन-संवाहन-केशमर्दन कुशलता | `Utsadana` |
+| रूप्यरत्नपरीक्षा | रूप्यरत्न परीक्षा | `Rupya-ratna-pariksha` |
+| चित्रयोग | चित्राश्चयोग | `Chitra-yoga` |
+| मणिरागज्ञान | मणिरागाकर ज्ञान | `Mani-raga-jnana` |
+
+`professionCards()` in `lib/vidyakala.ts` **throws** on a key that stops resolving, so a renamed entry
+fails the build rather than rendering a dead link. The keys live once, in `lib/i18n/professions.ts`,
+not under `hi` and `en` separately — they are structure, not copy.
+
+### Assets
+
+`npm run professions` → `public/professions/<key>-<width>.webp` at 480, 768 and native, plus
+`professions.json` for the srcset. **Nothing is upscaled**: sharp is passed `withoutEnlargement`, any
+requested width past the source is dropped, and a native width within 16px of one already emitted is
+skipped — the sources are 1074 or 1075 wide, and appending the native width blindly wrote a second
+near-identical file for three of them. The widest variant of each is 48% smaller than its JPEG
+(3.4MB → 1.7MB); the 3.1MB on disk is every size, of which a phone loads one.
+
+The artwork is used as it is — no crop, no recolour, no overlay. `alt=""`: the illustration restates
+the label beside it, and there is no approved caption for any of the eight.
+
+### Layout
+
+Mobile-first — the base rules are the phone layout and the wider grids are additive. One card open at
+a time. On a phone the open card expands in place; **at 1100px and up the plate and its links sit side
+by side**, because a full-row 3:2 illustration is over 700px tall and pushes every link below the
+fold, and the links are the point of the section rather than the picture. Between 720 and 1100 the
+open card spans the row with its links in two columns.
+
+Palette #2F456E, #A02B2D, #48887B: resting, open, and the link rail inside an open card. Every
+transition is caught by the reduced-motion block at the end of `globals.css`, and nothing depends on
+one having run — the panel is `hidden` when shut, so motion-off gets the same content instantly.
+
 ## 6. Copy that is still English on a Hindi site
 
-`lib/i18n/custom.ts` `otp.*` — fourteen strings, live on both the registration and sign-in paths.
-Listed in `COPY_NEEDED.md` part 2. No Devanagari was invented for them; they are English in both
-locales, following the `vidyaKala` precedent already in that file.
+`lib/i18n/custom.ts` `otp.*` — six of the seventeen were supplied on 4 August 2026 and are in.
+**Eleven are still English**, live on both the registration and sign-in paths, and listed in
+`COPY_NEEDED.md` part 2. `resendIn` is the one to fix first: it is shown for sixty seconds after
+every single send, sitting between two controls that are now Devanagari.
 
-This is the most user-visible thing outstanding.
+The Hindi strings live in `OTP_HI`; the eleven without Hindi read their value from `OTP_EN` rather
+than repeating its text, so each becomes Hindi in exactly one place and there is no second English
+copy to drift. No Devanagari was invented for any of them.
+
+Field placeholders were asked for on the same day and none exist. The five that need copy written,
+the one to decide on and the three that need nothing are in `COPY_NEEDED.md` part 3.
 
 ---
 
@@ -325,10 +664,14 @@ npm run registerflow 43/43   the form: code at step 1, duplicate gates, date whe
                              picker, step loader and scroll-to-top
 npm run quizentry     9/9
 npm run protection   14/14
-npm run shell        11/12   see below
+npm run shell        12/12   the flaky reveal assertion below passed on this run
 npm run certificate  24/24
 npm run admin         --     needs ADMIN_PASS; not run this session
+npm run journey       --     stale and unsafe to run; see the end of this section
 ```
+
+Re-run in full on 4 August 2026 against one dev server on 3111, after the copy, form and modal
+changes. The counts above are that run.
 
 All suites take `BASE`; the three that default to a port of their own were run with
 `BASE=http://localhost:3111` against one dev server.
@@ -361,6 +704,14 @@ Two cron entries are required and neither is installed by anything in the repo:
 ```
 
 ---
+
+**`npm run journey` is stale and it spends credits.** It was last touched in `1f0d59e`, before the
+OTP work landed in `0f0bca3`, so it still expects step 1 to advance straight to step 2 and fails at
+"advanced to step 2". Worse, it is the one suite that does **not** stub `/api/otp/send`, and it fills
+in a randomly generated mobile number — running it puts a real send on the wire. One went out on
+4 August 2026 before this was understood. `tests/registerflow.mjs` covers the same ground properly
+and stubs the send. Either rewrite `journey` against the OTP flow or delete it; leaving it runnable
+is a live hazard.
 
 ## 8. Live sends made during this work
 

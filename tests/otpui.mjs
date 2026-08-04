@@ -68,7 +68,7 @@ const typeCode = async (page, code) => {
   check("the code is six separate boxes", (await boxes.count()) === 6, `${await boxes.count()} boxes`);
   check("...each asking the phone for the SMS code", (await boxes.first().getAttribute("autocomplete")) === "one-time-code");
 
-  const verify = panel.getByRole("button", { name: /^Verify$/ });
+  const verify = panel.getByRole("button", { name: /^(सत्यापित करें|Verify)$/ });
   check("verify is disabled until six digits are in", await verify.isDisabled());
 
   // Pasting the whole code has to land in all six, which is what a student does with a code they
@@ -105,7 +105,9 @@ const typeCode = async (page, code) => {
   const stillOut = await page.evaluate(async () => (await (await fetch("/api/session")).json()).signedIn);
   check("a wrong code still issues no session", stillOut === false);
 
-  check("resend is held shut by the countdown", await panel.getByRole("button", { name: /Send it again in/ }).isDisabled());
+  // Located by its hook, not its label: the countdown text is one of the strings still awaiting
+  // Hindi, and this assertion is about the control being shut, not about what it says.
+  check("resend is held shut by the countdown", await panel.locator('[data-e~="resend"]').isDisabled());
 
   await typeCode(page, CODE);
   await verify.click();

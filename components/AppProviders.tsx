@@ -9,18 +9,20 @@ import Toast, { type ToastItem } from "@/components/Toast";
 import { errorMessage, type ErrorCode } from "@/lib/errors";
 import type { Lang } from "@/lib/models/types";
 
+/**
+ * Exactly what GET /api/session returns — see lib/serialize.ts. It used to carry `initial` and
+ * `attemptCount` as well; the initial is one character of a name the client already holds, and
+ * `attemptCount` said the same thing as `hasCertificates`, which is set for every paper sat
+ * (submitted, auto-submitted, or swept and scored at expiry).
+ */
 export interface SessionInfo {
   signedIn: boolean;
-  name: string | null;
-  initial: string | null;
-  attemptCount: number;
+  displayName: string | null;
   hasCertificates: boolean;
   lang: Lang;
 }
 
-const SIGNED_OUT: SessionInfo = {
-  signedIn: false, name: null, initial: null, attemptCount: 0, hasCertificates: false, lang: "hi",
-};
+const SIGNED_OUT: SessionInfo = { signedIn: false, displayName: null, hasCertificates: false, lang: "hi" };
 
 // Whether registration, sign-in and the quiz are open. The value is decided server-side in the
 // root layout; the default here is closed, so a component reached outside the provider cannot

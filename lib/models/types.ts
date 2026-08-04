@@ -99,6 +99,18 @@ export const PUBLIC_QUESTION_PROJECTION = { correctOptionId: 0 } as const;
 
 export type AttemptStatus = "in_progress" | "submitted" | "auto_submitted" | "expired";
 
+/**
+ * A paper that was sat: handed in by the student, auto-submitted at the bell, or swept and scored
+ * at expiry. `expired` belongs here — scripts/sweep-attempts.mjs scores those rows and increments
+ * attemptCount, so they are a used attempt in every other reader and must be one here too.
+ *
+ * This is the only definition of "has taken the competition". Having an account is not it, and
+ * neither is having a row in `attempts`: a paper merely opened is `in_progress`. Read this set
+ * rather than testing statuses inline, so the profile, /quiz and the attempt gate cannot drift into
+ * disagreeing about whether a given student is finished.
+ */
+export const SAT_STATUSES: AttemptStatus[] = ["submitted", "auto_submitted", "expired"];
+
 export interface AttemptAnswer {
   questionId: ObjectId;
   selectedOptionId: string | null;

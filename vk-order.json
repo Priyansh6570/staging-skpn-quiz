@@ -1,0 +1,719 @@
+{
+  "$comment": "Reading order of blocks already stored in vidya-kala.json, re-read from the page images in split/. Positions only, never text: dN is the Nth descriptionHi block on that printed page, sN the Nth shloka. Keyed 'entryKey|printedPage'. Pages carrying no shloka are absent and convert mechanically. Written by scripts/vk-order.mjs.",
+  "pages": {
+    "Rigveda|32": [
+      "d0",
+      "d1",
+      "s0",
+      "d2"
+    ],
+    "Rigveda|33": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Rigveda|37": [
+      "s0",
+      "d0",
+      "d1"
+    ],
+    "Samaveda|47": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5"
+    ],
+    "Samaveda|48": [
+      "d0",
+      "d1",
+      "d2",
+      "s0",
+      "d3",
+      "s1",
+      "d4",
+      "d5",
+      "d6"
+    ],
+    "Samaveda|51": [
+      "s0",
+      "d0",
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6",
+      "d7",
+      "d8",
+      "d9",
+      "d10",
+      "d11",
+      "d12"
+    ],
+    "Shiksha|65": [
+      "d0",
+      "s0",
+      "s1",
+      "s2",
+      "d1"
+    ],
+    "Chhanda|67": [
+      "s0",
+      "s1",
+      "d0",
+      "d1",
+      "s2",
+      "d2"
+    ],
+    "Vyakarana|69": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "d4"
+    ],
+    "Vyakarana|70": [
+      "d0",
+      "d1",
+      "s0",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6"
+    ],
+    "Vyakarana|71": [
+      "d0",
+      "s0",
+      "d1"
+    ],
+    "Nirukta|73": [
+      "d0",
+      "s0",
+      "d1"
+    ],
+    "Dharmashastra|77": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "s2",
+      "s3"
+    ],
+    "Purana|83": [
+      "d0",
+      "s0",
+      "d1",
+      "d2"
+    ],
+    "Mimamsa|85": [
+      "d0",
+      "s0",
+      "d1"
+    ],
+    "Nyaya|87": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "d3",
+      "d4",
+      "d5",
+      "d6"
+    ],
+    "Geet|104": [
+      "s0",
+      "d0",
+      "s1",
+      "d1",
+      "d2",
+      "d3",
+      "s2",
+      "d4"
+    ],
+    "Geet|105": [
+      "s0",
+      "d0"
+    ],
+    "Vadya|107": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "s2",
+      "d3"
+    ],
+    "Nritya|110": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "s2",
+      "d3"
+    ],
+    "Nritya|111": [
+      "d0",
+      "s0",
+      "d1"
+    ],
+    "Alekhya|113": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3",
+      "s2",
+      "d4"
+    ],
+    "Visheshakachchhedya|115": [
+      "d0",
+      "s0",
+      "d1",
+      "d2"
+    ],
+    "Visheshakachchhedya|116": [
+      "d0",
+      "s0",
+      "s1",
+      "s2",
+      "d1",
+      "d2",
+      "s3",
+      "s4"
+    ],
+    "Tandula-kusuma|119": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "s2",
+      "s3",
+      "s4",
+      "d2"
+    ],
+    "Pushpastarana|121": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "d3"
+    ],
+    "Dashana-vasana-raga|123": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3",
+      "s2",
+      "d4"
+    ],
+    "Manibhumika-karma|125": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2"
+    ],
+    "Shayana-rachana|127": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "s2",
+      "d3"
+    ],
+    "Udaka-vadya|129": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Udaka-ghata|131": [
+      "d0",
+      "s0",
+      "d1"
+    ],
+    "Chitra-yoga|133": [
+      "d0",
+      "s0",
+      "d1",
+      "d2"
+    ],
+    "Malya-grathana|135": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "d3"
+    ],
+    "Shekharaka-yojana|137": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "d3"
+    ],
+    "Nepathya-yoga|139": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "d3",
+      "s2",
+      "d4"
+    ],
+    "Karnapatra-bhanga|141": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2"
+    ],
+    "Gandha-yukti|143": [
+      "d0",
+      "s0",
+      "d1"
+    ],
+    "Bhushana-yojana|145": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2"
+    ],
+    "Aindrajala|147": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2"
+    ],
+    "Kauchumara-yoga|149": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "s2",
+      "d3"
+    ],
+    "Hasta-laghava|151": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "s2"
+    ],
+    "Hasta-laghava|153": [
+      "s0",
+      "s1",
+      "s2",
+      "d0",
+      "d1",
+      "d2"
+    ],
+    "Vichitra-bhakshya|155": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1"
+    ],
+    "Vichitra-bhakshya|156": [
+      "d0",
+      "d1",
+      "s0",
+      "d2",
+      "s1",
+      "d3"
+    ],
+    "Panaka-rasa-yojana|159": [
+      "d0",
+      "s0",
+      "d1",
+      "d2"
+    ],
+    "Suchi-vana-karma|161": [
+      "s0",
+      "d0",
+      "s1",
+      "d1",
+      "s2",
+      "d2"
+    ],
+    "Sutra-krida|163": [
+      "s0",
+      "d0",
+      "d1",
+      "d2"
+    ],
+    "Vina-damaruka|165": [
+      "s0",
+      "d0",
+      "d1",
+      "d2",
+      "d3"
+    ],
+    "Vina-damaruka|166": [
+      "s0",
+      "d0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Prahelika|169": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "s2",
+      "d3",
+      "s3",
+      "d4",
+      "s4",
+      "d5"
+    ],
+    "Pratimala|171": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "s2",
+      "d2",
+      "d3"
+    ],
+    "Durvachaka-yoga|173": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "s2",
+      "s3",
+      "d2",
+      "d3"
+    ],
+    "Pustaka-vachana|175": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "s1",
+      "d4"
+    ],
+    "Natika-akhyayika|177": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3"
+    ],
+    "Kavya-samasya-purana|179": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "s1"
+    ],
+    "Kavya-samasya-purana|181": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6",
+      "d7"
+    ],
+    "Pattika-vetra-vana|183": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "s2",
+      "d3",
+      "d4"
+    ],
+    "null|185": [
+      "s0",
+      "d0"
+    ],
+    "Takshana|187": [
+      "s0",
+      "d0",
+      "d1",
+      "d2",
+      "d3"
+    ],
+    "Vastu-vidya|189": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3",
+      "d4"
+    ],
+    "Vastu-vidya|191": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Rupya-ratna-pariksha|193": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "s1"
+    ],
+    "Rupya-ratna-pariksha|195": [
+      "s0",
+      "d0",
+      "d1",
+      "d2",
+      "d3",
+      "d4"
+    ],
+    "Dhatu-vada|197": [
+      "s0",
+      "d0",
+      "d1",
+      "d2",
+      "d3"
+    ],
+    "Mani-raga-jnana|199": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "d3"
+    ],
+    "Vrikshayurveda|201": [
+      "d0",
+      "s0",
+      "d1",
+      "d2"
+    ],
+    "Mesha-kukkuta-vidhi|203": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "d4"
+    ],
+    "Shuka-sarika-pralapana|205": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2"
+    ],
+    "Utsadana|207": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Akshara-mushtika|209": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "s2",
+      "s3",
+      "d3"
+    ],
+    "Mlechchhita-kala|211": [
+      "s0",
+      "d0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Desha-bhasha-jnana|213": [
+      "s0",
+      "d0",
+      "d1"
+    ],
+    "Pushpa-shakatika|215": [
+      "d0",
+      "s0",
+      "d1",
+      "d2"
+    ],
+    "null|217": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "s2",
+      "d3",
+      "d4"
+    ],
+    "Yantra-matrika|219": [
+      "s0",
+      "d0",
+      "s1",
+      "d1",
+      "d2",
+      "s2",
+      "d3"
+    ],
+    "Dharana-matrika|221": [
+      "s0",
+      "d0",
+      "d1",
+      "s1",
+      "d2",
+      "s2",
+      "d3",
+      "s3",
+      "d4",
+      "s4",
+      "d5"
+    ],
+    "Sampathya|223": [
+      "s0",
+      "d0",
+      "s1",
+      "s2",
+      "s3",
+      "d1",
+      "s4",
+      "d2"
+    ],
+    "Manasi-kavya-kriya|225": [
+      "s0",
+      "d0",
+      "s1",
+      "s2",
+      "d1",
+      "d2"
+    ],
+    "Abhidhana-kosha|227": [
+      "s0",
+      "d0",
+      "d1",
+      "s1",
+      "d2",
+      "d3",
+      "s2",
+      "d4"
+    ],
+    "Abhidhana-kosha|229": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Kriya-vikalpa|231": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3"
+    ],
+    "Chhalitaka-yoga|233": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "s2",
+      "d3"
+    ],
+    "Vastra-gopana|235": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "d3",
+      "s2",
+      "d4"
+    ],
+    "Dyuta-vishesha|237": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "d2",
+      "d3",
+      "s2",
+      "d4",
+      "d5"
+    ],
+    "Balakridanaka|241": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3",
+      "s1",
+      "d4"
+    ],
+    "Vainayiki-vidya|243": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "s1",
+      "s2",
+      "d3"
+    ],
+    "Vaijayiki-vidya|245": [
+      "d0",
+      "s0",
+      "d1",
+      "d2",
+      "d3"
+    ],
+    "null|247": [
+      "d0",
+      "s0",
+      "d1",
+      "s1",
+      "s2",
+      "d2"
+    ]
+  }
+}

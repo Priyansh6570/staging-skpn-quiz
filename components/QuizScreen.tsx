@@ -55,7 +55,10 @@ export default function QuizScreen({ phase, attemptId }: Props) {
   const [announcement, setAnnouncement] = useState("");
   const [stamp, setStamp] = useState("");
   const [succeeded, setSucceeded] = useState(false);
-  const [result, setResult] = useState<{ score: number; answered: number; timeTakenSeconds: number; expired: boolean } | null>(null);
+  // The submit receipt. It carries no score, no answered count and no duration — the screen below
+  // shows the last two and computes both from this client's own state, which is where they came
+  // from in the first place. See lib/serialize.ts.
+  const [result, setResult] = useState<{ expired: boolean } | null>(null);
 
   const expiresAtRef = useRef<number>(0);
   const seqRef = useRef(0);
@@ -351,10 +354,10 @@ export default function QuizScreen({ phase, attemptId }: Props) {
   const submittedKind = auto || result?.expired ? t.submittedAuto : t.submittedManual;
   const stampLine = `${t.stamp}: ${stamp}`;
   const results = [
-    { label: t.results[0], value: String(result?.answered ?? answeredCount) },
-    { label: t.results[1], value: String(TOTAL - (result?.answered ?? answeredCount)) },
+    { label: t.results[0], value: String(answeredCount) },
+    { label: t.results[1], value: String(TOTAL - answeredCount) },
     { label: t.results[2], value: "1" },
-    { label: t.results[3], value: mmss(result?.timeTakenSeconds ?? 600 - left) },
+    { label: t.results[3], value: mmss(600 - left) },
   ];
 
   const signedIn = session.signedIn;
@@ -448,9 +451,14 @@ export default function QuizScreen({ phase, attemptId }: Props) {
                 <span>{t.guardMsg}</span>
               </div>
               <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", marginTop: "26px", paddingTop: "22px", borderTop: "1px solid #F0EADD" }}>
-                <button type="button" onClick={prev} style={{ minHeight: "52px", padding: "14px 22px", border: "1px solid #DCD1BC", borderRadius: "999px", background: "#FCFAF4", cursor: `${prevCursor}`, fontSize: "16.5px", lineHeight: "1.5", color: `${prevFg}` }}>{t.prev}</button>
-                <button type="button" onClick={clearAnswer} style={{ minHeight: "52px", padding: "14px 22px", border: "1px solid #DCD1BC", borderRadius: "999px", background: "#FCFAF4", cursor: "pointer", fontSize: "16.5px", lineHeight: "1.5", color: "#161C2E", display: `${clearDisplay}` }}>{t.clear}</button>
-                <button type="button" onClick={next} style={{ marginLeft: "auto", minHeight: "54px", padding: "15px 30px", border: "0", borderRadius: "999px", background: `${nextBg}`, color: `${nextFg}`, cursor: "pointer", fontSize: "17.5px", fontWeight: "600", lineHeight: "1.5" }}>{nextLabel}</button>
+                {/* All three carry the same centring. The clear button toggles between "none" and
+                    "inline-flex", and a flex container with no justify-content lays its child out
+                    from flex-start — which is why that one label sat against the left edge while
+                    the other two, being inline-block, were centred by the button default. Setting
+                    it on all three means the row cannot drift apart again. */}
+                <button type="button" onClick={prev} style={{ minHeight: "52px", padding: "14px 22px", border: "1px solid #DCD1BC", borderRadius: "999px", background: "#FCFAF4", cursor: `${prevCursor}`, fontSize: "16.5px", lineHeight: "1.5", color: `${prevFg}`, display: "inline-flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>{t.prev}</button>
+                <button type="button" onClick={clearAnswer} style={{ minHeight: "52px", padding: "14px 22px", border: "1px solid #DCD1BC", borderRadius: "999px", background: "#FCFAF4", cursor: "pointer", fontSize: "16.5px", lineHeight: "1.5", color: "#161C2E", display: `${clearDisplay}`, alignItems: "center", justifyContent: "center", textAlign: "center" }}>{t.clear}</button>
+                <button type="button" onClick={next} style={{ marginLeft: "auto", minHeight: "54px", padding: "15px 30px", border: "0", borderRadius: "999px", background: `${nextBg}`, color: `${nextFg}`, cursor: "pointer", fontSize: "17.5px", fontWeight: "600", lineHeight: "1.5", display: "inline-flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>{nextLabel}</button>
               </div>
             </main>
 
@@ -522,8 +530,8 @@ export default function QuizScreen({ phase, attemptId }: Props) {
               </dl>
               <p data-e="cwarn" style={{ margin: "0 0 24px", padding: "16px 20px", borderRadius: "14px", background: "#F4EBD8", fontSize: "16px", lineHeight: "1.8", color: "#161C2E" }}>{t.confirmWarn1} <br />{t.confirmWarn2}</p>
               <div data-e="ctarow" style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
-                <button type="button" onClick={closeModal} style={{ flex: "1 1 auto", minHeight: "56px", maxHeight: "56px", padding: "0 26px", border: "0", borderRadius: "999px", background: "#14203E", color: "#FDF3DF", cursor: "pointer", fontSize: "17.5px", fontWeight: "600", lineHeight: "1.5" }}>{t.goBack}</button>
-                <button type="button" onClick={confirmSubmit} style={{ flex: "1 1 auto", minHeight: "54px", maxHeight: "54px", padding: "0 24px", border: "1px solid #DCD1BC", borderRadius: "999px", background: "#FCFAF4", cursor: "pointer", fontSize: "16.5px", lineHeight: "1.5", color: "#161C2E" }}>{t.confirm}</button>
+                <button type="button" onClick={closeModal} style={{ flex: "1 1 auto", minHeight: "54px", maxHeight: "54px", padding: "0 24px", border: "1px solid #DCD1BC", borderRadius: "999px", background: "#FCFAF4", cursor: "pointer", fontSize: "16.5px", lineHeight: "1.5", color: "#161C2E" }}>{t.goBack}</button>
+                <button type="button" onClick={confirmSubmit} style={{ flex: "1 1 auto", minHeight: "56px", maxHeight: "56px", padding: "0 26px", border: "0", borderRadius: "999px", background: "#14203E", color: "#FDF3DF", cursor: "pointer", fontSize: "17.5px", fontWeight: "600", lineHeight: "1.5" }}>{t.confirm}</button>
               </div>
             </div>
           </div>

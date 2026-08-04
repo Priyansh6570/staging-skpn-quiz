@@ -615,7 +615,7 @@ export const en = {
     "S": {
       "org": "Shri Krishna Pathey Nyas, Bhopal",
       "heroTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Yojana",
-      "heroDate": "Opens on Guru Purnima, 29 July 2026",
+      "heroDate": "5 August 2026",
       "heroLede": "A free competition on the 14 Vidyas, the 64 Kalas and the Indian knowledge tradition.",
       "ctaPrimaryOut": "Register now",
       "ctaTake": "Take part",
@@ -669,8 +669,8 @@ export const en = {
       ],
       "dates": [
         {
-          "when": "29 July 2026",
-          "what": "Maharishi Sandipani Guru Parv begins",
+          "when": "5 August 2026",
+          "what": "Competition opens",
           "note": "Competition opens"
         },
         {
@@ -686,7 +686,7 @@ export const en = {
       ],
       "closeTitle": "Enter the competition",
       "closeBody": "Registration takes a few minutes.",
-      "heroDateRange": "Opens on Guru Purnima, 29 July to Shri Krishna Janmashtami, 4 September",
+      "heroDateRange": "5 August 2026 to Shri Krishna Janmashtami, 4 September",
       "factTimeValue": "10 minutes",
       "factTimeLabel": "time"
     },
@@ -815,7 +815,7 @@ export const en = {
       "title": "Sign in",
       "lede": "Enter the same mobile number you registered with.",
       "asideOrg": "Shri Krishna Pathey Nyas, Bhopal",
-      "asideKicker": "Guru Purnima, 29 July 2026",
+      "asideKicker": "5 August 2026",
       "asideTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita",
       "slides": [
         {
@@ -887,8 +887,8 @@ export const en = {
       "datesTitle": "Dates",
       "dates": [
         {
-          "when": "29 July 2026",
-          "what": "Maharishi Sandipani Guru Parv begins",
+          "when": "5 August 2026",
+          "what": "Competition opens",
           "note": "Competition opens"
         },
         {
@@ -1390,7 +1390,7 @@ export const en = {
     "S": {
       "title": "Register for the competition",
       "asideOrg": "Shri Krishna Pathey Nyas, Bhopal",
-      "asideKicker": "Opens on Guru Purnima, 29 July to Shri Krishna Janmashtami, 4 September",
+      "asideKicker": "5 August 2026 to Shri Krishna Janmashtami, 4 September",
       "asideTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Yojana",
       "slides": [
         {

@@ -68,7 +68,7 @@ const clearStepOne = async (page, mobile) => {
   await page.waitForTimeout(1800);
   await plantOtp(mobile, "register");
   await typeCode(page, CODE);
-  await page.getByRole("button", { name: "Verify", exact: true }).click();
+  await page.getByRole("button", { name: /^(सत्यापित करें|Verify)$/ }).click();
   await page.waitForTimeout(2600);
 };
 
@@ -225,7 +225,7 @@ const clearStepOne = async (page, mobile) => {
 
   await page.waitForTimeout(1400);
   check("a code is asked for at step 1, before any other question", sends.n === 1, `${sends.n} sends`);
-  check("no dialog is opened for it", (await page.getByRole("dialog", { name: "Enter the code" }).count()) === 0);
+  check("no dialog is opened for it", (await page.getByRole("dialog", { name: /^(कोड दर्ज करें|Enter the code)$/ }).count()) === 0);
   check("the code field is six separate boxes", (await page.locator('[data-e~="otpbox"]').count()) === 6);
   check("...below a locked mobile number", await page.locator('[data-e~="verify"] input[type="tel"]').isDisabled());
   check("...showing the number the code went to", (await page.locator('[data-e~="verify"] input[type="tel"]').inputValue()) === mobile);
@@ -234,7 +234,7 @@ const clearStepOne = async (page, mobile) => {
 
   await plantOtp(mobile, "register");
   await typeCode(page, CODE);
-  await page.getByRole("button", { name: "Verify", exact: true }).click();
+  await page.getByRole("button", { name: /^(सत्यापित करें|Verify)$/ }).click();
   await page.waitForTimeout(1400);
   check("verifying shows a loader inside the form", (await page.locator('[data-e~="verifybusy"], [data-e~="stepbusy"]').count()) >= 1);
 

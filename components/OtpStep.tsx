@@ -174,7 +174,16 @@ export default function OtpStep({
       <label data-e="field" style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
         <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{mobileLabel}</span>
         <span data-e="control" style={{ display: "flex", alignItems: "stretch", border: "1px solid #E8DFCE", borderRadius: "14px", background: "#F2ECE0", overflow: "hidden" }}>
-          <span aria-hidden="true" style={{ flex: "0 0 auto", display: "flex", alignItems: "center", padding: "0 13px", background: "#EDE5D6", borderRight: "1px solid #E3D9C6", fontSize: "16.5px", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }}>+91</span>
+          <span aria-hidden="true" style={{ flex: "0 0 auto", display: "flex", alignItems: "center", gap: "8px", padding: "0 13px", background: "#EDE5D6", borderRight: "1px solid #E3D9C6" }}>
+            <svg viewBox="0 0 30 20" width="26" height="18" aria-hidden="true" focusable="false" style={{ display: "block", borderRadius: "3px", boxShadow: "0 0 0 1px rgba(20,32,62,.14)" }}>
+              <rect width="30" height="20" fill="#FFFFFF"></rect>
+              <rect width="30" height="6.667" fill="#FF9933"></rect>
+              <rect y="13.333" width="30" height="6.667" fill="#138808"></rect>
+              <circle cx="15" cy="10" r="2.6" fill="none" stroke="#000080" strokeWidth="0.7"></circle>
+              <circle cx="15" cy="10" r="0.6" fill="#000080"></circle>
+            </svg>
+            <span style={{ fontSize: "16.5px", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }}>+91</span>
+          </span>
           <input type="tel" value={mobile} disabled readOnly style={{ flex: "1 1 auto", minWidth: "0", minHeight: "54px", padding: "14px 16px", border: "0", background: "transparent", fontSize: "18px", letterSpacing: ".04em", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }} />
         </span>
       </label>

@@ -3,7 +3,8 @@ import { z } from "zod";
 import { attempts, certificates, users } from "@/lib/models";
 import type { AttemptStatus } from "@/lib/models/types";
 import { requireOwnership, requireSession, setSession } from "@/lib/session";
-import { GRACE_SECONDS, TOTAL, scoreAnswers } from "@/lib/quiz";
+import { GRACE_SECONDS, scoreAnswers } from "@/lib/quiz";
+import { submitReceipt } from "@/lib/serialize";
 import { errorResponse, fail, json, sameOrigin } from "@/lib/api";
 import { competitionOpen } from "@/lib/competition";
 import { randomBytes } from "node:crypto";
@@ -47,13 +48,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   // Idempotent: the auto-submit timer and a manual tap will race, and whichever loses reads back
   // the stored result instead of scoring a second time.
   if (attempt.status !== "in_progress") {
+    const existing = await (await certificates()).findOne({ attemptId }, { projection: { certificateNumber: 1 } });
     return json({
-      score: attempt.score ?? 0,
-      total: TOTAL,
-      answered: attempt.answers.filter((a) => a.selectedOptionId).length,
-      timeTakenSeconds: attempt.timeTakenSeconds ?? 0,
-      submittedAt: attempt.submittedAt?.toISOString() ?? now.toISOString(),
-      expired: attempt.status === "expired",
+      ...submitReceipt({
+        submittedAt: attempt.submittedAt ?? now,
+        expired: attempt.status === "expired",
+        certificateNumber: existing?.certificateNumber ?? null,
+      }),
       alreadySubmitted: true,
     });
   }
@@ -72,16 +73,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     { returnDocument: "after" },
   );
 
-  // Lost the race: another request scored it first, so read that result back.
+  // Lost the race: another request scored it first, so read that outcome back. The receipt is the
+  // same shape either way — the auto-submit timer and a manual submit will race, and the loser must
+  // not learn anything the winner did not return.
   if (!claimed) {
-    const settled = await collection.findOne({ _id: attemptId });
+    const settled = await collection.findOne(
+      { _id: attemptId },
+      { projection: { status: 1, submittedAt: 1 } },
+    );
+    const existing = await (await certificates()).findOne({ attemptId }, { projection: { certificateNumber: 1 } });
     return json({
-      score: settled?.score ?? 0,
-      total: TOTAL,
-      answered: settled?.answers.filter((a) => a.selectedOptionId).length ?? 0,
-      timeTakenSeconds: settled?.timeTakenSeconds ?? 0,
-      submittedAt: settled?.submittedAt?.toISOString() ?? now.toISOString(),
-      expired: settled?.status === "expired",
+      ...submitReceipt({
+        submittedAt: settled?.submittedAt ?? now,
+        expired: settled?.status === "expired",
+        certificateNumber: existing?.certificateNumber ?? null,
+      }),
       alreadySubmitted: true,
     });
   }
@@ -104,14 +110,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
   await setSession({ ...session, hasCertificates: true, attemptCount: session.attemptCount + 1 });
 
-  return json({
-    score,
-    total: TOTAL,
-    answered: attempt.answers.filter((a) => a.selectedOptionId).length,
-    timeTakenSeconds,
-    submittedAt: closedAt.toISOString(),
-    // A designed state, not a 4xx the UI renders as a crash.
+  // The score is written to the attempt and never returned. The screen that follows shows how many
+  // questions were answered and how long was taken, both of which the client already knows from its
+  // own state; it has never shown a score and must not be given one.
+  return json(submitReceipt({
+    submittedAt: closedAt,
     expired,
-    certificateId: certificate ? String(certificate._id) : null,
-  });
+    certificateNumber: certificate?.certificateNumber ?? null,
+  }));
 }

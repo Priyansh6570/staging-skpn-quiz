@@ -62,10 +62,10 @@ export default function VidyaKalaTeaser({ lang }: { lang: Lang }) {
 
             <div data-e="vkctas">
               <Link href="/vidya-kala" data-e="vkcta" data-vkc="primary">
-                {c.vidyaKala.browseAll}
+                <span data-e="vkctalabel">{c.vidyaKala.browseAll}</span>
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#241703" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false" style={{ display: "block" }}><path d="M9.5 5.5 16 12l-6.5 6.5"></path></svg>
               </Link>
-              <Link href="/vidya-kala?view=kala" data-e="vkcta" data-vkc="ghost">{s.tabKalas}</Link>
+              <Link href="/vidya-kala?view=kala" data-e="vkcta" data-vkc="ghost"><span data-e="vkctalabel">{s.tabKalas}</span></Link>
             </div>
           </div>
 

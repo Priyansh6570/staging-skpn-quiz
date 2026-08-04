@@ -59,7 +59,9 @@ const browser = await chromium.launch();
   });
   const session = async () => page.evaluate(async () => (await (await fetch("/api/session", { cache: "no-store" })).json()));
 
-  check("starting a paper does not count as having sat it", (await session()).attemptCount === 0, `attemptCount ${(await session()).attemptCount}`);
+  // The session no longer carries a count — a certificate exists for every paper sat, so that
+  // boolean is the whole signal. See lib/serialize.ts.
+  check("starting a paper does not count as having sat it", (await session()).hasCertificates === false, JSON.stringify(await session()));
 
   await page.goto(`${BASE}/quiz`, { waitUntil: "networkidle" });
   check("/quiz with a paper in progress resumes it", page.url().includes(`/quiz/attempt/${started}`), page.url());
@@ -68,7 +70,7 @@ const browser = await chromium.launch();
     await fetch(`/api/quiz/attempts/${id}/submit`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ reason: "manual" }) });
   }, started);
 
-  check("submitting counts as having sat it", (await session()).attemptCount === 1, `attemptCount ${(await session()).attemptCount}`);
+  check("submitting counts as having sat it", (await session()).hasCertificates === true, JSON.stringify(await session()));
 
   await page.goto(`${BASE}/quiz`, { waitUntil: "networkidle" });
   check("/quiz after submitting shows the recorded screen", await alreadyRecorded(page), page.url());

@@ -1,12 +1,22 @@
 import { z } from "zod";
-import { en } from "@/lib/i18n";
+import { en, customEn } from "@/lib/i18n";
 import { MOBILE_RE } from "@/lib/models/types";
 
 // The English tables are the canonical keys: a merit list that groups on "कक्षा 10" and "Class 10"
 // as different values is a silent correctness failure (AUDIT.md §3.7).
 export const DISTRICT_KEYS = en.Register.DISTRICTS.map((d) => d[0]);
 export const LEVEL_KEYS = en.Register.LEVELS;
-export const EXAM_KEYS = [...en.Register.EXAMS, en.Register.S.examOther, en.Register.S.examNone];
+/**
+ * The four the form offers, plus Other and None — read from the same array the form renders, so
+ * there is one list rather than two.
+ *
+ * This was `en.Register.EXAMS`, the design export's 34-entry list. Item 13 narrowed the form to
+ * four without narrowing the enum, and the export has "NEET UG", "NEET PG", "JEE Main" and
+ * "JEE Advanced" but no bare "NEET" or "JEE" — so two of the four options the form offered were
+ * refused at submit with `invalid`. `en.Register.EXAMS` is now unused by validation and is kept
+ * only as the export's own copy.
+ */
+export const EXAM_KEYS = [...customEn.pratiyogita.examNames, en.Register.S.examOther, en.Register.S.examNone];
 export const GENDER_KEYS = ["male", "female", "other"] as const;
 export const CATEGORY_KEYS = ["vidyalaya", "mahavidyalaya"] as const;
 

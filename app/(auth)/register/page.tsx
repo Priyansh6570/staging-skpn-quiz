@@ -11,7 +11,7 @@ import DobWheel, { WHEEL_ITEM } from "@/components/DobWheel";
 import OtpStep from "@/components/OtpStep";
 import { useLang, useSession, useShell } from "@/components/AppProviders";
 import { custom, strings, en } from "@/lib/i18n";
-import { CATEGORY_KEYS, GENDER_KEYS } from "@/lib/registration";
+import { CATEGORY_KEYS, EXAM_KEYS, GENDER_KEYS } from "@/lib/registration";
 import { codeFromResponse, errorMessage, type ErrorCode } from "@/lib/errors";
 
 const TODAY = Date.now();
@@ -42,8 +42,13 @@ export default function RegisterPage() {
   const DISTRICTS = strings(lang).Register.DISTRICTS;
   const LEVELS = strings(lang).Register.LEVELS;
   const MONTHS = strings(lang).Register.MONTHS;
-  // Item 13: the client narrowed the list to these four.
-  const EXAMS = custom(lang).pratiyogita.examNames;
+  /**
+   * Label and value are separate here for the same reason as district and level: what is stored is
+   * the English key from EXAM_KEYS, what the student reads is the label. For the four exam names
+   * the two are the same string — they are proper nouns, identical in both tables — but "Other"
+   * and "None" are not, and sending the Hindi label was refused by the server's enum.
+   */
+  const EXAM_LABELS = [...custom(lang).pratiyogita.examNames, t.examOther, t.examNone];
 
   const [step, setStep] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
@@ -70,6 +75,9 @@ export default function RegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [pendingStep, setPendingStep] = useState<number | null>(null);
   const [dobResetKey, setDobResetKey] = useState(0);
+  // Nothing is marked wrong until Continue has been pressed. A form that reddens a field the moment
+  // it is tabbed into is telling a student they are failing at typing.
+  const [showErrors, setShowErrors] = useState(false);
   const scrollYRef = useRef(0);
   const formRef = useRef<HTMLDivElement>(null);
 
@@ -126,37 +134,41 @@ export default function RegisterPage() {
   const dobValid =
     dob.y > 0 && dob.m >= 1 && dob.m <= 12 && dob.d >= 1 && dob.d <= daysInMonth(dob.m, dob.y);
 
-  /** The labels of everything the current step still needs, in the reader's language. */
-  const missingFields = (): string[] => {
+  /**
+   * Everything the current step still needs, as the field it belongs to and the label the reader
+   * knows it by. One list feeds both the message under Continue and the ring drawn round the field,
+   * so the two can never name different things.
+   */
+  const stepProblems = (): { at: string; label: string }[] => {
+    const out: { at: string; label: string }[] = [];
     if (step === 0) {
-      return mobileProblem() || form.mobile.length !== 10 ? [t.mobileLabel] : [];
+      if (mobileProblem() || form.mobile.length !== 10) out.push({ at: "mobile", label: t.mobileLabel });
+      return out;
     }
     if (step === 1) {
-      const missing: string[] = [];
-      if (form.name.trim().length < 3) missing.push(t.nameLabel);
-      if (emailProblem()) missing.push(t.emailLabel);
-      if (!form.gender) missing.push(t.genderLabel);
-      if (!dobValid) missing.push(t.dobLabel);
-      if (form.address.trim().length < 5) missing.push(t.addressLabel);
-      if (form.city.trim().length < 2) missing.push(t.cityLabel);
-      if (!/^\d{6}$/.test(form.pin)) missing.push(t.pinLabel);
-      if (!form.district) missing.push(t.districtLabel);
-      return missing;
+      if (form.name.trim().length < 3) out.push({ at: "name", label: t.nameLabel });
+      if (emailProblem()) out.push({ at: "email", label: t.emailLabel });
+      if (!form.gender) out.push({ at: "gender", label: t.genderLabel });
+      if (!dobValid) out.push({ at: "dob", label: t.dobLabel });
+      if (form.address.trim().length < 5) out.push({ at: "address", label: t.addressLabel });
+      if (form.city.trim().length < 2) out.push({ at: "city", label: t.cityLabel });
+      if (!/^\d{6}$/.test(form.pin)) out.push({ at: "pin", label: t.pinLabel });
+      if (!form.district) out.push({ at: "district", label: t.districtLabel });
+      return out;
     }
     if (step === 2) {
-      const missing: string[] = [];
-      if (!form.category) missing.push(t.categoryLabel);
-      if (!form.level) missing.push(t.levelLabel);
-      if (form.institution.trim().length < 3) missing.push(t.institutionLabel);
-      return missing;
+      if (!form.category) out.push({ at: "category", label: t.categoryLabel });
+      if (!form.level) out.push({ at: "level", label: t.levelLabel });
+      if (form.institution.trim().length < 3) out.push({ at: "institution", label: t.institutionLabel });
+      return out;
     }
-    const missing: string[] = [];
-    if (!rulesAccepted || !privacyAccepted) missing.push(t.rulesLink);
-    if (needsGuardian && form.guardianName.trim().length < 3) missing.push(t.guardianName);
-    return missing;
+    if (!rulesAccepted || !privacyAccepted) out.push({ at: "consent", label: t.rulesLink });
+    if (needsGuardian && form.guardianName.trim().length < 3) out.push({ at: "guardian", label: t.guardianName });
+    return out;
   };
 
-  const canAdvance = () => missingFields().length === 0;
+  const missingFields = (): string[] => stepProblems().map((p) => p.label);
+  const canAdvance = () => stepProblems().length === 0;
 
   // Item 15: derived from the date itself, so editing the date re-evaluates it immediately.
   const ageYears = dobValid
@@ -171,6 +183,8 @@ export default function RegisterPage() {
   const awaitingCode = sendToken > 0;
   const busy = checkingMobile || submitting || pendingStep !== null;
   const ok = canAdvance() && !busy;
+  const flagged = new Set(showErrors ? stepProblems().map((p) => p.at) : []);
+  const bad = (at: string) => (flagged.has(at) ? "true" : "false");
   const mobileMsg = mobileTouched && mp === "invalid" ? t.mobileInvalid : (mobileTouched && mp === "duplicate" ? t.mobileDuplicate : "");
   const districtRow = DISTRICTS.find((_, i) => en.Register.DISTRICTS[i][0] === form.district);
 
@@ -187,7 +201,7 @@ export default function RegisterPage() {
       return LEVELS[key].map((l, i) => ({ value: en.Register.LEVELS[key][i], label: l, on: form.level === en.Register.LEVELS[key][i] }));
     }
     if (picker === "exam") {
-      return [...EXAMS, t.examOther, t.examNone].map((x) => ({ value: x, label: x, on: form.exam === x }));
+      return EXAM_KEYS.map((value, i) => ({ value, label: EXAM_LABELS[i], on: form.exam === value }));
     }
     return [];
   })();
@@ -221,6 +235,7 @@ export default function RegisterPage() {
     setPendingStep(n);
     await wait(1000);
     setStep(n);
+    setShowErrors(false);
     setPendingStep(null);
     requestAnimationFrame(scrollFormToTop);
   };
@@ -313,10 +328,13 @@ export default function RegisterPage() {
     n: String(i + 1), label,
     state: i === step ? "current" : i < step ? "done" : "todo",
     done: i < step ? "true" : "false",
+    current: (i === step ? "step" : undefined) as "step" | undefined,
     bg: i === step ? "#14203E" : i < step ? "#F4EBD8" : "#FFFFFF",
     fg: i === step ? "#FDF3DF" : i < step ? "#7A5412" : "#161C2E",
-    border: i === step ? "#14203E" : "#DCD1BC",
-    labelFg: i === step ? "#14203E" : "#161C2E",
+    border: i === step ? "#14203E" : i < step ? "#E8C173" : "#DCD1BC",
+    // A step still ahead is not competing for attention with the one being filled in.
+    labelFg: i === step ? "#14203E" : i < step ? "#161C2E" : "#7A6B4E",
+    labelWeight: i === step ? "600" : "400",
     sepDisplay: i === t.stepLabels.length - 1 ? "none" : "block",
   }));
   const stepCounter = `${t.stepOf} ${step + 1} ${t.of} 4 · ${t.stepTitles[step]}`;
@@ -367,7 +385,8 @@ export default function RegisterPage() {
   const mobileBorder = mobileMsg ? "#A03A2B" : "#DCD1BC";
 
   const dobDisplay = dob.y ? `${dob.d} ${MONTHS[dob.m - 1]} ${dob.y}` : t.dobPlaceholder;
-  const dobInk = "#161C2E";
+  // Muted until a date is chosen, like every other picker on the form. It read as a filled-in value.
+  const dobInk = dob.y ? "#161C2E" : "#7A6B4E";
   const openDob = () => {
     lockScroll(true);
     setPick({ y: dob.y || 2005, m: dob.m || 6, d: dob.d || 15 });
@@ -406,7 +425,8 @@ export default function RegisterPage() {
   const openLevel = () => openPicker("level");
   // Item 13: only school-level entrants are asked about entrance exams.
   const showExam = form.category === "vidyalaya";
-  const examDisplay = form.exam || t.examPlaceholder;
+  const examIndex = EXAM_KEYS.indexOf(form.exam);
+  const examDisplay = examIndex >= 0 ? EXAM_LABELS[examIndex] : t.examPlaceholder;
   const examInk = form.exam ? "#161C2E" : "#7A6B4E";
   const openExam = () => openPicker("exam");
   const pickerDisplay = picker ? "flex" : "none";
@@ -459,9 +479,11 @@ export default function RegisterPage() {
     if (busy) return;
     const missing = missingFields();
     if (missing.length) {
+      setShowErrors(true);
       showMessage(missing.join(", "));
       return;
     }
+    setShowErrors(false);
     if (step === 0) {
       if (mobileVerified) { void goToStep(1); return; }
       setMobileTouched(true);
@@ -492,8 +514,16 @@ export default function RegisterPage() {
         <div data-e="split" style={{ display: "grid", gridTemplateColumns: "minmax(0,.8fr) minmax(0,1.2fr)", borderRadius: "26px", overflow: "hidden", boxShadow: "0 2px 6px rgba(20,32,62,.06),0 22px 52px rgba(20,32,62,.14)", alignItems: "stretch" }}>
 
           <aside data-e="aside" style={{ position: "relative", overflow: "hidden", background: "#070B1E", minHeight: "560px", padding: "36px 32px", display: "flex", flexDirection: "column", gap: "24px" }}>
-            <Image src="/assets/pathey.png" alt="" width={2560} height={1440} sizes="100vw" loading="eager" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "50% 34%", opacity: ".46" }} />
-            <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(170deg, rgba(7,11,30,.5) 0%, rgba(7,11,30,.87) 52%, rgba(5,8,22,.97) 100%)" }}></div>
+            {/* objectPosition is 40% 35% because the subject is off-centre in this artwork: the
+                face sits in the left third, a little above the middle. The panel is tall and narrow
+                on a desktop (cover crops the width, so the 40% holds the face in the slice) and
+                short and wide once it collapses below 900px (cover crops the height, so the 35%
+                holds it in the band). One value keeps the face at both extremes.
+                The scrim is heavier than the artwork it replaced — this one carries a bright nebula
+                and a gold crown — and is set so the palest pixel under each text run still clears
+                AA. Measured, not estimated; see HANDOFF. */}
+            <Image src="/assets/newbg.jpg" alt="" width={1791} height={1007} sizes="(max-width: 900px) 100vw, 40vw" loading="eager" style={{ position: "absolute", inset: "0", width: "100%", height: "100%", objectFit: "cover", objectPosition: "40% 35%", opacity: ".62" }} />
+            <div aria-hidden="true" style={{ position: "absolute", inset: "0", background: "linear-gradient(170deg, rgba(7,11,30,.46) 0%, rgba(7,11,30,.80) 52%, rgba(5,8,22,.94) 100%)" }}></div>
             <div aria-hidden="true" style={{ position: "absolute", left: "-12%", top: "-14%", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle,rgba(232,193,115,.22) 0%,rgba(232,193,115,0) 70%)", animation: "rg-glow 9s ease-in-out infinite" }}></div>
 
             <div style={{ position: "relative", display: "flex", alignItems: "center", gap: "12px" }}>
@@ -522,16 +552,18 @@ export default function RegisterPage() {
           <div ref={formRef} data-e="form" style={{ padding: "36px 34px 40px", background: "#FFFFFF", display: "flex", flexDirection: "column" }}>
             <h1 style={{ margin: "0 0 20px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(25px,3.2vw,33px)", lineHeight: "1.3", color: "#14203E" }}>{t.title}</h1>
 
-            <ol data-e="steps" style={{ margin: "0 0 10px", padding: "0", listStyle: "none", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px", minWidth: "0" }}>
+            {/* The separators stretch and fill in gold behind the walked steps, so the row is a
+                track showing how far along the form is rather than four unrelated badges. */}
+            <ol data-e="steps" style={{ margin: "0 0 14px", padding: "0", listStyle: "none", display: "flex", flexWrap: "nowrap", alignItems: "center", gap: "10px", minWidth: "0" }}>
               {steps.map((s, sIndex) => (
-                <li key={sIndex} style={{ display: "flex", alignItems: "center", gap: "10px", flex: "0 1 auto" }}>
+                <li key={sIndex} aria-current={s.current} style={{ display: "flex", alignItems: "center", gap: "10px", flex: sIndex === steps.length - 1 ? "0 1 auto" : "1 1 auto", minWidth: "0" }}>
                   <span data-e="stepdot" data-state={s.state} style={{ width: "32px", height: "32px", flex: "0 0 auto", borderRadius: "50%", background: `${s.bg}`, color: `${s.fg}`, border: `1px solid ${s.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "15px", fontWeight: "600" }}>{s.state === "done" ? "✓" : s.n}</span>
-                  <span data-e="steplabel" style={{ fontSize: "15.5px", lineHeight: "1.6", color: `${s.labelFg}`, whiteSpace: "nowrap" }}>{s.label}</span>
-                  <span aria-hidden="true" data-e="stepsep" data-done={s.done} style={{ width: "18px", height: "2px", borderRadius: "2px", background: "#DCD1BC", display: `${s.sepDisplay}` }}></span>
+                  <span data-e="steplabel" style={{ minWidth: "0", fontSize: "15.5px", fontWeight: `${s.labelWeight}`, lineHeight: "1.6", color: `${s.labelFg}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</span>
+                  <span aria-hidden="true" data-e="stepsep" data-done={s.done} style={{ flex: "1 1 auto", minWidth: "18px", height: "2px", borderRadius: "2px", background: "#DCD1BC", display: `${s.sepDisplay}` }}></span>
                 </li>
               ))}
             </ol>
-            <p data-e="stepcounter" style={{ margin: "0 0 28px", paddingBottom: "20px", borderBottom: "1px solid #F0EADD", fontSize: "15px", lineHeight: "1.7", color: "#161C2E" }}>{stepCounter}</p>
+            <p data-e="stepcounter" style={{ margin: "0 0 30px", paddingBottom: "22px", borderBottom: "1px solid #F0EADD", fontSize: "15px", lineHeight: "1.7", color: "#7A6B4E" }}>{stepCounter}</p>
 
             {busyLabel ? (
               <div role="status" aria-live="polite" data-e="stepbusy" style={{ minHeight: "260px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px" }}>
@@ -541,7 +573,7 @@ export default function RegisterPage() {
             ) : null}
 
             {!busyLabel && isIdentity ? (
-              <div data-e="fields" style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+              <div data-e="fields" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 {awaitingCode && !mobileVerified ? (
                   <OtpStep
                     lang={lang}
@@ -559,7 +591,7 @@ export default function RegisterPage() {
                     <button type="button" onClick={changeNumber} style={{ alignSelf: "flex-start", padding: "0", border: "0", background: "transparent", fontSize: "16px", lineHeight: "1.7", color: "#27408B", cursor: "pointer", fontFamily: "inherit" }}>{cOtp.changeNumber}</button>
                   </div>
                 ) : (
-                  <label data-e="field" data-invalid={mobileMsg ? "true" : "false"} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <label data-e="field" data-invalid={mobileMsg || flagged.has("mobile") ? "true" : "false"} style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.mobileLabel}</span>
                     <span data-e="control" style={{ display: "flex", alignItems: "stretch", border: `1px solid ${mobileBorder}`, borderRadius: "14px", background: "#FCFAF4", overflow: "hidden" }}>
                       <span aria-hidden="true" style={{ flex: "0 0 auto", display: "flex", alignItems: "center", gap: "8px", padding: "0 13px", background: "#F1E9DA", borderRight: "1px solid #E3D9C6" }}>
@@ -586,65 +618,69 @@ export default function RegisterPage() {
               </div>
             ) : null}
 
+            {/* Two groups, ruled apart: who the student is, then where they live. As one ten-field
+                grid it read as a wall and the address questions arrived unannounced. */}
             {!busyLabel && isStudent ? (
-              <div data-g="two" data-e="fields" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "20px" }}>
-                <label style={{ display: "flex", flexDirection: "column", gap: "7px", gridColumn: "1 / -1" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.nameLabel}</span>
-                  <input type="text" maxLength={100} value={name} onInput={onName} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
-                </label>
-                <label data-e="field" data-invalid={ep ? "true" : "false"} style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.emailLabel} <span style={{ padding: "3px 11px", borderRadius: "999px", background: "#F1E9DA", border: "1px solid #E3D9C6", fontSize: "14.5px", lineHeight: "1.6", color: "#161C2E" }}>{t.optional}</span></span>
-                  <input type="email" inputMode="email" autoComplete="email" value={email} onInput={onEmail} placeholder="name@gmail.com" style={{ minHeight: "54px", padding: "14px 16px", border: `1px solid ${emailBorder}`, borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
-                  <span role="alert" data-e="fieldnote" style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B", display: `${emailMsgDisplay}` }}>{emailMsg}</span>
-                </label>
-                <div style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.dobLabel}</span>
-                  <button type="button" onClick={openDob} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: `${dobInk}`, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-                    <span>{dobDisplay}</span>
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><rect x="3.3" y="4.8" width="17.4" height="15.9" rx="3"></rect><path d="M3.3 9.6h17.4M8 3.3v3M16 3.3v3"></path></svg>
-                  </button>
-                </div>
-                <fieldset style={{ gridColumn: "1 / -1", margin: "0", padding: "0", border: "0", display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <legend style={{ padding: "0", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.genderLabel}</legend>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                    {genders.map((g, gIndex) => (
-                      <button key={gIndex} type="button" onClick={g.select} aria-pressed={g.on} style={{ minHeight: "48px", padding: "12px 22px", border: `1px solid ${g.border}`, borderRadius: "999px", background: `${g.bg}`, color: `${g.fg}`, cursor: "pointer", fontSize: "16.5px", lineHeight: "1.6" }}>{g.label}</button>
-                    ))}
+              <div data-e="fields" style={{ display: "flex", flexDirection: "column", gap: "26px" }}>
+                <div data-g="two" data-e="fieldgroup" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "20px" }}>
+                  <label data-e="field" data-invalid={bad("name")} style={{ display: "flex", flexDirection: "column", gap: "7px", gridColumn: "1 / -1" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.nameLabel}</span>
+                    <input type="text" autoComplete="name" maxLength={100} value={name} onInput={onName} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
+                  </label>
+                  <label data-e="field" data-invalid={ep || flagged.has("email") ? "true" : "false"} style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                    <span data-e="fieldlabel" style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.emailLabel} <span style={{ padding: "3px 11px", borderRadius: "999px", background: "#F1E9DA", border: "1px solid #E3D9C6", fontSize: "14.5px", lineHeight: "1.6", color: "#161C2E" }}>{t.optional}</span></span>
+                    <input type="email" inputMode="email" autoComplete="email" value={email} onInput={onEmail} placeholder="name@gmail.com" style={{ minHeight: "54px", padding: "14px 16px", border: `1px solid ${emailBorder}`, borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
+                    <span role="alert" data-e="fieldnote" style={{ fontSize: "15px", lineHeight: "1.7", color: "#A03A2B", display: `${emailMsgDisplay}` }}>{emailMsg}</span>
+                  </label>
+                  <div data-e="field" data-invalid={bad("dob")} style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.dobLabel}</span>
+                    <button type="button" onClick={openDob} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: `${dobInk}`, cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                      <span>{dobDisplay}</span>
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.7" strokeLinecap="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><rect x="3.3" y="4.8" width="17.4" height="15.9" rx="3"></rect><path d="M3.3 9.6h17.4M8 3.3v3M16 3.3v3"></path></svg>
+                    </button>
                   </div>
-                </fieldset>
-
-                <span aria-hidden="true" style={{ gridColumn: "1 / -1", height: "1px", marginTop: "6px", background: "#EFE5D3" }}></span>
-
-                <label style={{ display: "flex", flexDirection: "column", gap: "7px", gridColumn: "1 / -1" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.addressLabel}</span>
-                  <textarea rows={2} value={address} onInput={onAddress} style={{ padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.7", color: "#161C2E", resize: "vertical" }}></textarea>
-                </label>
-                <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.cityLabel}</span>
-                  <input type="text" value={city} onInput={onCity} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
-                </label>
-                <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.pinLabel}</span>
-                  <input type="text" inputMode="numeric" maxLength={6} value={pin} onInput={onPin} placeholder="000000" style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }} />
-                </label>
-                <div style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.districtLabel}</span>
-                  <button type="button" onClick={openDistrict} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", color: `${districtInk}` }}>
-                    <span>{districtDisplay}</span>
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><path d="M6 9.5 12 15.5l6-6"></path></svg>
-                  </button>
+                  <fieldset data-e="field" data-invalid={bad("gender")} style={{ gridColumn: "1 / -1", margin: "0", padding: "0", border: "0", display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <legend data-e="fieldlabel" style={{ padding: "0", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.genderLabel}</legend>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                      {genders.map((g, gIndex) => (
+                        <button key={gIndex} type="button" onClick={g.select} aria-pressed={g.on} style={{ minHeight: "48px", padding: "12px 22px", border: `1px solid ${g.border}`, borderRadius: "999px", background: `${g.bg}`, color: `${g.fg}`, cursor: "pointer", fontSize: "16.5px", lineHeight: "1.6" }}>{g.label}</button>
+                      ))}
+                    </div>
+                  </fieldset>
                 </div>
-                <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.stateLabel}</span>
-                  <input type="text" value={t.stateValue} disabled={true} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #E8DFCE", borderRadius: "14px", background: "#F2ECE0", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
-                </label>
+
+                <div data-g="two" data-e="fieldgroup" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "20px" }}>
+                  <label data-e="field" data-invalid={bad("address")} style={{ display: "flex", flexDirection: "column", gap: "7px", gridColumn: "1 / -1" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.addressLabel}</span>
+                    <textarea rows={2} autoComplete="street-address" value={address} onInput={onAddress} style={{ padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.7", color: "#161C2E", resize: "vertical" }}></textarea>
+                  </label>
+                  <label data-e="field" data-invalid={bad("city")} style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.cityLabel}</span>
+                    <input type="text" autoComplete="address-level2" value={city} onInput={onCity} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
+                  </label>
+                  <label data-e="field" data-invalid={bad("pin")} style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.pinLabel}</span>
+                    <input type="text" inputMode="numeric" autoComplete="postal-code" maxLength={6} value={pin} onInput={onPin} placeholder="000000" style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E", fontVariantNumeric: "tabular-nums" }} />
+                  </label>
+                  <div data-e="field" data-invalid={bad("district")} style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.districtLabel}</span>
+                    <button type="button" onClick={openDistrict} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", color: `${districtInk}` }}>
+                      <span>{districtDisplay}</span>
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><path d="M6 9.5 12 15.5l6-6"></path></svg>
+                    </button>
+                  </div>
+                  <label data-e="field" style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.stateLabel}</span>
+                    <input type="text" value={t.stateValue} disabled={true} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #E8DFCE", borderRadius: "14px", background: "#F2ECE0", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
+                  </label>
+                </div>
               </div>
             ) : null}
 
             {!busyLabel && isEducation ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                <fieldset style={{ margin: "0", padding: "0", border: "0", display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <legend style={{ padding: "0 0 2px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.categoryLabel}</legend>
+              <div data-e="fields" style={{ display: "flex", flexDirection: "column", gap: "22px" }}>
+                <fieldset data-e="field" data-invalid={bad("category")} style={{ margin: "0", padding: "0", border: "0", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <legend data-e="fieldlabel" style={{ padding: "0 0 2px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.categoryLabel}</legend>
                   <div data-g="two" style={{ display: "grid", gridTemplateColumns: "repeat(2,minmax(0,1fr))", gap: "14px" }}>
                     {categories.map((c, cIndex) => (
                       <button key={cIndex} type="button" onClick={c.select} aria-pressed={c.on} style={{ textAlign: "left", padding: "20px", border: `1.5px solid ${c.border}`, borderRadius: "18px", background: `${c.bg}`, cursor: "pointer", display: "flex", gap: "14px", alignItems: "flex-start", minHeight: "104px", transition: "border-color .16s ease,background .16s ease" }}>
@@ -659,32 +695,32 @@ export default function RegisterPage() {
                     ))}
                   </div>
                 </fieldset>
-                <div style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.levelLabel}</span>
+                <div data-e="field" data-invalid={bad("level")} style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
+                  <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.levelLabel}</span>
                   <button type="button" onClick={openLevel} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", color: `${levelInk}` }}>
                     <span>{levelDisplay}</span>
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><path d="M6 9.5 12 15.5l6-6"></path></svg>
                   </button>
                 </div>
                 {showExam ? (
-                <div style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.examLabel} <span style={{ padding: "3px 11px", borderRadius: "999px", background: "#F1E9DA", border: "1px solid #E3D9C6", fontSize: "14.5px", lineHeight: "1.6", color: "#161C2E" }}>{t.optional}</span></span>
+                <div data-e="field" style={{ minWidth: "0", display: "flex", flexDirection: "column", gap: "7px" }}>
+                  <span data-e="fieldlabel" style={{ display: "flex", alignItems: "center", gap: "9px", fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.examLabel} <span style={{ padding: "3px 11px", borderRadius: "999px", background: "#F1E9DA", border: "1px solid #E3D9C6", fontSize: "14.5px", lineHeight: "1.6", color: "#161C2E" }}>{t.optional}</span></span>
                   <button type="button" onClick={openExam} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", cursor: "pointer", textAlign: "left", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", color: `${examInk}` }}>
                     <span>{examDisplay}</span>
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6015" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ display: "block", flex: "0 0 auto" }}><path d="M6 9.5 12 15.5l6-6"></path></svg>
                   </button>
                 </div>
                 ) : null}
-                <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                  <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.institutionLabel}</span>
+                <label data-e="field" data-invalid={bad("institution")} style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                  <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.institutionLabel}</span>
                   <input type="text" value={institution} onInput={onInstitution} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FCFAF4", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
                 </label>
               </div>
             ) : null}
 
             {!busyLabel && isDeclare ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                <label style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", borderRadius: "16px", border: `1px solid ${rulesBorder}`, background: `${rulesBg}` }}>
+              <div data-e="fields" style={{ display: "flex", flexDirection: "column", gap: "18px" }}>
+                <label data-e="consent" data-invalid={bad("consent")} style={{ display: "flex", gap: "14px", alignItems: "flex-start", cursor: "pointer", padding: "16px 18px", borderRadius: "16px", border: `1px solid ${rulesBorder}`, background: `${rulesBg}`, transition: "border-color .16s ease,background .16s ease" }}>
                   <input type="checkbox" checked={rulesAccepted && privacyAccepted} onChange={toggleBothConsents} style={{ marginTop: "3px", width: "22px", height: "22px", flex: "0 0 auto", accentColor: "#14203E", cursor: "pointer" }} />
                   <span style={{ fontSize: "16.5px", lineHeight: "1.8", color: "#161C2E" }}>
                     {c.consent}{" "}
@@ -696,8 +732,9 @@ export default function RegisterPage() {
                 {needsGuardian ? (
                 <div style={{ padding: "22px", borderRadius: "16px", background: "#F6F0E4", display: "flex", flexDirection: "column", gap: "14px" }}>
                   <p style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontSize: "18px", lineHeight: "1.5", color: "#14203E" }}>{t.guardianTitle}</p>
-                  <label style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
-                    <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.guardianName}</span>
+                  <p data-e="fieldhelp" style={{ margin: "0", fontSize: "15.5px", lineHeight: "1.8", color: "#161C2E" }}>{c.guardianWhy}</p>
+                  <label data-e="field" data-invalid={bad("guardian")} style={{ display: "flex", flexDirection: "column", gap: "7px" }}>
+                    <span data-e="fieldlabel" style={{ fontSize: "16px", lineHeight: "1.6", color: "#161C2E" }}>{t.guardianName}</span>
                     <input type="text" value={guardianName} onInput={onGuardianName} style={{ minHeight: "54px", padding: "14px 16px", border: "1px solid #DCD1BC", borderRadius: "14px", background: "#FFFFFF", fontSize: "17px", lineHeight: "1.6", color: "#161C2E" }} />
                   </label>
                 </div>

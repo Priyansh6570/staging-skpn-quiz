@@ -27,10 +27,10 @@ export default function PratiyogitaPage() {
   const c = custom(lang);
   const signedIn = session.signedIn;
   const hasCerts = session.hasCertificates;
-  const attempts = session.attemptCount;
+  const hasSat = session.hasCertificates;
 
-  const t = { ...s, ctaPrimary: signedIn ? (attempts > 0 ? s.ctaAgain : s.ctaTake) : s.ctaPrimary };
-  const primaryHref = signedIn ? (attempts > 0 ? "/certificates" : "/quiz") : "/register";
+  const t = { ...s, ctaPrimary: signedIn ? (hasSat ? s.ctaAgain : s.ctaTake) : s.ctaPrimary };
+  const primaryHref = signedIn ? (hasSat ? "/certificates" : "/quiz") : "/register";
   const categories = s.categories.map((c, i) => ({
     ...c,
     ...CAT_STYLE[i === 0 ? "school" : "college"],
@@ -46,8 +46,11 @@ export default function PratiyogitaPage() {
     i === 0
       ? { value: s.formatFirstValue, label: s.formatFirstLabel, accent: F_ACCENTS[0] }
       : { ...f, accent: F_ACCENTS[i % F_ACCENTS.length] });
+  // The opening row has no separate occasion to name any more — the competition's own start is the
+  // occasion — so `what` and `note` carry the same words there. Printed once, not twice.
   const dates = s.dates.map((d, i) => ({
     ...d,
+    what: d.what === d.note ? "" : d.what,
     dotBg: i === 0 ? "#E8C173" : "#FBF7F0",
     dotBorder: i === 0 ? "#B98F3C" : "#DCD1BC",
     line: i === s.dates.length - 1 ? "transparent" : "#E3D9C6",
@@ -139,7 +142,7 @@ export default function PratiyogitaPage() {
               <span aria-hidden="true" style={{ position: "absolute", left: "9px", top: "24px", bottom: "0", width: "1px", background: `${d.line}` }}></span>
               <span aria-hidden="true" style={{ position: "absolute", left: "0", top: "7px", width: "19px", height: "19px", borderRadius: "50%", background: `${d.dotBg}`, border: `2px solid ${d.dotBorder}` }}></span>
               <span style={{ fontSize: "17px", lineHeight: "1.6", color: "#8A6015" }}>{d.note}</span>
-              <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "500", fontSize: "21px", lineHeight: "1.5", color: "#161C2E" }}>{d.what}</span>
+              {d.what ? <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "500", fontSize: "21px", lineHeight: "1.5", color: "#161C2E" }}>{d.what}</span> : null}
               <span style={{ fontSize: "16px", lineHeight: "1.75", color: "#161C2E", fontVariantNumeric: "tabular-nums" }}>{d.when}</span>
             </li>
           ))}
@@ -147,7 +150,7 @@ export default function PratiyogitaPage() {
       </section>
       ) : null}
 
-      {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} attempts={attempts} /> : null}
+      {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} hasSat={hasSat} /> : null}
 
       <SiteFooter lang={lang} />
     </div>

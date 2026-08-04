@@ -114,17 +114,18 @@ export function applyTransforms(tree, lang) {
   const home = next.Home_v5?.S;
   if (home) {
     home.sylLede = addVirtue(home.sylLede, lang);
-    const start = dropYear(home.dates[0].when);                       // "29 जुलाई"
+    // The range opens on the competition's own date and closes on the second occasion. It no longer
+    // borrows a festival name off heroDate: the competition opens 5 August and Guru Purnima is
+    // 29 July, so naming the festival here would date the range to the wrong day.
+    const start = home.dates[0].when;                                 // "5 अगस्त 2026"
     const end = dropYear(home.dates[1].when);                         // "4 सितम्बर"
-    const [festival, connector] = home.heroDate.split(/\s+(?=\d)/);   // "गुरु पूर्णिमा," | rest
-    void connector;
     const seTak = lang === "hi"
       ? { se: "से", tak: (next.Register?.S?.categories?.[0]?.who ?? "").match(/तक/)?.[0] ?? "तक" }
       : { se: "to", tak: "" };
 
     home.heroDateRange = lang === "hi"
-      ? `${festival} ${start} ${seTak.se} ${home.dates[1].what} ${end} ${seTak.tak}`
-      : `${festival} ${start} to ${home.dates[1].what}, ${end}`;
+      ? `${start} ${seTak.se} ${home.dates[1].what} ${end} ${seTak.tak}`
+      : `${start} to ${home.dates[1].what}, ${end}`;
 
     // Fourth stat card: "10 मिनट" over "समय".
     const minutes = next.Pratiyogita?.S?.format?.[1];

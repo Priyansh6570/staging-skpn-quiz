@@ -4,15 +4,16 @@ import { strings, type Lang } from "@/lib/i18n";
 type Props = {
   lang: Lang;
   signedIn?: boolean;
-  // The design read this from localStorage.skpn_attempts. localStorage is gone, so the third state
-  // ("done") is unreachable unless the caller supplies the count from GET /api/session.
-  attempts?: number;
+  // The design read a count from localStorage.skpn_attempts. localStorage is gone and the count is
+  // no longer in the session body: a certificate exists for every paper sat, so this is the same
+  // third state ("done") expressed as the boolean the session actually carries.
+  hasSat?: boolean;
 };
 
-export default function CtaBox({ lang, signedIn = false, attempts = 0 }: Props) {
+export default function CtaBox({ lang, signedIn = false, hasSat = false }: Props) {
   const t = strings(lang).CtaBox.T;
-  const key = !signedIn ? "out" : attempts > 0 ? "done" : "pending";
-  const href = !signedIn ? "/register" : attempts > 0 ? "/certificates" : "/quiz";
+  const key = !signedIn ? "out" : hasSat ? "done" : "pending";
+  const href = !signedIn ? "/register" : hasSat ? "/certificates" : "/quiz";
   const [heading, sub, action] = t[key];
 
   return (

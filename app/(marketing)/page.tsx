@@ -32,8 +32,8 @@ export default function HomePage() {
   const parallaxRef = useRef<HTMLElement | null>(null);
 
   const signedIn = session.signedIn;
-  const attempts = session.attemptCount;
-  const hasCerts = session.hasCertificates || attempts > 0;
+  const hasSat = session.hasCertificates;
+  const hasCerts = hasSat;
 
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -59,7 +59,7 @@ export default function HomePage() {
   }, []);
 
 
-  const t = { ...s, ctaPrimary: signedIn ? (attempts > 0 ? s.ctaCert : s.ctaTake) : s.ctaPrimaryOut };
+  const t = { ...s, ctaPrimary: signedIn ? (hasSat ? s.ctaCert : s.ctaTake) : s.ctaPrimaryOut };
 
   // heroDateRange is one string, and narrow screens have to break it before the second occasion.
   // That occasion is the only point inside it that also exists as a string of its own, so the cut
@@ -81,8 +81,10 @@ export default function HomePage() {
     isClock: STEP_ICONS[i] === "clock",
     isCert: STEP_ICONS[i] === "cert",
   }));
-  const dates = s.dates.map((d, i) => ({ ...d, ...DATE_STYLE[i % 3], step: s.dateSteps[i] }));
-  const primaryHref = signedIn ? (attempts > 0 ? "/certificates" : "/quiz") : "/register";
+  // The opening row has no separate occasion to name any more — the competition's own start is the
+  // occasion — so `what` and `note` carry the same words there. Printed once, not twice.
+  const dates = s.dates.map((d, i) => ({ ...d, what: d.what === d.note ? "" : d.what, ...DATE_STYLE[i % 3], step: s.dateSteps[i] }));
+  const primaryHref = signedIn ? (hasSat ? "/certificates" : "/quiz") : "/register";
   return (
     <div data-page="Home-v5" style={{ background: "#FBF7F0", color: "#161C2E", fontFamily: "'Noto Sans Devanagari',system-ui,sans-serif", minWidth: "320px", overflowX: "clip", isolation: "isolate" }}>
       <PageAura />
@@ -211,14 +213,14 @@ export default function HomePage() {
               {/* The section heading is gone, so each card's own heading is the top level here. */}
               <h2 style={{ position: "relative", margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "20px", lineHeight: "1.5", color: `${d.stepFg}` }}>{d.note}</h2>
               <span style={{ position: "relative", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(25px,3vw,32px)", lineHeight: "1.24", color: "#14203E", fontVariantNumeric: "tabular-nums", textWrap: "balance" }}>{d.when}</span>
-              <span style={{ position: "relative", fontSize: "18px", lineHeight: "1.6", color: "#161C2E" }}>{d.what}</span>
+              {d.what ? <span style={{ position: "relative", fontSize: "18px", lineHeight: "1.6", color: "#161C2E" }}>{d.what}</span> : null}
             </li>
           ))}
         </ol>
       </section>
       ) : null}
 
-      {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} attempts={attempts} /> : null}
+      {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} hasSat={hasSat} /> : null}
 
       <SiteFooter lang={lang} />
     </div>

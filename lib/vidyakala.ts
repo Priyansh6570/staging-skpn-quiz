@@ -1,11 +1,28 @@
 import book from "@/vidya-kala.json";
+import plateBook from "@/vk-plates.json";
 import { hi as hiStrings, type Lang, strings } from "@/lib/i18n";
+import { PROFESSIONS, professionCopy } from "@/lib/i18n/professions";
 
 // Server-only. The JSON is ~400KB; nothing here may be imported by a client component.
 // Callers pass the narrow shapes below across the boundary instead.
 
-type Para = { printed: number; kind: string; text: string };
-type Shloka = { printed: number; text: string; attribution: string | null };
+/**
+ * One block of the entry, in the order the book prints it.
+ *
+ * `content` replaces the old parallel `descriptionHi` / `shloka` arrays. Those were keyed only by
+ * printed page, so within a page the sequence was lost and every shloka rendered after all the
+ * prose — detached from the sentence that introduces it, which is usually the line directly above
+ * or below it in the book. The order was re-read from the page images in split/ and is rebuilt by
+ * scripts/vk-order.mjs; the two source arrays are still in the JSON as the provenance it was
+ * assembled from, and nothing reads them.
+ */
+type Block = {
+  printed: number;
+  kind: "para" | "subhead" | "deflist-item" | "quote" | "connector" | "shloka";
+  text: string;
+  term?: string;
+  attribution?: string | null;
+};
 type Figure = { printed: number; position: string; subject: string; pdfPage: number; file: string | null };
 
 type RawEntry = {
@@ -13,14 +30,21 @@ type RawEntry = {
   section: "vidya" | "kala";
   nameHi: string | null;
   glossHi: string | null;
-  descriptionHi: Para[];
-  shloka: Shloka[];
+  content: Block[];
   figures: Figure[];
   variantHi?: string[];
   bookHeading: { printed: number; bookNum?: number | null; note?: string | null };
 };
 
 const raw = book.entries as unknown as RawEntry[];
+
+/**
+ * One commissioned plate per entry, keyed by entry key. See scripts/vk-plates.mjs: design/image
+ * numbers 78 plates in book order and there are exactly 78 entries, so the mapping is 1:1 and no
+ * entry has a second plate to place further down.
+ */
+type Plate = { src: string; width: number; height: number };
+const PLATES = plateBook.plates as Record<string, Plate>;
 
 // Three reconciliations between the book file and the i18n keys, all consequences of the
 // book-authority pass:
@@ -34,11 +58,11 @@ const SOURCE_KEY: Record<string, string> = { "Chhando-jnana": "Abhidhana-kosha" 
 
 const keyOf = (e: RawEntry) => e.key ?? KEY_BY_PAGE[e.bookHeading.printed] ?? null;
 
-const scopedParas = (key: string): Para[] => {
+const scopedContent = (key: string): Block[] => {
   const e = raw.find((x) => keyOf(x) === (SOURCE_KEY[key] ?? key));
   if (!e) return [];
   const scope = PAGE_SCOPED[key];
-  return scope ? e.descriptionHi.filter((p) => scope.includes(p.printed)) : e.descriptionHi;
+  return scope ? e.content.filter((p) => scope.includes(p.printed)) : e.content;
 };
 
 /** Longest preview the drawer can show before the panel starts to scroll on a phone. */
@@ -55,8 +79,8 @@ const DANDA = "\u0964";
  * three. An entry whose first sentence runs past the budget with no earlier break gets no preview
  * at all rather than a mangled one; the drawer then shows name and gloss only.
  */
-const previewOf = (paras: Para[]): string | null => {
-  const first = paras.find((p) => p.kind === "para")?.text;
+const previewOf = (blocks: Block[]): string | null => {
+  const first = blocks.find((p) => p.kind === "para")?.text;
   if (!first) return null;
   if (first.length <= PREVIEW_MAX) return first;
   const cut = first.lastIndexOf(DANDA, PREVIEW_MAX);
@@ -87,9 +111,50 @@ const rowOf = (t: (string | null)[], lang: Lang, n: number): IndexRow => {
     gloss: gloss ?? null,
     glossIsHindi: lang === "en" && !t[3],
     n,
-    preview: previewOf(scopedParas(key)),
+    preview: previewOf(scopedContent(key)),
   };
 };
+
+export type ProfessionEntry = { key: string; name: string; gloss: string | null; glossIsHindi: boolean; n: number; section: "vidya" | "kala" };
+export type ProfessionCard = { key: string; label: string; entries: ProfessionEntry[] };
+
+/**
+ * The professions section's data, resolved server-side: for each profession, the Vidyas and Kalas it
+ * shares a domain with, carrying each entry's own name and its gloss from the book.
+ *
+ * The gloss is the point. A student who taps "चिकित्सा" is not shown a list of words — they are shown
+ * that वृक्षायुर्वेद योग is "पेड़-पौधों की चिकित्सा", and the link takes them to what the book says.
+ *
+ * Throws on a key that no longer resolves. The section is a set of promises about what the reader
+ * will find; a silently dropped link is worse than a failed build.
+ */
+export function professionCards(lang: Lang): ProfessionCard[] {
+  const vidyas = i18nList(lang, "VIDYAS");
+  const kalas = i18nList(lang, "KALAS");
+  // Built field by field rather than through rowOf: this needs a name and a gloss, and rowOf also
+  // computes the drawer preview, which walks the entry's whole content for a string nothing here
+  // renders.
+  const entryOf = (t: (string | null)[], n: number, section: "vidya" | "kala"): ProfessionEntry => ({
+    key: t[2] as string,
+    name: ((lang === "hi" ? t[0] : t[2]) ?? t[0] ?? "") as string,
+    gloss: (lang === "hi" ? t[1] : (t[3] ?? t[1])) ?? null,
+    glossIsHindi: lang === "en" && !t[3],
+    n,
+    section,
+  });
+  const find = (key: string): ProfessionEntry => {
+    const vi = vidyas.findIndex((t) => t[2] === key);
+    if (vi >= 0) return entryOf(vidyas[vi], vi + 1, "vidya");
+    const ki = kalas.findIndex((t) => t[2] === key);
+    if (ki >= 0) return entryOf(kalas[ki], ki + 1, "kala");
+    throw new Error(`professions: no Vidya or Kala with key "${key}" — see lib/i18n/professions.ts`);
+  };
+  return PROFESSIONS.map(({ key, entries }) => ({
+    key,
+    label: professionCopy[lang].labels[key as keyof (typeof professionCopy)["hi"]["labels"]],
+    entries: entries.map(find),
+  }));
+}
 
 /**
  * Vidyas grouped 4/6/4. The label comes from groupHi on the book entry, written there once by a
@@ -123,8 +188,9 @@ export type EntryDetail = {
   n: number | null;
   bookHeading: string | null;
   variants: string[];
-  paras: Para[];
-  shlokas: Shloka[];
+  /** Prose and shlokas interleaved, in the book's own printed order. */
+  content: Block[];
+  plate: Plate | null;
   figures: Figure[];
   pages: number[];
   prev: { key: string; name: string } | null;
@@ -192,10 +258,10 @@ export function entry(key: string, lang: Lang): EntryDetail | null {
     n: isVidya ? null : pos + 1,
     bookHeading: heading && heading !== row.name ? heading : null,
     variants: e.variantHi ?? [],
-    paras: inScope(e.descriptionHi),
-    shlokas: inScope(e.shloka),
+    content: inScope(e.content),
+    plate: PLATES[key] ?? null,
     figures: inScope(e.figures),
-    pages: [...new Set(inScope(e.descriptionHi).map((p) => p.printed))].sort((a, b) => a - b),
+    pages: [...new Set(inScope(e.content).map((p) => p.printed))].sort((a, b) => a - b),
     prev: i > 0 ? { key: order[i - 1], name: nameOf(order[i - 1]) } : null,
     next: i >= 0 && i < order.length - 1 ? { key: order[i + 1], name: nameOf(order[i + 1]) } : null,
     siblings: siblingsAround(list, pos, lang),

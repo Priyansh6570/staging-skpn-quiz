@@ -17,7 +17,10 @@ export async function POST(req: Request) {
 
   const parsed = RegistrationInput.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
-    return json({ error: "invalid", issues: parsed.error.issues.map((i) => i.path.join(".")) }, { status: 400 });
+    // The failing field paths used to be listed here. The form submits every field at once, so the
+    // list was a map of the whole schema handed to anyone who posted a malformed body; the client
+    // never read it and renders one message for a 400.
+    return json({ error: "invalid" }, { status: 400 });
   }
   const input = parsed.data;
 
@@ -91,5 +94,7 @@ export async function POST(req: Request) {
     }),
   ]);
 
-  return json({ ok: true, userId: String(userId) });
+  // No id. The session cookie carries the uid; the client had no use for the Mongo _id and echoing
+  // it made a primary key readable in the network tab on the one request every student makes.
+  return json({ ok: true });
 }
