@@ -21,6 +21,19 @@ const CSS = `
     user-select: none;
     -webkit-touch-callout: none;
   }
+  img, svg, video, canvas,
+  a, button, label, summary, [role="button"] {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    /* Chrome/Safari paint a translucent blue rect over the tapped element even when it is
+       unselectable; only this kills it. */
+    -webkit-tap-highlight-color: transparent;
+  }
+  img, svg {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }
   input, textarea, select, [contenteditable="true"],
   .adm, .adm-login {
     -webkit-user-select: text;
