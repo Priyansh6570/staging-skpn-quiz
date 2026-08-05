@@ -33,6 +33,8 @@ export default function VidyaKalaIndex({ vidyas, kalas, vidyasEn, kalasEn }: Pro
 
   const groups = hi ? vidyas : vidyasEn;
   const rows = hi ? kalas : kalasEn;
+  // Names the list actually under the box, so it follows the tab as well as the language.
+  const searchLabel = view === "kala" ? c.vidyaKala.searchKalas : c.vidyaKala.searchVidyas;
   const [q, setQ] = useState("");
   const needle = fold(q);
   const shown = useMemo(
@@ -69,14 +71,18 @@ export default function VidyaKalaIndex({ vidyas, kalas, vidyasEn, kalasEn }: Pro
           {view === "kala" ? (
             <div data-e="vksearch">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8790A6" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
-              <input data-e="vksearchinput" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={c.vidyaKala.searchLabel} aria-label={c.vidyaKala.searchLabel} lang={hi ? "hi" : "en"} autoComplete="off" />
+              <input data-e="vksearchinput" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={searchLabel} aria-label={searchLabel} lang={hi ? "hi" : "en"} autoComplete="off" />
             </div>
           ) : null}
         </div>
       </div>
 
+      {/* key={view}: both branches put a <section> in the same slot, so without a differing key React
+          reconciles the two lists into each other instead of swapping them. The vidya branch's five
+          keyed bands against the kala branch's three unkeyed children left two bands orphaned in the
+          DOM on every client-side tab change — the list and the tab disagreed until a reload. */}
       {view === "vidya" ? (
-        <section data-e="pad section" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "18px 30px 90px" }}>
+        <section key={view} data-e="pad section" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "18px 30px 90px" }}>
           {groups.map((g, gi) => (
             <div key={g.label} data-e="vkband" data-vkg={gi}>
               <div data-e="vkbandhead">
@@ -102,7 +108,7 @@ export default function VidyaKalaIndex({ vidyas, kalas, vidyasEn, kalasEn }: Pro
           ))}
         </section>
       ) : (
-        <section data-e="pad section" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "28px 30px 90px" }}>
+        <section key={view} data-e="pad section" style={{ position: "relative", maxWidth: "1220px", margin: "0 auto", padding: "28px 30px 90px" }}>
           <div data-e="vkmeta" style={{ marginBottom: "16px" }}>
             <span data-e="vkmetacount">{needle ? `${shown.length} / ${rows.length}` : s.tabKalas}</span>
           </div>

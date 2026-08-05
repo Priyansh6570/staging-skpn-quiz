@@ -107,16 +107,18 @@ await card.setContent(`<head><link rel="stylesheet" href="${FONTS}"></head>
         <span id="dept" style="font-size:22px;line-height:1.6;color:#E9E4D8"></span>
         <span style="width:46px;height:1px;background:rgba(232,193,115,.7)"></span>
       </div>
+      <p id="dates" style="margin:0;font-family:'Noto Serif Devanagari',serif;font-size:27px;line-height:1.6;color:#E8C173;letter-spacing:.01em"></p>
     </div>
   </div>
 </body>`);
 await card.evaluate(
-  ([org, title, dept]) => {
+  ([org, title, dept, dates]) => {
     document.getElementById("org").textContent = org;
     document.getElementById("title").textContent = title;
     document.getElementById("dept").textContent = dept;
+    document.getElementById("dates").textContent = dates;
   },
-  [hi.Home_v5.S.org, hi.Home_v5.S.heroTitle, hi.SiteHeader.T.deptShort],
+  [hi.Home_v5.S.org, hi.Home_v5.S.heroTitle, hi.SiteHeader.T.deptShort, hi.Home_v5.S.heroDateRange],
 );
 await card.evaluate(() => document.fonts.ready);
 await card.waitForTimeout(400);

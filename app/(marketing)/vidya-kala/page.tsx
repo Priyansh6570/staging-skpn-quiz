@@ -1,17 +1,18 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
 import VidyaKalaIndex from "@/components/VidyaKalaIndex";
 import { hi } from "@/lib/i18n";
+import { pageMetadata } from "@/lib/seo";
 import { kalaIndex, vidyaGroups } from "@/lib/vidyakala";
 
 // Static. lib/vidyakala.ts pulls in the whole 400KB book file, so the read happens here and only the
 // index rows — name and gloss, both languages already resolved — cross into the client component.
-export const metadata: Metadata = {
+// canonical is /vidya-kala with no query: ?view=vidya and ?view=kala are the same document with a
+// different tab open, and indexing them separately would be two URLs for one page.
+export const metadata = pageMetadata({
+  path: "/vidya-kala",
   title: `${hi.Home_v5.S.tabVidyas} · ${hi.Home_v5.S.tabKalas}`,
   description: hi.Home_v5.S.sylLede,
-  alternates: { canonical: "/vidya-kala" },
-  openGraph: { url: "/vidya-kala", title: `${hi.Home_v5.S.tabVidyas} · ${hi.Home_v5.S.tabKalas}`, description: hi.Home_v5.S.sylLede },
-};
+});
 
 export default function VidyaKalaPage() {
   // Both languages are resolved at build time because the language toggle is client-side and must

@@ -35,6 +35,12 @@ export const metadata: Metadata = {
     images: ["/og.jpg"],
   },
   robots: { index: true, follow: true },
+  // Search Console's ownership check, and nothing else — it carries no user data and phones nothing
+  // home. Unset in development, where the tag would be meaningless; no analytics script is loaded
+  // anywhere on this site, deliberately.
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 // Both languages are served from one URL by a client toggle, so the graph carries the Hindi name

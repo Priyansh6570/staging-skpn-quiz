@@ -127,18 +127,18 @@ export const en = {
         "ज्योतिष"
       ],
       [
-        "कल्प",
-        "कर्मकांड",
-        "Kalpa",
-        "Ritual and procedure",
-        "कल्प"
-      ],
-      [
         "धर्म शास्त्र",
         "कानून/नीति",
         "Dharmashastra",
         "Law, ethics and conduct",
         "धर्म शास्त्र"
+      ],
+      [
+        "कल्प",
+        "कर्मकांड",
+        "Kalpa",
+        "Ritual and procedure",
+        "कल्प"
       ],
       [
         "पुराण",
@@ -403,9 +403,9 @@ export const en = {
       ],
       [
         "तक्षकर्म",
-        "नक्काशी का शिल्प",
+        null,
         "Takshakarma",
-        "The craft of carving",
+        null,
         "तक्षकर्म"
       ],
       [
@@ -494,16 +494,16 @@ export const en = {
       ],
       [
         "पुष्पशकटिका",
-        "फूलों को गूँथ कर या यष्टियों में लगाकर शकट छकड़ा, रथ आदि वाहनों को यथा आकार सजाना",
+        null,
         "Pushpa-shakatika",
-        "Decorating carts and vehicles with flowers",
+        null,
         "पुष्पशकटिका"
       ],
       [
         "निमित्त ज्ञान",
         "शकुन-अपशकुन का ज्ञान",
         "Nimitta-jnana",
-        "Knowledge of omens",
+        null,
         "निमित्त ज्ञान"
       ],
       [
@@ -538,14 +538,14 @@ export const en = {
         "अभिधानकोष",
         "शब्दकोश",
         "Abhidhana-kosha",
-        "Lexicography",
+        "Lexicon and metre",
         "अभिधानकोष"
       ],
       [
         "छन्दोज्ञान",
         "छंदों का ज्ञान",
         "Chhando-jnana",
-        "Knowledge of prosody",
+        null,
         "छन्दोज्ञान"
       ],
       [
@@ -606,16 +606,16 @@ export const en = {
       ],
       [
         "व्यायामिकी",
-        "शारीरिक और मानसिक उन्नति",
+        null,
         "Vyayamiki",
-        "Physical and mental development",
+        null,
         "व्यायामिकी"
       ]
     ],
     "S": {
       "org": "Shri Krishna Pathey Nyas, Bhopal",
       "heroTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Yojana",
-      "heroDate": "5 August 2026",
+      "heroDate": "10 August 2026",
       "heroLede": "A free competition on the 14 Vidyas, the 64 Kalas and the Indian knowledge tradition.",
       "ctaPrimaryOut": "Register now",
       "ctaTake": "Take part",
@@ -669,13 +669,13 @@ export const en = {
       ],
       "dates": [
         {
-          "when": "5 August 2026",
+          "when": "10 August 2026",
           "what": "Competition opens",
           "note": "Competition opens"
         },
         {
-          "when": "4 September 2026",
-          "what": "Shri Krishna Janmashtami",
+          "when": "30 September 2026",
+          "what": "Last date for entries",
           "note": "Last date for entries"
         },
         {
@@ -686,7 +686,7 @@ export const en = {
       ],
       "closeTitle": "Enter the competition",
       "closeBody": "Registration takes a few minutes.",
-      "heroDateRange": "5 August 2026 to Shri Krishna Janmashtami, 4 September",
+      "heroDateRange": "10 August 2026 to 30 September 2026",
       "factTimeValue": "10 minutes",
       "factTimeLabel": "time"
     },
@@ -815,7 +815,7 @@ export const en = {
       "title": "Sign in",
       "lede": "Enter the same mobile number you registered with.",
       "asideOrg": "Shri Krishna Pathey Nyas, Bhopal",
-      "asideKicker": "5 August 2026",
+      "asideKicker": "10 August 2026",
       "asideTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita",
       "slides": [
         {
@@ -887,13 +887,13 @@ export const en = {
       "datesTitle": "Dates",
       "dates": [
         {
-          "when": "5 August 2026",
+          "when": "10 August 2026",
           "what": "Competition opens",
           "note": "Competition opens"
         },
         {
-          "when": "4 September 2026",
-          "what": "Shri Krishna Janmashtami",
+          "when": "30 September 2026",
+          "what": "Last date for entries",
           "note": "Last date for entries"
         },
         {
@@ -1390,7 +1390,7 @@ export const en = {
     "S": {
       "title": "Register for the competition",
       "asideOrg": "Shri Krishna Pathey Nyas, Bhopal",
-      "asideKicker": "5 August 2026 to Shri Krishna Janmashtami, 4 September",
+      "asideKicker": "10 August 2026 to 30 September 2026",
       "asideTitle": "Bhagwan Shri Krishna Medhavi Chhatravritti Yojana",
       "slides": [
         {

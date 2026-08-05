@@ -8,6 +8,9 @@
  * one thing this file cannot verify about itself.
  */
 
+import { en } from "./en";
+import { hi } from "./hi";
+
 export interface CustomStrings {
   /** The floating notice, the only place the closed state is stated in words. */
   competitionNoticeBanner: string;
@@ -82,8 +85,9 @@ export interface CustomStrings {
    * label on those pages is reused from lib/i18n. Supply Hindi here before launch.
    */
   vidyaKala: {
-    /** TODO(hi): search field label over the 64 kalas. */
-    searchLabel: string;
+    /** Search field placeholders, one per tab. Composed — see SEARCH_HI below. */
+    searchKalas: string;
+    searchVidyas: string;
     /** Supplied by the client in the change request: "विस्तार से देखें" / "Browse". */
     browseAll: string;
     /** Composed from Home_v5.S.tabVidyas + the conjunction + tabKalas — never retyped. */
@@ -160,10 +164,41 @@ const OTP_HI: CustomStrings["otp"] = {
   verified: OTP_EN.verified,
 };
 
+/**
+ * The closed state states the opening date now that it is fixed, instead of promising an
+ * announcement. None of the three strings below is authored: the frame is this file's own pending
+ * sentence with the word standing in for the date swapped out, and every date comes from the
+ * export. That is why the pending sentences are kept — they are the source of their replacements.
+ */
+const HI_PENDING = "पंजीयन शीघ्र प्रारंभ होगा · तिथि शीघ्र घोषित की जाएगी";
+const EN_PENDING = "Registration opens shortly · Date to be announced";
+
+const START_HI = hi.Home_v5.S.dates[0].when;
+const START_EN = en.Home_v5.S.dates[0].when;
+/** The joiner the date range already puts between its two dates. */
+const FROM_HI = hi.Home_v5.S.heroDateRange.slice(START_HI.length).trim().split(" ")[0];
+
+/** Second word out, opening date and joiner in, rest of the sentence unchanged. */
+const hiOpens = (() => {
+  const w = HI_PENDING.split(" · ")[0].split(" ");
+  return [w[0], START_HI, FROM_HI, ...w.slice(2)].join(" ");
+})();
+
+/** English drops the same word off the end and takes the date in its place. */
+const enOpens = `${EN_PENDING.split(" · ")[0].split(" ").slice(0, -1).join(" ")} ${START_EN}`;
+
+/**
+ * The two search placeholders. The oblique forms of both counts and the postposition between them
+ * come out of the About objective that already carries all three in a row; the verb is the register
+ * form's own placeholder. Composed rather than typed, like countLine above.
+ */
+const [, IN_HI, VIDYAS_HI, KALAS_HI] = hi.About.S.objects[2].match(/(\S+) (14 \S+) \S+ (64 \S+)/) ?? [];
+const SEARCH_HI = hi.Register.S.searchPlaceholder;
+
 export const customHi: CustomStrings = {
-  competitionNoticeBanner: "भगवान श्रीकृष्ण मेधावी छात्रवृत्ति प्रतियोगिता की तिथि शीघ्र घोषित की जाएगी",
-  competitionPendingNotice: "पंजीयन शीघ्र प्रारंभ होगा · तिथि शीघ्र घोषित की जाएगी",
-  competitionPendingDate: "तिथि शीघ्र घोषित की जाएगी",
+  competitionNoticeBanner: hiOpens,
+  competitionPendingNotice: `${hiOpens} · ${hi.Home_v5.S.heroDateRange}`,
+  competitionPendingDate: hi.Home_v5.S.heroDateRange,
   home: {
     perStudent: "प्रति छात्र छात्रवृत्ति",
   },
@@ -201,7 +236,8 @@ export const customHi: CustomStrings = {
   },
   otp: OTP_HI,
   vidyaKala: {
-    searchLabel: "Search the 64 Kalas",
+    searchKalas: `${KALAS_HI} ${IN_HI} ${SEARCH_HI}`,
+    searchVidyas: `${VIDYAS_HI} ${IN_HI} ${SEARCH_HI}`,
     browseAll: "विस्तार से देखें",
     countLine: "14 विद्याएँ और 64 कलाएँ",
     hindiOnly: "Hindi only",
@@ -214,10 +250,9 @@ export const customHi: CustomStrings = {
 };
 
 export const customEn: CustomStrings = {
-  competitionNoticeBanner:
-    "The date of the Bhagwan Shri Krishna Medhavi Chhatravritti Pratiyogita will be announced shortly",
-  competitionPendingNotice: "Registration opens shortly · Date to be announced",
-  competitionPendingDate: "Date to be announced",
+  competitionNoticeBanner: enOpens,
+  competitionPendingNotice: `${enOpens} · ${en.Home_v5.S.heroDateRange}`,
+  competitionPendingDate: en.Home_v5.S.heroDateRange,
   home: {
     perStudent: "Scholarship per student",
   },
@@ -255,7 +290,8 @@ export const customEn: CustomStrings = {
   },
   otp: OTP_EN,
   vidyaKala: {
-    searchLabel: "Search the 64 Kalas",
+    searchKalas: "Search the 64 Kalas",
+    searchVidyas: "Search the 14 Vidyas",
     browseAll: "Browse",
     countLine: "14 Vidyas and 64 Kalas",
     hindiOnly: "Hindi only",

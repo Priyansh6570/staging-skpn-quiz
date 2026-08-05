@@ -62,11 +62,11 @@ export default function HomePage() {
 
   const t = { ...s, ctaPrimary: signedIn ? (hasSat ? s.ctaCert : s.ctaTake) : s.ctaPrimaryOut };
 
-  // heroDateRange is one string, and narrow screens have to break it before the second occasion.
-  // That occasion is the only point inside it that also exists as a string of its own, so the cut
-  // is found rather than spelled out — in either language. The head keeps its trailing space: the
+  // heroDateRange is one string, and narrow screens have to break it before the closing date. That
+  // date is the only point inside it that also exists as a string of its own, so the cut is found
+  // rather than spelled out — in either language. The head keeps its trailing space: the
   // <br> is display:none above 640px, and without the space the two halves would run together.
-  const dateCut = t.heroDateRange.indexOf(s.dates[1].what);
+  const dateCut = t.heroDateRange.indexOf(s.dates[1].when);
   const heroDateHead = t.heroDateRange.slice(0, dateCut);
   const heroDateTail = t.heroDateRange.slice(dateCut);
 
@@ -126,13 +126,12 @@ export default function HomePage() {
 
           <h1 data-reveal style={{ margin: "0", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(32px,5vw,58px)", lineHeight: "1.24", color: "#FFF9EC", maxWidth: "20ch", textWrap: "balance", textShadow: "0 2px 30px rgba(0,0,0,.4)" }}>{t.heroTitle}</h1>
 
-          {competitionOpen ? (
+          {/* The dates are final, so the hero states them whether or not registration is open. */}
           <div data-reveal style={{ display: "flex", alignItems: "center", gap: "14px", flexWrap: "wrap", justifyContent: "center" }}>
             <span style={{ width: "38px", height: "1px", background: "rgba(232,193,115,.7)" }}></span>
             <span style={{ fontFamily: "'Noto Serif Devanagari',serif", fontSize: "clamp(16px,2vw,20px)", lineHeight: "1.6", color: "#F5E5C2" }}>{heroDateHead}<br data-e="datebreak" />{heroDateTail}</span>
             <span style={{ width: "38px", height: "1px", background: "rgba(232,193,115,.7)" }}></span>
           </div>
-          ) : null}
 
           <p data-reveal style={{ margin: "0", maxWidth: "44ch", fontSize: "clamp(16.5px,1.9vw,19px)", lineHeight: "1.85", color: "#E9E4D8" }}>{t.heroLede}</p>
 
@@ -201,8 +200,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* The three-date timeline. No date is announced, so the whole section goes. */}
-      {competitionOpen ? (
+      {/* The three-date timeline. The dates are final, so it shows whether or not registration is
+          open: before the CTAs come back it is the most useful thing on the page. */}
       <section data-e="pad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "88px 30px" }}>
         <ol data-e="datesgrid" style={{ margin: "0", padding: "0", listStyle: "none", display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: "20px" }}>
           {dates.map((d, dIndex) => (
@@ -221,7 +220,6 @@ export default function HomePage() {
           ))}
         </ol>
       </section>
-      ) : null}
 
       {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} hasSat={hasSat} /> : null}
 

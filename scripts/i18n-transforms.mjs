@@ -14,7 +14,25 @@
 
 import { readFileSync } from "node:fs";
 
-const dropYear = (s) => s.replace(/\s*\d{4}\s*$/, "").trim();
+// Client change request: the competition now opens 10 August and closes 30 September. Only the day
+// moves, so the month and year bytes reach hi.ts exactly as they were extracted.
+const START_DAY = "10";
+const END_DAY = "30";
+const setDay = (when, day) => when.replace(/^\d+/, day);
+
+/**
+ * Moves the two competition dates and drops the festival name off the closing card: 30 September is
+ * not Janmashtami. The card's own note already names what the date is, so `what` takes the note's
+ * words rather than new ones — both marketing pages print `what` only where it differs from `note`.
+ */
+function moveDates(dates) {
+  if (!Array.isArray(dates) || dates.length < 2) return dates;
+  const out = dates.map((d) => ({ ...d }));
+  out[0].when = setDay(out[0].when, START_DAY);
+  out[1].when = setDay(out[1].when, END_DAY);
+  out[1].what = out[1].note;
+  return out;
+}
 
 // The client replaced the rules wholesale and supplied them as a text file. It is read, never
 // re-typed: a heading line opens a section, "N<tab>text" lines are its points, and the two title
@@ -114,18 +132,20 @@ export function applyTransforms(tree, lang) {
   const home = next.Home_v5?.S;
   if (home) {
     home.sylLede = addVirtue(home.sylLede, lang);
-    // The range opens on the competition's own date and closes on the second occasion. It no longer
-    // borrows a festival name off heroDate: the competition opens 5 August and Guru Purnima is
-    // 29 July, so naming the festival here would date the range to the wrong day.
-    const start = home.dates[0].when;                                 // "5 अगस्त 2026"
-    const end = dropYear(home.dates[1].when);                         // "4 सितम्बर"
+    home.dates = moveDates(home.dates);
+    home.heroDate = home.dates[0].when;
+
+    // The range runs from the competition's own start to its close, both dates carried whole. It
+    // names no occasion: the close is no longer Janmashtami, and the open never was Guru Purnima.
+    const start = home.dates[0].when;
+    const end = home.dates[1].when;
     const seTak = lang === "hi"
       ? { se: "से", tak: (next.Register?.S?.categories?.[0]?.who ?? "").match(/तक/)?.[0] ?? "तक" }
       : { se: "to", tak: "" };
 
     home.heroDateRange = lang === "hi"
-      ? `${start} ${seTak.se} ${home.dates[1].what} ${end} ${seTak.tak}`
-      : `${start} to ${home.dates[1].what}, ${end}`;
+      ? `${start} ${seTak.se} ${end} ${seTak.tak}`
+      : `${start} to ${end}`;
 
     // Fourth stat card: "10 मिनट" over "समय".
     const minutes = next.Pratiyogita?.S?.format?.[1];
@@ -146,6 +166,7 @@ export function applyTransforms(tree, lang) {
 
   const prat = next.Pratiyogita?.S;
   if (prat) {
+    prat.dates = moveDates(prat.dates);
     prat.categories = movePolytechnic(prat.categories, lang);
     // "30" + "प्रश्न, ..." -> "30 प्रश्न" over the remainder.
     const first = prat.format?.[0];
@@ -198,6 +219,10 @@ export function applyTransforms(tree, lang) {
     reg.asideKicker = home.heroDateRange;
     reg.asideTitle = home.heroTitle;
   }
+
+  // The login aside carries the opening date on its own.
+  const login = next.Login?.S;
+  if (login && home) login.asideKicker = home.dates[0].when;
 
   // The date-of-birth wheel carries the export's abbreviated Hindi months. The client wants them
   // written out, and the full twelve are already in the export: the quiz result date formatter

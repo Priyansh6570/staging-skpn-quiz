@@ -132,8 +132,7 @@ export default function PratiyogitaPage() {
         </div>
       </section>
 
-      {/* The तिथियाँ timeline. No date is announced, so the whole section goes. */}
-      {competitionOpen ? (
+      {/* The तिथियाँ timeline. The dates are final, so it shows whether or not registration is open. */}
       <section data-e="pad section" style={{ maxWidth: "1220px", margin: "0 auto", padding: "80px 30px" }}>
         <h2 data-reveal style={{ margin: "0 0 34px", fontFamily: "'Noto Serif Devanagari',serif", fontWeight: "600", fontSize: "clamp(24px,3.2vw,32px)", lineHeight: "1.35", color: "#14203E", textAlign: "center" }}>{t.datesTitle}</h2>
         <ol style={{ margin: "0 auto", padding: "0", maxWidth: "420px", listStyle: "none", display: "flex", flexDirection: "column" }}>
@@ -148,7 +147,6 @@ export default function PratiyogitaPage() {
           ))}
         </ol>
       </section>
-      ) : null}
 
       {competitionOpen ? <CtaBox lang={lang} signedIn={signedIn} hasSat={hasSat} /> : null}
 
